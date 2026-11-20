@@ -3,6 +3,19 @@
 **Repository:** akhmadafnan/iches-2027  
 **Status sekarang:** planning-only. **No Laravel application source yet.** Do not begin implementation until the owner instructs GO CODING for a named task or scope.
 
+## Official technical sources — MUST CONSULT
+
+Use these **two upstream GitHub repositories as primary technical references** whenever installing, changing, or reviewing Laravel/Livewire code:
+
+1. **Laravel 13 documentation:** [laravel/docs, branch `13.x`](https://github.com/laravel/docs/tree/13.x) — especially [Starter Kits](https://github.com/laravel/docs/blob/13.x/starter-kits.md), [Directory Structure](https://github.com/laravel/docs/blob/13.x/structure.md), [Release Notes](https://github.com/laravel/docs/blob/13.x/releases.md), plus relevant domain chapters.
+2. **Official Laravel Livewire Starter Kit:** [laravel/livewire-starter-kit, branch `main`](https://github.com/laravel/livewire-starter-kit) — examine its [composer.json](https://github.com/laravel/livewire-starter-kit/blob/main/composer.json), source organization, routes, Fortify registration actions and Blade/Livewire templates.
+
+**Verified reference snapshot (20 November 2026):** upstream kit specifies `laravel/framework: ^13.17`, `livewire/livewire: ^4.1`, `livewire/flux: ^2.13.1`, `laravel/fortify: ^1.37.2`, and `php: ^8.3`; the readme also identifies Tailwind and TypeScript. Verify fresh upstream/current installed versions **at execution time**, not from remembered versions alone. Laravel docs' default branch is `13.x` and the kit's default is `main`.
+
+**Priority when technical guidance disagrees:** actual locked installed dependencies and source > matching official upstream Laravel 13 / Starter Kit docs for that version > repo project engineering standards > older snippets/agent assumptions. Do not replace built-in Fortify, starter-kit auth, or the stock Blade/Livewire structure without a concrete task justification. Add class-based Livewire components for ICHES business workflows, but preserve official scaffold patterns where they already work.
+
+These repositories are **reference sources, not code to copy wholesale into this repo**. The ICHES PRD/TASKS remain authoritative for PRODUCT BEHAVIOR. No coding authorized by this section.
+
 ## Read order (minimal token use)
 
 1. [docs/TASKS.md](docs/TASKS.md) — task ID, dependency, acceptance.
