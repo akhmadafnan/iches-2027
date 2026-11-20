@@ -1,7 +1,7 @@
 # AGENTS.md — ICHES 2027 Coding Agent Instructions
 
 **Repository:** akhmadafnan/iches-2027  
-**Status sekarang (20 Nov 2026):** FND-001, FND-002, FND-003 completed and tested locally in `D:\PINJAM-AFNAN\iches-2027`. Herd Secure Site is `https://iches-2027.test`; Fortify authentication, ICHES registration, and personal profile (name/email/institution/country) are implemented. Four development-only demo accounts are seeded with `user`, `reviewer`, `committee`, `admin` role values; authorization, assignment and role navigation (FND-004/FND-005), conference submissions and other modules remain TODO. Seeder may run only in local/testing; never reuse the `password` demo credential in production. Do not implement additional modules without the owner's instruction for a named task or scope.
+**Status sekarang (20 Nov 2026):** FND-001 through FND-004 completed and tested locally in `D:\PINJAM-AFNAN\iches-2027` at Herd Secure Site `https://iches-2027.test`. Fortify login, registration, profile and role-based authorization are implemented. Four demo accounts use `user`, `reviewer`, `committee`, `admin`; Admin's `/admin/users` Livewire page changes other users' roles and explicit global Finance/Academic Authority assignments. Moderator/CoHost PIC authorization is **resource-scoped**, not globally assignable until sessions/institutions exist. Reviewer/Committee workspaces are authorized placeholders, NOT functional review/QR modules. FND-005 contextual dashboards and further academic modules remain TODO. No new modules without owner's instruction; never use seeded `password` credentials in production.
 
 ## Official technical sources — MUST CONSULT
 

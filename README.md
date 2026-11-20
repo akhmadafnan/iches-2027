@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **These business modules are not implemented yet.**
 
-> **Current status (20 November 2026): FND-001, FND-002 and FND-003 DONE.** Official Laravel 13/Livewire 4 foundation, Herd HTTPS, Fortify authentication, ICHES registration and personal profile editing are implemented and tested. Four development-only role demo accounts are seeded. **Role-based authorization and assignments (FND-004), personalized dashboard, submissions, QR and other program workflows remain TODO.** Public landing page remains the unmodified starter-kit placeholder. No production URL is known.
+> **Current status (20 November 2026): FND-001 through FND-004 DONE.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication, ICHES registration/profile, and server-enforced roles and staff assignments are implemented. Four development-only role demo accounts are seeded. **Contextual dashboards (FND-005), abstract/review workflows, QR and other program modules remain TODO.** Public landing page remains the starter-kit placeholder. No production URL is known.
 
 ## Start here
 
@@ -56,11 +56,22 @@ Run `php artisan db:seed` in the `local` environment to create the following *ve
 | Committee | `committee@iches.id` | `password` |
 | Admin | `admin@iches.id` | `password` |
 
-**IMPORTANT:** These are disposable local/testing credentials only; never use them on an internet-accessible deployment. All new public registrations default to `user` regardless of submitted fields. The stored role column/enum is groundwork for **FND-004**; Admin/Reviewer/Committee access-control policies and staff assignments are **not yet implemented**, so role-labeled accounts do not imply working role-specific menus.
+**IMPORTANT:** These are disposable local/testing credentials only; never use them on an internet-accessible deployment. All new public registrations default to `user` regardless of submitted fields. Role/Gate/Policy checks are now active (FND-004). Admin can manage other users' roles and the global Finance/Academic Authority assignments. Specific Reviewer and Committee routes exist only as access-verified placeholders; the actual academic review and QR scan modules will be built in their respective tasks.
 
 **FND-003 profile:** the authenticated user's `/settings/profile` page can edit name, email, institution and country, with server validation and email re-verification on address change. Role and initial intention are not editable from this form. Profile photo crop is a separate planned task (ID-001), not part of FND-003.
 
 **Verification (20 Nov 2026):** four demo roles seeded on MySQL, second seed run succeeded without duplicates; **49 tests / 165 assertions** passed; Pint **51 files** and PHPStan no errors; dedicated migration marked `Ran`.
+
+## UAT FND-004 — Roles & access (local only)
+
+1. Open `https://iches-2027.test/login`. Log in with the development accounts listed above (password `password`).
+2. As **Admin**, open `https://iches-2027.test/admin/users`. The Users & Access screen permits changing **other users'** primary roles. An Admin cannot edit their own role.
+3. As **Reviewer**, `/reviewer/workspace` must load; `/admin/users` and `/committee/workspace` must return **403 Forbidden**.
+4. As **Committee**, `/committee/workspace` must load; Admin/Reviewer routes must return 403.
+5. As **User**, all three special role routes must return 403. The personal profile settings remain available.
+6. In Admin → Users & Access, grant a **Committee** user Finance or Academic Authority, then save. Such duty **does not** follow from being Admin/Committee by default; only an explicit assignment grants it. Clear the checkbox before changing the primary role to User. Moderator/Co-Host PIC resource assignments are deferred until sessions/institutions exist.
+
+**IMPORTANT:** This phase verifies permissions, not full reviewer/admin/QR workflows or role-specific dashboards. FND-005 will provide contextual dashboards and navigation.
 
 ## Core application areas
 

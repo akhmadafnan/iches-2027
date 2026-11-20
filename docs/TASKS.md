@@ -1,6 +1,6 @@
 # IMPLEMENTATION TASK BACKLOG — ICHES 2027
 
-**Version:** 1.0 | **Date:** 20 November 2026 | **Status:** FND-001, FND-002 and FND-003 DONE; other tasks TODO
+**Version:** 1.0 | **Date:** 20 November 2026 | **Status:** FND-001 through FND-004 DONE; other tasks TODO
 **Source:** [PRD](PRD.md) + [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md).  
 **Priority:** P0 = critical flow, P1 = essential follow-up, P2 = polish/post-event.  
 **Never treat TODO as implemented.** Code changes begin only when the owner instructs us to start coding.
@@ -21,7 +21,7 @@
 | **FND-001 [DONE]** Laravel + Livewire Starter Kit installation | ACC-01 | — | Laravel 13.43, Livewire 4.4; MySQL `iches_2027` migrated; Herd HTTP 200/302; PHP 38 tests/97 assertions PASS, Pint 45 PASS, PHPStan PASS, npm build PASS (20 Nov 2026) |
 | **FND-002 [DONE]** Fortify register/login/reset/verification | ACC-01, ACC-02 | FND-001 | HTTPS site live; registration saves institution/country/intention; no self-assigned admin role; six registration tests PASS; full suite 42 tests/122 assertions, Pint/PHPStan PASS (20 Nov 2026). Contextual CTA remains FND-005. |
 | **FND-003 [DONE]** Profile, institution and country | ACC-03, ACC-04 | FND-002 | Authenticated `/settings/profile` edits name, email, institution and country; role/intention untouched, validation + owner-scoped tests PASS (20 Nov 2026). Photo crop remains ID-001. |
-| FND-004 Simple permissions and assignment [TODO] | ACC-06 | FND-002 | Role enum/column + demo records exist as preparation; **authorization/assignments and role-based server boundaries not yet implemented**. |
+| **FND-004 [DONE]** Simple permissions and assignment | ACC-06 | FND-002 | Roles User/Reviewer/Committee/Admin enforced by Gates/Policies and 403 route guards; Admin Livewire `/admin/users` edits others' roles & Finance/Academic Authority assignments; Moderator/CoHost PIC gates are resource-scoped; test suite verifies unauthorized access. Completed 20 Nov 2026. |
 | FND-005 Minimal dashboards and navigation | ACC-03 | FND-004 | Initial CTA based on intention; role menus scoped |
 | FND-006 Five program records + event settings | PG-01 | FND-001 | Actual data from TOR seeded and Admin-readable |
 | ACAD-001 Conference tracks CRUD | AC-01 | FND-004 | 8 TOR tracks seeded, selectable in form |
@@ -44,6 +44,8 @@
 **DEV-001 / supporting seeder evidence (20 Nov 2026):** added `UserRole` enum and default `user` database column, with **role excluded from User's mass-assignable fields**. `DatabaseSeeder` invokes a local/testing-only demo seeder with `user@iches.id`, `reviewer@iches.id`, `committee@iches.id`, and `admin@iches.id`; all have hashed development password `password` and verified email. Rerun is idempotent, existing accounts are not overwritten. The role field is only preparatory data for FND-004, **not** finished permissions.
 
 **FND-003 evidence (20 Nov 2026):** extended official class-backed Livewire profile component and shared profile validation rules to persist institution/country for the authenticated user. Factory defaults and authorization/validation regression tests added; **49 tests / 165 assertions PASS, Pint 51 files PASS, PHPStan PASS**. No public/frontend layout was changed.
+
+**FND-004 evidence (20 Nov 2026):** Added `UserPolicy`, Laravel authorization Gates, a `staff_assignments` table with nonnullable resource scope+unique constraint, scoped permission checks, an Admin-only class-based Livewire Users & Access page, UpdateUserAccess Action (transaction/lock), and role-restricted Reviewer/Committee placeholder workspaces. FND-005 remains responsible for fully contextual dashboards/navigation; academic review/QR features remain TODO. UAT: login as local-only accounts, confirm `/admin/users`, `/reviewer/workspace`, `/committee/workspace` enforce 200 for the matching role and 403 for others. Finance/Academic privileges require explicit global assignment even for Admin; Moderator/CoHost PIC require exact resource scope.
 
 ## C. P1 — Academic Completion, Co-Host & Finance
 

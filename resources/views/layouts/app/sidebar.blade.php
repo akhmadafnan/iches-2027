@@ -15,6 +15,21 @@
                     <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
+                    @can('manage-users')
+                        <flux:sidebar.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>
+                            {{ __('Users & Access') }}
+                        </flux:sidebar.item>
+                    @endcan
+                    @can('review-papers')
+                        <flux:sidebar.item icon="book-open" :href="route('reviewer.workspace')" :current="request()->routeIs('reviewer.workspace')" wire:navigate>
+                            {{ __('Reviewer Workspace') }}
+                        </flux:sidebar.item>
+                    @endcan
+                    @can('scan-services')
+                        <flux:sidebar.item icon="qr-code" :href="route('committee.workspace')" :current="request()->routeIs('committee.workspace')" wire:navigate>
+                            {{ __('Committee Workspace') }}
+                        </flux:sidebar.item>
+                    @endcan
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\RegistrationIntention;
+use App\Enums\StaffDuty;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -54,6 +56,38 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'role' => UserRole::class,
             'password' => 'hashed',
         ];
+    }
+
+    /** @return HasMany<StaffAssignment, $this> */
+    public function staffAssignments(): HasMany
+    {
+        return $this->hasMany(StaffAssignment::class);
+    }
+
+    public function hasGlobalDuty(StaffDuty $duty): bool
+    {
+        if ($duty->requiresScope()) {
+            return false;
+        }
+
+        return $this->staffAssignments()
+            ->where('duty', $duty->value)
+            ->where('scope_type', 'global')
+            ->where('scope_id', 0)
+            ->exists();
+    }
+
+    public function hasScopedDuty(StaffDuty $duty, string $scopeType, int $scopeId): bool
+    {
+        if (! $duty->requiresScope() || $scopeId < 1) {
+            return false;
+        }
+
+        return $this->staffAssignments()
+            ->where('duty', $duty->value)
+            ->where('scope_type', $scopeType)
+            ->where('scope_id', $scopeId)
+            ->exists();
     }
 
     /**
