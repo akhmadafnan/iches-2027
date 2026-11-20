@@ -4,11 +4,17 @@
 **Wajib untuk seluruh code baru.** Aplikasi belum dibuat. Gunakan versi paket aktual pada saat bootstrap, bukan asumsi lama.
 
 **Referensi resmi:**
-- [Laravel 13 Starter Kits](https://laravel.com/framework/docs/13.x/starter-kits) — official Livewire Starter Kit.
-- [Laravel 13 Documentation](https://laravel.com/framework/docs/13.x) — ORM, Policies, authorization, validation, transactions, queues, notifications.
+- [Laravel 13 Starter Kits — source 13.x](https://github.com/laravel/docs/blob/13.x/starter-kits.md) — official Livewire Starter Kit.
+- [Laravel 13 Documentation — official source 13.x](https://github.com/laravel/docs/tree/13.x) — ORM, Policies, authorization, validation, transactions, queues, notifications.
 - [Livewire 4 Components](https://livewire.laravel.com/docs/4.x/components) — class-based components tetap didukung.
 - [Livewire 4 Validation](https://livewire.laravel.com/docs/4.x/validation).
 - [PHP-FIG PSR-12](https://www.php-fig.org/psr/psr-12/); gunakan Laravel Pint sebagai formatter.
+
+**Dua repository rujukan teknis WAJIB (disepakati pemilik proyek 20 November 2026):**
+- **[laravel/docs — 13.x](https://github.com/laravel/docs/tree/13.x)**: sumber dokumentasi Laravel 13; branch resminya `13.x`, termasuk [releases.md](https://github.com/laravel/docs/blob/13.x/releases.md) dan [structure.md](https://github.com/laravel/docs/blob/13.x/structure.md).
+- **[laravel/livewire-starter-kit — main](https://github.com/laravel/livewire-starter-kit)**: source of truth untuk struktur starter kit, komponen, Fortify dan dependency; [composer.json](https://github.com/laravel/livewire-starter-kit/blob/main/composer.json) pada pemeriksaan 20 Nov 2026 menetapkan PHP `^8.3`, Laravel `^13.17`, Livewire `^4.1`, Flux `^2.13.1`, Fortify `^1.37.2`.
+
+**Panduan konflik versi:** ikuti dependency **yang benar-benar terpasang** pada project dan source dokumentasi upstream yang cocok; periksa ulang upstream sebelum coding. Jangan menerapkan API Livewire 3 atau tutorial Laravel lama tanpa verifikasi. Starter Kit nyata memiliki actions Fortify, pages Blade/Livewire, layout dan file `routes/web.php`; **extend bawaan, jangan bangun auth sendiri**. Kode bisnis ICHES diutamakan class-based/OOP sedangkan scaffolding bawaan tidak wajib direstrukturisasi hanya demi gaya. PRD tetap mengatur keputusan produk, repo upstream mengatur penggunaan framework.
 
 ## 1. Baseline stack
 
