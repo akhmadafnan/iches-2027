@@ -1,7 +1,7 @@
 # AGENTS.md — ICHES 2027 Coding Agent Instructions
 
 **Repository:** akhmadafnan/iches-2027  
-**Status sekarang (20 Nov 2026):** FND-001 Laravel/Livewire Starter Kit foundation is installed and locally verified in `D:\PINJAM-AFNAN\iches-2027`. Business modules remain TODO. Do not implement additional modules without the owner's instruction for a named task or scope.
+**Status sekarang (20 Nov 2026):** FND-001 and FND-002 completed and tested locally in `D:\PINJAM-AFNAN\iches-2027`. Herd Secure Site is `https://iches-2027.test`; Fortify authentication plus ICHES registration fields/participation intention are implemented. Role assignment, profile editing, conditional dashboard CTA, conference submissions and other modules remain TODO. Do not implement additional modules without the owner's instruction for a named task or scope.
 
 ## Official technical sources — MUST CONSULT
 

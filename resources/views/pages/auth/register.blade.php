@@ -30,6 +30,43 @@
                 placeholder="email@example.com"
             />
 
+            <!-- Institution -->
+            <flux:input
+                name="institution"
+                :label="__('Institution / Affiliation')"
+                :value="old('institution')"
+                type="text"
+                required
+                autocomplete="organization"
+                :placeholder="__('Your university or institution')"
+            />
+
+            <!-- Country -->
+            <flux:input
+                name="country"
+                :label="__('Country')"
+                :value="old('country')"
+                type="text"
+                required
+                autocomplete="country-name"
+                :placeholder="__('Country of affiliation')"
+            />
+
+            <!-- Starting intention (never a system role) -->
+            <flux:select
+                name="registration_intention"
+                :label="__('I want to')"
+                :value="old('registration_intention')"
+                :placeholder="__('Choose a starting activity')"
+                required
+            >
+                @foreach (\App\Enums\RegistrationIntention::cases() as $intention)
+                    <flux:select.option :value="$intention->value">
+                        {{ $intention->label() }}
+                    </flux:select.option>
+                @endforeach
+            </flux:select>
+
             <!-- Password -->
             <flux:input
                 name="password"
