@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **These business modules are not implemented yet.**
 
-> **Current status (20 November 2026): FND-001 and FND-002 DONE.** Official Laravel 13/Livewire 4 foundation, secured Laravel Herd local site, Fortify login/password reset/email verification, and ICHES registration fields (institution, country, intention) are implemented and tested. ICHES roles, profile editor, personalized dashboard, submissions, QR, and other program workflows remain TODO. Public landing page remains the unmodified starter-kit placeholder. No production URL is known.
+> **Current status (20 November 2026): FND-001, FND-002 and FND-003 DONE.** Official Laravel 13/Livewire 4 foundation, Herd HTTPS, Fortify authentication, ICHES registration and personal profile editing are implemented and tested. Four development-only role demo accounts are seeded. **Role-based authorization and assignments (FND-004), personalized dashboard, submissions, QR and other program workflows remain TODO.** Public landing page remains the unmodified starter-kit placeholder. No production URL is known.
 
 ## Start here
 
@@ -32,6 +32,7 @@ composer install
 npm install
 php artisan key:generate
 php artisan migrate
+php artisan db:seed # local/testing only; creates demo accounts
 npm run build
 php artisan test --compact
 composer run lint:check
@@ -43,6 +44,23 @@ Do not commit `.env`, passwords, keys, personal data, or vendor/node_modules. `c
 **Verified FND-001:** five default migrations on isolated MySQL `iches_2027`; 38 PHP tests / 97 assertions, Pint 45 files, PHPStan, npm build PASS.
 
 **Verified Herd HTTPS + FND-002 (20 Nov 2026):** Secure Site generated a local certificate; HTTP redirects to HTTPS (301); HTTPS `/`, `/login`, `/register`, `/forgot-password` return 200; `.env` `APP_URL` uses HTTPS locally. ICHES registration stores institution, country and typed participation intention, without accepting privileged role selection; Fortify login, reset password, email verification and 2FA remain native. One additional migration ran without resetting data. All **42 PHP tests / 122 assertions** PASS; Pint 47 files and PHPStan PASS. Registration-intention dashboard CTA and profile editing remain future tasks. Windows curl certificate-revocation checking required `--ssl-no-revoke` for the local certificate check (no `-k` bypass).
+
+## Local-only seeded demo accounts (NOT FOR PRODUCTION)
+
+Run `php artisan db:seed` in the `local` environment to create the following *verified* demo identities. The seeder is **guarded against production** and is idempotent; rerunning does not reset existing passwords or promote colliding accounts.
+
+| Base role | Email | Development password |
+|---|---|---|
+| User | `user@iches.id` | `password` |
+| Reviewer | `reviewer@iches.id` | `password` |
+| Committee | `committee@iches.id` | `password` |
+| Admin | `admin@iches.id` | `password` |
+
+**IMPORTANT:** These are disposable local/testing credentials only; never use them on an internet-accessible deployment. All new public registrations default to `user` regardless of submitted fields. The stored role column/enum is groundwork for **FND-004**; Admin/Reviewer/Committee access-control policies and staff assignments are **not yet implemented**, so role-labeled accounts do not imply working role-specific menus.
+
+**FND-003 profile:** the authenticated user's `/settings/profile` page can edit name, email, institution and country, with server validation and email re-verification on address change. Role and initial intention are not editable from this form. Profile photo crop is a separate planned task (ID-001), not part of FND-003.
+
+**Verification (20 Nov 2026):** four demo roles seeded on MySQL, second seed run succeeded without duplicates; **49 tests / 165 assertions** passed; Pint **51 files** and PHPStan no errors; dedicated migration marked `Ran`.
 
 ## Core application areas
 

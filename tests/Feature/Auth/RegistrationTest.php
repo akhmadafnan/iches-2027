@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Enums\RegistrationIntention;
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -85,7 +86,7 @@ class RegistrationTest extends TestCase
 
         $user = User::query()->where('email', 'test@example.com')->firstOrFail();
 
-        $this->assertNotSame('admin', $user->getAttribute('role'));
+        $this->assertSame(UserRole::User, $user->role);
         $this->assertNotSame(true, $user->getAttribute('is_admin'));
         $this->assertSame(RegistrationIntention::SubmitPaper, $user->registration_intention);
     }

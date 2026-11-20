@@ -19,6 +19,8 @@ trait ProfileValidationRules
         return [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
+            'institution' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:100'],
         ];
     }
 

@@ -23,8 +23,6 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
-            'institution' => ['required', 'string', 'max:255'],
-            'country' => ['required', 'string', 'max:100'],
             'registration_intention' => ['required', Rule::enum(RegistrationIntention::class)],
             'password' => $this->passwordRules(),
         ])->validate();
