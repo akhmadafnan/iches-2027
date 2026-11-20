@@ -1,7 +1,7 @@
 # ENGINEERING STANDARDS — OOP PHP, LARAVEL & LIVEWIRE
 
 **Versi:** 1.0 | **Tanggal:** 20 November 2026  
-**Wajib untuk seluruh code baru.** Aplikasi belum dibuat. Gunakan versi paket aktual pada saat bootstrap, bukan asumsi lama.
+**Wajib untuk seluruh code baru.** Fondasi Laravel 13 + Livewire 4 kini sudah terpasang pada proyek. Periksa versi paket aktual sebelum menambah fitur, bukan menggunakan asumsi lama.
 
 **Referensi resmi:**
 - [Laravel 13 Starter Kits — source 13.x](https://github.com/laravel/docs/blob/13.x/starter-kits.md) — official Livewire Starter Kit.
@@ -15,6 +15,8 @@
 - **[laravel/livewire-starter-kit — main](https://github.com/laravel/livewire-starter-kit)**: source of truth untuk struktur starter kit, komponen, Fortify dan dependency; [composer.json](https://github.com/laravel/livewire-starter-kit/blob/main/composer.json) pada pemeriksaan 20 Nov 2026 menetapkan PHP `^8.3`, Laravel `^13.17`, Livewire `^4.1`, Flux `^2.13.1`, Fortify `^1.37.2`.
 
 **Panduan konflik versi:** ikuti dependency **yang benar-benar terpasang** pada project dan source dokumentasi upstream yang cocok; periksa ulang upstream sebelum coding. Jangan menerapkan API Livewire 3 atau tutorial Laravel lama tanpa verifikasi. Starter Kit nyata memiliki actions Fortify, pages Blade/Livewire, layout dan file `routes/web.php`; **extend bawaan, jangan bangun auth sendiri**. Kode bisnis ICHES diutamakan class-based/OOP sedangkan scaffolding bawaan tidak wajib direstrukturisasi hanya demi gaya. PRD tetap mengatur keputusan produk, repo upstream mengatur penggunaan framework.
+
+**Standar visual aplikasi yang telah disetujui (20 November 2026):** gunakan [Flux UI theming resmi](https://fluxui.dev/docs/theming) dengan CSS variables di `resources/css/app.css`: light `--color-accent` dan `--color-accent-content` = `--color-emerald-600`, foreground putih; dark accent emerald-600, content emerald-400, foreground putih. Layout aplikasi privat menggunakan hierarki tipografi jelas, card/panel yang rapi, tabel Flux penuh lebar dengan nomor urut dan pagination status-kiri/actions-kanan, dan modal Flux untuk edit akses. Uji desain melalui render browser desktop/mobile serta targeted Livewire tests. Website publik tetap menunggu pembahasan pemilik proyek.
 
 ## 1. Baseline stack
 

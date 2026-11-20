@@ -5,7 +5,9 @@ namespace App\Livewire\Admin;
 use App\Actions\Access\UpdateUserAccess;
 use App\Enums\StaffDuty;
 use App\Enums\UserRole;
+use App\Models\StaffAssignment;
 use App\Models\User;
+use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -30,6 +32,8 @@ class ManageUsers extends Component
 
     public string $search = '';
 
+    public string $roleFilter = 'all';
+
     public string $role = 'user';
 
     public bool $finance = false;
@@ -42,6 +46,11 @@ class ManageUsers extends Component
     }
 
     public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedRoleFilter(): void
     {
         $this->resetPage();
     }
@@ -95,7 +104,7 @@ class ManageUsers extends Component
 
         $this->editingUserId = null;
         $this->showEditModal = false;
-        session()->flash('access_saved', 'User access updated.');
+        Flux::toast(variant: 'success', text: 'User access updated successfully.');
     }
 
     public function render(): View
@@ -112,10 +121,14 @@ class ManageUsers extends Component
                             ->orWhere('email', 'like', $term);
                     });
                 })
+                ->when($this->roleFilter !== 'all', fn (Builder $query) => $query->where('role', $this->roleFilter))
                 ->orderBy('name')
                 ->orderBy('id')
                 ->paginate(10),
             'roles' => UserRole::cases(),
+            'totalAccounts' => User::query()->count(),
+            'staffAccounts' => User::query()->where('role', '!=', UserRole::User->value)->count(),
+            'delegatedDuties' => StaffAssignment::query()->count(),
         ]);
     }
 }

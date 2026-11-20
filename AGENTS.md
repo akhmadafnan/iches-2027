@@ -26,6 +26,14 @@ These repositories are **reference sources, not code to copy wholesale into this
 
 Do **not** recursively ingest all repository docs, previous repo docs, or irrelevant files for every task.
 
+## ICHES application UI conventions — locked 20 Nov 2026
+
+- Use the **installed Flux UI** for application controls (tables, inputs, selects, buttons, badges, modals, pagination) and Tailwind for page composition. Refer to [official Flux theming](https://fluxui.dev/docs/theming), [table](https://fluxui.dev/components/table) and [modal](https://fluxui.dev/components/modal) docs.
+- The global app theme lives in `resources/css/app.css`: **emerald-600 accent**, emerald-400 accent-content in dark mode, white foreground; preserve these Flux CSS variables unless the owner explicitly requests a different palette.
+- For management indexes, enforce clear heading hierarchy, generous spacing, a full-width responsive table with leftmost sequential **No.**, **Page X of Y** at bottom-left and **Previous / Next** at bottom-right; use a modal for compact edit forms. Avoid flat, cramped, default-looking tables.
+- Test behavior with Livewire/feature tests and **visually inspect actual browser rendering** whenever the environment allows. Do not claim a visual review without a screenshot/browser check.
+- These are **authenticated app UI** conventions only. The **public frontend** remains on HOLD until explicitly discussed.
+
 ## Required implementation stack
 
 - Official Laravel + Livewire Starter Kit, MySQL, Blade/Tailwind and compatible starter-kit UI.

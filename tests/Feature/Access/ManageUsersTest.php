@@ -76,6 +76,29 @@ class ManageUsersTest extends TestCase
             ->assertSee('Page 2 of 3');
     }
 
+    public function test_filtering_by_role_keeps_summary_and_resets_pagination(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        User::factory()->count(12)->create();
+        User::factory()->create(['name' => 'Reviewer Filter Fixture', 'role' => UserRole::Reviewer]);
+        User::factory()->create(['name' => 'Committee Filter Fixture', 'role' => UserRole::Committee]);
+
+        $this->actingAs($admin);
+
+        Livewire::test(ManageUsers::class)
+            ->assertSee('Total accounts')
+            ->assertSee('Staff accounts')
+            ->assertSee('Delegated duties')
+            ->call('nextPage')
+            ->assertSee('Page 2 of 2')
+            ->set('roleFilter', UserRole::Reviewer->value)
+            ->assertSee('Reviewer Filter Fixture')
+            ->assertDontSee('Committee Filter Fixture')
+            ->assertSee('Page 1 of 1')
+            ->set('roleFilter', 'all')
+            ->assertSee('Page 1 of 2');
+    }
+
     public function test_search_filters_users_and_resets_pagination(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);
