@@ -3,9 +3,9 @@
 **The 6th International Conference on Humanity, Education, and Society (ICHES 2027)**  
 Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 2027**
 
-A planned **Laravel + Livewire Starter Kit** application supporting the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, on-site ID Cards, a personal QR, configurable scanner services, hybrid parallel sessions and operations reporting.
+This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **These business modules are not implemented yet.**
 
-> **Current status (20 November 2026): Documentation and product preparation ONLY.** No Laravel app, database migrations, installed starter kit or tested business feature has been created in this repository. Implementation begins on the owner's instruction. No production URL is known.
+> **Current status (20 November 2026): FND-001 FOUNDATION COMPLETE locally.** Laravel 13/Livewire 4, Fortify authentication, MySQL development migrations, asset build, tests and Herd routing verified. ICHES-specific role, submission, QR and program workflows remain TODO. Public frontend is the unmodified starter-kit placeholder—not approved ICHES design. No production URL is known.
 
 ## Start here
 
@@ -18,6 +18,29 @@ A planned **Laravel + Livewire Starter Kit** application supporting the academic
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
 | [Public Frontend — Discussion Pending](docs/PUBLIC-FRONTEND-TBD.md) | Decisions intentionally on hold |
+
+## Local development — FND-001 verified
+
+**Working directory:** `D:\PINJAM-AFNAN\iches-2027` on Windows.
+**Local Herd URL:** `http://iches-2027.test` (only available on the configured development computer).
+**Installed foundation:** PHP 8.4.27, Laravel 13.43.0, Livewire 4.4.8, Flux UI 2.22.0, MySQL 9.7.
+
+For a fresh clone, create `.env` from `.env.example`, configure an **isolated MySQL development database** and credentials, then:
+
+```powershell
+composer install
+npm install
+php artisan key:generate
+php artisan migrate
+npm run build
+php artisan test --compact
+composer run lint:check
+composer run types:check
+```
+
+Do not commit `.env`, passwords, keys, personal data, or vendor/node_modules. `composer.lock` and `package-lock.json` are committed for repeatable installs. The Herd link on this computer is `iches-2027.test`, not an official public website.
+
+**Verified FND-001:** five default migrations on the isolated `iches_2027` MySQL database; 38 PHP tests / 97 assertions passed; Pint checked 45 PHP files; PHPStan passed with 512 MB memory; npm build succeeded; HTTP `/`, `/login`, `/register` returned 200 and protected `/dashboard` returned 302 to login.
 
 ## Core application areas
 
@@ -51,20 +74,9 @@ A planned **Laravel + Livewire Starter Kit** application supporting the academic
 
 Milestones are goals; no functionality is claimed complete simply because it appears in a document.
 
-## Repository layout now
+## Repository layout
 
-    .
-    ├── README.md
-    ├── AGENTS.md
-    ├── MASTER-BLUEPRINT-ICHES-2027.md
-    └── docs/
-        ├── PRD.md
-        ├── TASKS.md
-        ├── WORKING-RULES.md
-        ├── OOP-LARAVEL-LIVEWIRE-STANDARDS.md
-        └── PUBLIC-FRONTEND-TBD.md
-
-**There is no Laravel source tree yet.** Install project source only after GO CODING. Later, application quick-start and test commands should be documented here based on actual installed dependencies and environment—not guessed in advance.
+The project root now contains the **standard Laravel application tree** (`app/`, `bootstrap/`, `config/`, `database/`, `public/`, `resources/`, `routes/`, `storage/`, `tests/`) alongside `artisan`, Composer/npm lock files, the original Blueprint, `README.md`, `AGENTS.md`, and `docs/`. Starter-kit authentication stays intact; build ICHES workflows in later authorized tasks.
 
 ## How AI contributors should work
 

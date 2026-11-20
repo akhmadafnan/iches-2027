@@ -1,7 +1,7 @@
 # AGENTS.md — ICHES 2027 Coding Agent Instructions
 
 **Repository:** akhmadafnan/iches-2027  
-**Status sekarang:** planning-only. **No Laravel application source yet.** Do not begin implementation until the owner instructs GO CODING for a named task or scope.
+**Status sekarang (20 Nov 2026):** FND-001 Laravel/Livewire Starter Kit foundation is installed and locally verified in `D:\PINJAM-AFNAN\iches-2027`. Business modules remain TODO. Do not implement additional modules without the owner's instruction for a named task or scope.
 
 ## Official technical sources — MUST CONSULT
 
