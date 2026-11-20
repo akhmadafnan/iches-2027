@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **These business modules are not implemented yet.**
 
-> **Current status (20 November 2026): FND-001 through FND-004 DONE.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication, ICHES registration/profile, and server-enforced roles and staff assignments are implemented. Four development-only role demo accounts are seeded. **Contextual dashboards (FND-005), abstract/review workflows, QR and other program modules remain TODO.** Public landing page remains the starter-kit placeholder. No production URL is known.
+> **Current status (20 November 2026): FND-001 through FND-005 DONE.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication and profile onboarding, role/assignment controls, and four role-aware dashboards are implemented. Demo accounts are available for local UAT. **Five-program settings (FND-006), academic submission/review, QR and other business workflows remain TODO.** The public landing page still awaits a separate design discussion. No production URL is known.
 
 ## Start here
 
@@ -81,7 +81,19 @@ Four existing `@iches.id` demo accounts are **not** forced into onboarding. Thei
 5. As **User**, all three special role routes must return 403. The personal profile settings remain available.
 6. In Admin → Users & Access, grant a **Committee** user Finance or Academic Authority, then save. Such duty **does not** follow from being Admin/Committee by default; only an explicit assignment grants it. Clear the checkbox before changing the primary role to User. Moderator/Co-Host PIC resource assignments are deferred until sessions/institutions exist.
 
-**IMPORTANT:** This phase verifies permissions, not full reviewer/admin/QR workflows or role-specific dashboards. FND-005 will provide contextual dashboards and navigation.
+**IMPORTANT:** FND-004 validates permissions only. FND-005 adds role-aware dashboards but does not make paper review, QR scanning, program enrollment, or finance workflows functional.
+
+## UAT FND-005 — Dashboard & navigation (local only)
+
+1. Log in to `https://iches-2027.test/dashboard` using one of the four seeded `@iches.id` accounts (password `password`, development only).
+2. **Admin:** dashboard shows live **Registered accounts**, **Verified emails**, and **Staff accounts** counts from the database. Only Admin sees the **Users & Access** workspace link.
+3. **Reviewer:** dashboard has a link to the role-protected **Reviewer Workspace**. Review queues/self-claim are explicitly marked for later development, not shown as working.
+4. **Committee:** dashboard links to **Committee Workspace**. Finance/Academic delegated-duty labels appear **only if actually assigned**; QR scan tools remain future work.
+5. **User:** dashboard shows the chosen registration intention and tailored next-step text for **Submit Paper / Join Conference / Explore Programs**, with **Coming soon** on unbuilt modules. Profile editing is the real active CTA.
+6. Sidebar uses **Overview**, role-scoped **Workspace** (hidden for User), and **My Account** with Profile/Security; the generic Laravel starter-kit Repository/Documentation links have been removed.
+7. Confirm the same page works on phone widths. All private routes remain protected by `auth`, `verified`, `profile.complete`, and dedicated server-side role gates.
+
+**Verification (20 Nov 2026):** **84 tests / 358 assertions PASS**; PHPStan no errors, Pint **65 files** PASS, npm build PASS; Microsoft Edge actual authenticated renders for all four seeded roles PASS, plus 390-pixel mobile User screen, no JavaScript errors or document horizontal overflow. No fictitious paper/payment/program counters or public frontend design were added.
 
 ## Core application areas
 
