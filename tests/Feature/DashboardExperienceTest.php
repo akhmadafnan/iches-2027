@@ -64,7 +64,7 @@ class DashboardExperienceTest extends TestCase
             ->assertOk()
             ->assertSee('Explore ICHES Programs')
             ->assertSee('Explore the ICHES programs')
-            ->assertSee('FND-006')
+            ->assertSee('PROG-001')
             ->assertDontSee('Open users & access');
     }
 

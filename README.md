@@ -3,9 +3,9 @@
 **The 6th International Conference on Humanity, Education, and Society (ICHES 2027)**  
 Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 2027**
 
-This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **These business modules are not implemented yet.**
+This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Submission, enrollment, payments, QR and other operational workflows are not implemented yet; the five official program master records and event settings are now implemented.**
 
-> **Current status (20 November 2026): FND-001 through FND-005 DONE.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication and profile onboarding, role/assignment controls, and four role-aware dashboards are implemented. Demo accounts are available for local UAT. **Five-program settings (FND-006), academic submission/review, QR and other business workflows remain TODO.** The public landing page still awaits a separate design discussion. No production URL is known.
+> **Current status (20 November 2026): FND-001 through FND-006 implemented and automated-tested.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication/profile onboarding, role/assignment controls, role-aware dashboards, and **five TOR-based program masters + Event Settings + seven Important Dates** are implemented. Admin UI UAT is pending owner review. Academic submissions/review, participation enrollment, finance and QR remain TODO. Public landing design is on HOLD. No production URL is known.
 
 ## Start here
 
@@ -14,6 +14,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [Master Blueprint](MASTER-BLUEPRINT-ICHES-2027.md) | Project vision and full event process |
 | [Product Requirements (PRD)](docs/PRD.md) | Actors, business rules, modules, acceptance |
 | [Task Backlog](docs/TASKS.md) | Prioritized P0/P1/P2 tasks, dependencies and outcomes |
+| [FND-006 TOR Master Data Baseline](docs/FND-006-TOR-BASELINE.md) | Verbatim source verification, canonical program codes, dates and safeguards |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -94,6 +95,18 @@ Four existing `@iches.id` demo accounts are **not** forced into onboarding. Thei
 7. Confirm the same page works on phone widths. All private routes remain protected by `auth`, `verified`, `profile.complete`, and dedicated server-side role gates.
 
 **Verification (20 Nov 2026):** **84 tests / 358 assertions PASS**; PHPStan no errors, Pint **65 files** PASS, npm build PASS; Microsoft Edge actual authenticated renders for all four seeded roles PASS, plus 390-pixel mobile User screen, no JavaScript errors or document horizontal overflow. No fictitious paper/payment/program counters or public frontend design were added.
+
+## UAT FND-006 — Five Programs & Event Settings (local only)
+
+1. Sign in at `https://iches-2027.test/login` using the **local-only** `admin@iches.id` demo account.
+2. Open `https://iches-2027.test/admin/programs`: confirm five programs, accurate TOR names/dates, venue/mode labels, column **No.**, **Page 1 of 1** at bottom-left and **Previous/Next** on right. Search by name/venue or permanent code.
+3. Click **Edit** on any program: modal opens, immutable code is visible, and Admin can edit title, description, program start/end dates, venue, optional mode and sort order. Try invalid end-before-start dates; they must be rejected. Restore the official data after testing any real changes.
+4. Open `https://iches-2027.test/admin/event-settings`: edit event name, theme, organizer, venue, date range, optional time and timezone; all start times are initially **blank** unless officially confirmed. Save, refresh and verify persistence.
+5. In **Important dates**, verify seven TOR milestones; **Edit** opens a modal, and invalid date ranges are rejected. The milestones **do not** independently open Full Paper, publish decisions or verify payments.
+6. Sign in as `user@iches.id`, `reviewer@iches.id`, or `committee@iches.id`: both Admin paths must yield 403, with Admin-only navigation hidden. New accounts still complete profile before entering dashboards.
+7. Review desktop and mobile layout. On narrow screens tables scroll **inside** their card; no horizontal overflow should appear across the entire document.
+
+**Automated verification:** **95 tests / 450 assertions PASS** (11 new FND-006 tests), Pint **74 files**, PHPStan no errors, Blade compilation and npm build PASS. MySQL migration `2026_11_20_000005` ran safely; re-running `EventMasterSeeder` retains **1 event, 5 programs, 7 milestones** and does not overwrite Admin modifications. **Manual owner UI/UAT remains to be confirmed**; no direct visual browser inspection is claimed for FND-006.
 
 ## Core application areas
 

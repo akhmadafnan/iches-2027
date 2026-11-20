@@ -36,7 +36,7 @@ class Dashboard extends Component
         };
 
         $heroDescription = match ($role) {
-            UserRole::Admin => 'Manage account access and monitor the people registered in your ICHES platform.',
+            UserRole::Admin => 'Manage accounts, five official programs and event settings from your ICHES workspace.',
             UserRole::Reviewer => 'Your academic review workspace is ready for the upcoming paper review workflow.',
             UserRole::Committee => 'Your operations workspace is ready for the upcoming onsite services workflow.',
             UserRole::User => 'Your personal home for conference participation and the next steps in your ICHES journey.',
@@ -55,8 +55,8 @@ class Dashboard extends Component
             ],
             RegistrationIntention::ExplorePrograms => [
                 'title' => 'Explore the ICHES programs',
-                'description' => 'The conference and four companion programs will appear here once their official program records are configured.',
-                'module' => 'FND-006',
+                'description' => 'Five official programs are now configured. Participant enrollment and schedules will be available in the dedicated participation module.',
+                'module' => 'PROG-001',
             ],
         };
 
