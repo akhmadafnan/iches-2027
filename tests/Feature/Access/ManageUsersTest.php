@@ -17,6 +17,85 @@ class ManageUsersTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_edit_access_opens_and_closes_the_flux_modal(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        $target = User::factory()->create(['name' => 'ICHES Modal UAT']);
+
+        $this->actingAs($admin);
+
+        Livewire::test(ManageUsers::class)
+            ->assertSet('showEditModal', false)
+            ->call('edit', $target->id)
+            ->assertSet('showEditModal', true)
+            ->assertSet('editingName', 'ICHES Modal UAT')
+            ->assertSet('editingEmail', $target->email)
+            ->call('cancel')
+            ->assertSet('showEditModal', false)
+            ->assertSet('editingUserId', null);
+
+        $this->assertSame(UserRole::User, $target->fresh()->role);
+    }
+
+    public function test_modal_closes_after_successful_access_change(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        $target = User::factory()->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(ManageUsers::class)
+            ->call('edit', $target->id)
+            ->assertSet('showEditModal', true)
+            ->set('role', UserRole::Reviewer->value)
+            ->call('save')
+            ->assertHasNoErrors()
+            ->assertSet('showEditModal', false);
+
+        $this->assertSame(UserRole::Reviewer, $target->fresh()->role);
+    }
+
+    public function test_directory_shows_row_numbers_and_exact_pagination_footer(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+
+        User::factory()->count(22)->create();
+
+        $this->actingAs($admin);
+
+        Livewire::test(ManageUsers::class)
+            ->assertSee('No.')
+            ->assertSee('Page 1 of 3')
+            ->assertSee('Previous')
+            ->assertSee('Next')
+            ->call('nextPage')
+            ->assertSee('Page 2 of 3')
+            ->call('nextPage')
+            ->assertSee('Page 3 of 3')
+            ->call('previousPage')
+            ->assertSee('Page 2 of 3');
+    }
+
+    public function test_search_filters_users_and_resets_pagination(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        User::factory()->count(14)->create();
+        User::factory()->create(['name' => 'Distinctive ICHES Participant']);
+
+        $this->actingAs($admin);
+
+        Livewire::test(ManageUsers::class)
+            ->call('nextPage')
+            ->assertSee('Page 2 of 2')
+            ->set('search', 'Distinctive ICHES Participant')
+            ->assertSee('Distinctive ICHES Participant')
+            ->assertSee('Page 1 of 1')
+            ->assertDontSee('Page 2 of 2')
+            ->set('search', 'This user does not exist')
+            ->assertSee('No users found')
+            ->assertSee('Page 1 of 1');
+    }
+
     public function test_admin_can_load_user_management_livewire_page(): void
     {
         $admin = User::factory()->create(['role' => UserRole::Admin]);
