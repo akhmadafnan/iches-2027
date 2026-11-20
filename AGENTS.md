@@ -3,6 +3,8 @@
 **Repository:** akhmadafnan/iches-2027  
 **Status sekarang (20 Nov 2026):** FND-001 through FND-004 completed and tested locally in `D:\PINJAM-AFNAN\iches-2027` at Herd Secure Site `https://iches-2027.test`. Fortify login, registration, profile and role-based authorization are implemented. Four demo accounts use `user`, `reviewer`, `committee`, `admin`; Admin's `/admin/users` Livewire page changes other users' roles and explicit global Finance/Academic Authority assignments. Moderator/CoHost PIC authorization is **resource-scoped**, not globally assignable until sessions/institutions exist. Reviewer/Committee workspaces are authorized placeholders, NOT functional review/QR modules. FND-005 contextual dashboards and further academic modules remain TODO. No new modules without owner's instruction; never use seeded `password` credentials in production.
 
+**Auth/onboarding update (20 Nov 2026):** Fortify Passkeys are disabled and their login/security UI, Vite entry and JS dependency removed. New registration redirects to `/settings/profile` and sets `profile_setup_required`; verified private routes enforce completion. A user must upload a server-validated JPG/PNG/WebP (private `local` disk, max 3 MB, min 200×200) before entering the dashboard. Photo retrieval is owner-only behind auth; existing seeded UAT accounts are intentionally exempt from mandatory onboarding. ID Card crop 1:1 is **still TODO (ID-001)**. Keep email verification and 2FA working. This applies to the authenticated app, not the public website design.
+
 ## Official technical sources — MUST CONSULT
 
 Use these **two upstream GitHub repositories as primary technical references** whenever installing, changing, or reviewing Laravel/Livewire code:

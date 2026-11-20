@@ -38,7 +38,7 @@ class RegistrationTest extends TestCase
         $response = $this->post(route('register.store'), $this->registrationPayload());
 
         $response->assertSessionHasNoErrors()
-            ->assertRedirect(route('dashboard', absolute: false));
+            ->assertRedirect(route('profile.edit'));
 
         $this->assertAuthenticated();
 
@@ -48,6 +48,8 @@ class RegistrationTest extends TestCase
         $this->assertSame('Indonesia', $user->country);
         $this->assertSame(RegistrationIntention::SubmitPaper, $user->registration_intention);
         $this->assertNull($user->email_verified_at);
+        $this->assertTrue($user->profile_setup_required);
+        $this->assertNull($user->profile_photo_path);
         Notification::assertSentTo($user, VerifyEmail::class);
     }
 

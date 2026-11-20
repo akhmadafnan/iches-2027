@@ -11,6 +11,7 @@
             <flux:avatar
                 :name="auth()->user()->name"
                 :initials="auth()->user()->initials()"
+                :src="auth()->user()->profile_photo_path ? route('profile.photo') : null"
             />
             <div class="grid flex-1 text-start text-sm leading-tight">
                 <flux:heading class="truncate">{{ auth()->user()->name }}</flux:heading>

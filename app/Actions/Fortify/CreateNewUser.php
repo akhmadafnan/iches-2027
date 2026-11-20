@@ -27,7 +27,7 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'institution' => $input['institution'],
@@ -35,5 +35,9 @@ class CreateNewUser implements CreatesNewUsers
             'registration_intention' => $input['registration_intention'],
             'password' => $input['password'],
         ]);
+
+        $user->forceFill(['profile_setup_required' => true])->save();
+
+        return $user;
     }
 }

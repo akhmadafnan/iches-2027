@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 
     Route::livewire('admin/users', ManageUsers::class)

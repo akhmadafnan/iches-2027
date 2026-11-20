@@ -20,7 +20,7 @@
 |---|---|---|---|
 | **FND-001 [DONE]** Laravel + Livewire Starter Kit installation | ACC-01 | — | Laravel 13.43, Livewire 4.4; MySQL `iches_2027` migrated; Herd HTTP 200/302; PHP 38 tests/97 assertions PASS, Pint 45 PASS, PHPStan PASS, npm build PASS (20 Nov 2026) |
 | **FND-002 [DONE]** Fortify register/login/reset/verification | ACC-01, ACC-02 | FND-001 | HTTPS site live; registration saves institution/country/intention; no self-assigned admin role; six registration tests PASS; full suite 42 tests/122 assertions, Pint/PHPStan PASS (20 Nov 2026). Contextual CTA remains FND-005. |
-| **FND-003 [DONE]** Profile, institution and country | ACC-03, ACC-04 | FND-002 | Authenticated `/settings/profile` edits name, email, institution and country; role/intention untouched, validation + owner-scoped tests PASS (20 Nov 2026). Photo crop remains ID-001. |
+| **FND-003 [DONE]** Profile, institution, country + private photo upload | ACC-03, ACC-04 | FND-002 | Authenticated `/settings/profile` edits personal details and stores photo privately; newly registered accounts must upload photo before dashboard, old demo accounts exempt. Photo crop 1:1 remains ID-001. |
 | **FND-004 [DONE]** Simple permissions and assignment | ACC-06 | FND-002 | Roles User/Reviewer/Committee/Admin enforced by Gates/Policies and 403 route guards; Admin Livewire `/admin/users` edits others' roles & Finance/Academic Authority assignments; Moderator/CoHost PIC gates are resource-scoped; test suite verifies unauthorized access. Completed 20 Nov 2026. |
 | FND-005 Minimal dashboards and navigation | ACC-03 | FND-004 | Initial CTA based on intention; role menus scoped |
 | FND-006 Five program records + event settings | PG-01 | FND-001 | Actual data from TOR seeded and Admin-readable |
@@ -46,6 +46,8 @@
 **FND-003 evidence (20 Nov 2026):** extended official class-backed Livewire profile component and shared profile validation rules to persist institution/country for the authenticated user. Factory defaults and authorization/validation regression tests added; **49 tests / 165 assertions PASS, Pint 51 files PASS, PHPStan PASS**. No public/frontend layout was changed.
 
 **FND-004 evidence (20 Nov 2026):** Added `UserPolicy`, Laravel authorization Gates, a `staff_assignments` table with nonnullable resource scope+unique constraint, scoped permission checks, an Admin-only class-based Livewire Users & Access page, UpdateUserAccess Action (transaction/lock), and role-restricted Reviewer/Committee placeholder workspaces. FND-005 remains responsible for fully contextual dashboards/navigation; academic review/QR features remain TODO. UAT: login as local-only accounts, confirm `/admin/users`, `/reviewer/workspace`, `/committee/workspace` enforce 200 for the matching role and 403 for others. Finance/Academic privileges require explicit global assignment even for Admin; Moderator/CoHost PIC require exact resource scope.
+
+**Account onboarding hardening (20 Nov 2026, user-requested before FND-005):** Fortify Passkeys feature disabled and removed from app auth/security UI plus frontend build. New account registration now redirects to `/settings/profile` and requires verified format profile photo upload before accessing verified private routes; existing accounts intentionally exempted. Files stored privately with owner-only authenticated photo endpoint. Fortify verification, reset and 2FA remain. **Full suite 75 tests / 298 assertions PASS; PHPStan, Pint and frontend build PASS.** ID-001 image crop remains not started.
 
 ## C. P1 — Academic Completion, Co-Host & Finance
 

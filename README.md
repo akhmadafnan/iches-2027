@@ -58,9 +58,19 @@ Run `php artisan db:seed` in the `local` environment to create the following *ve
 
 **IMPORTANT:** These are disposable local/testing credentials only; never use them on an internet-accessible deployment. All new public registrations default to `user` regardless of submitted fields. Role/Gate/Policy checks are now active (FND-004). Admin can manage other users' roles and the global Finance/Academic Authority assignments. Specific Reviewer and Committee routes exist only as access-verified placeholders; the actual academic review and QR scan modules will be built in their respective tasks.
 
-**FND-003 profile:** the authenticated user's `/settings/profile` page can edit name, email, institution and country, with server validation and email re-verification on address change. Role and initial intention are not editable from this form. Profile photo crop is a separate planned task (ID-001), not part of FND-003.
+**FND-003 + onboarding enhancement (20 Nov 2026):** `/settings/profile` edits name, email, institution and country, and now supports a securely validated **private profile-photo upload** (JPG/PNG/WebP, max 3 MB, min 200×200). New registrants are immediately redirected to `/settings/profile`; they must upload a photo before opening verified private dashboard/role pages. Existing accounts/seeded UAT users are not retroactively blocked. Photos are accessed only by their authenticated owner at `/settings/profile/photo`; they are not on a public storage disk. Login/password confirmation remain available; **Passkeys are fully disabled** in Fortify routes, auth/security UI and JS build. **Cropping a 1:1 ID Card photo remains ID-001 TODO.**
 
 **Verification (20 Nov 2026):** four demo roles seeded on MySQL, second seed run succeeded without duplicates; **49 tests / 165 assertions** passed; Pint **51 files** and PHPStan no errors; dedicated migration marked `Ran`.
+
+## UAT new-account onboarding and Passkeys (local only)
+
+1. Open `https://iches-2027.test/register` with a new test email; complete normal registration.
+2. Confirm the redirect to `/settings/profile` and the `Complete your ICHES profile` notice.
+3. Attempt Save without a photo: the system requires a photo. Upload JPG, PNG or WebP (max 3 MB, min 200×200); preview it and Save.
+4. After saving, the user is redirected to the dashboard (if email is not yet verified, Fortify's email-verification page remains in force). Private photos cannot be accessed by a guest or another account.
+5. Login and Security screens no longer expose Passkeys; normal password, reset and 2FA flows remain available.
+
+Four existing `@iches.id` demo accounts are **not** forced into onboarding. Their profile page allows an optional photo upload. Upload replaces old private file on save; deleting or changing a user role cannot be done from Profile. The **photo crop/ID Card pipeline is separate and not yet implemented**.
 
 ## UAT FND-004 — Roles & access (local only)
 
