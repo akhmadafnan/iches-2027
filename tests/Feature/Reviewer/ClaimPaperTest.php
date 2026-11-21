@@ -260,7 +260,7 @@ class ClaimPaperTest extends TestCase
         $other = $this->reviewer();
         $author = User::factory()->create();
         $first = $this->paper($author, title: 'Traditions and Islamic Knowledge');
-        $second = $this->paper($author, title: 'Education and Culture in East Java', trackCode: 'TRK-02');
+        $second = $this->paper(User::factory()->create(), title: 'Education and Culture in East Java', trackCode: 'TRK-02');
 
         $first->authors()->create([
             'name' => 'Secret Author Name',

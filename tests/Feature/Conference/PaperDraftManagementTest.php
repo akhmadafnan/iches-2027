@@ -323,7 +323,9 @@ class PaperDraftManagementTest extends TestCase
         $track = $this->track();
         $track->update(['is_active' => false]);
 
-        Livewire::actingAs($owner)->test(PaperEditor::class)
+        $newOwner = User::factory()->create();
+
+        Livewire::actingAs($newOwner)->test(PaperEditor::class)
             ->set('title', 'New Draft with Disabled Track')
             ->set('conferenceTrackId', (string) $track->id)
             ->call('editAuthor', 0)

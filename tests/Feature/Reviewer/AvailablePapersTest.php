@@ -91,7 +91,7 @@ class AvailablePapersTest extends TestCase
         $reviewer = $this->reviewer();
         $author = User::factory()->create();
         $submitted = $this->paper($author, title: 'Submitted Community Paper');
-        $draft = $this->paper($author, PaperStatus::Draft, 'Private Draft Paper');
+        $draft = $this->paper(User::factory()->create(), PaperStatus::Draft, 'Private Draft Paper');
         $own = $this->paper($reviewer, title: 'My Own Submitted Paper');
 
         Livewire::actingAs($reviewer)->test(AvailablePapers::class)
@@ -112,7 +112,7 @@ class AvailablePapersTest extends TestCase
         $reviewer = $this->reviewer();
         $author = User::factory()->create();
         $first = $this->paper($author, title: 'Social History Research', trackCode: 'TRK-01');
-        $second = $this->paper($author, title: 'Health and Food Systems', trackCode: 'TRK-02');
+        $second = $this->paper(User::factory()->create(), title: 'Health and Food Systems', trackCode: 'TRK-02');
 
         Livewire::actingAs($reviewer)->test(AvailablePapers::class)
             ->set('search', 'Social History')
@@ -159,7 +159,7 @@ class AvailablePapersTest extends TestCase
         $reviewer = $this->reviewer();
         $author = User::factory()->create();
         $eligible = $this->paper($author);
-        $draft = $this->paper($author, PaperStatus::Draft);
+        $draft = $this->paper(User::factory()->create(), PaperStatus::Draft);
         $own = $this->paper($reviewer);
 
         auth()->logout();

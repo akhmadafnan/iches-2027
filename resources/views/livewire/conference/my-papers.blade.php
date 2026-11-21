@@ -9,11 +9,6 @@
                 <h1 class="text-3xl font-semibold tracking-tight sm:text-[34px]">My Submissions</h1>
                 <p class="mt-2 max-w-xl text-sm leading-7 text-emerald-50/85">Manage your drafts and submitted papers in one place. Only complete saved drafts can be submitted.</p>
             </div>
-            @if ($totalPapers > 0)
-                <flux:button :href="route('papers.create')" variant="primary" class="!bg-white !text-emerald-950 hover:!bg-emerald-50" icon="plus" wire:navigate>
-                    New paper draft
-                </flux:button>
-            @endif
         </div>
     </section>
 
@@ -56,7 +51,9 @@
                     <h3 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ trim($search) !== '' ? 'No matching papers' : 'No paper drafts found' }}</h3>
                     <p class="mx-auto max-w-[340px] text-sm leading-6 text-zinc-500 dark:text-zinc-400">{{ trim($search) !== '' ? 'Try another title or paper reference.' : 'Create your first paper draft to begin your submission.' }}</p>
                 </div>
-                <flux:button size="sm" variant="primary" icon="plus" class="mt-2" :href="route('papers.create')" wire:navigate>Start a draft</flux:button>
+                @if ($totalPapers === 0)
+                    <flux:button size="sm" variant="primary" icon="plus" class="mt-2" :href="route('papers.create')" wire:navigate>Start a draft</flux:button>
+                @endif
             </div>
         @else
             <p class="flex items-center gap-1.5 px-6 pt-3 text-xs text-zinc-500 md:hidden"><flux:icon.arrows-right-left class="size-3.5" /> Swipe inside the table to view more columns</p>
@@ -120,7 +117,7 @@
 
     <div class="flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
         <flux:icon.information-circle class="mt-0.5 size-5 shrink-0" />
-        <p><strong>Drafts are private.</strong> Complete and save the title, track, authors, abstract, keywords and PDF to reveal the Submit icon. Submitted papers become read-only and eligible for academic review.</p>
+        <p><strong>One owned paper per account.</strong> Continue your existing Draft until you submit it. Submitted papers are read-only and eligible for academic review; co-authoring a paper owned by someone else is still allowed.</p>
     </div>
 
     <flux:modal wire:model.self="submitModalOpen" class="md:w-[32rem]">

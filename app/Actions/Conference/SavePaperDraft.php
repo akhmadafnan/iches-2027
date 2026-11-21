@@ -8,6 +8,7 @@ use App\Models\ConferenceTrack;
 use App\Models\Paper;
 use App\Models\User;
 use App\Services\RorOrganizationService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\UploadedFile;
@@ -86,6 +87,15 @@ final class SavePaperDraft
                     $paper = Paper::query()->whereKey($existing->id)->lockForUpdate()->firstOrFail();
                     Gate::forUser($actor)->authorize('update', $paper);
                 } else {
+                    // Serialize first-paper creation for the same account across concurrent requests.
+                    User::query()->whereKey($actor->id)->lockForUpdate()->firstOrFail();
+
+                    if (Paper::query()->where('owner_id', $actor->id)->exists()) {
+                        throw ValidationException::withMessages([
+                            'paper' => 'You already own a paper. Continue your existing submission.',
+                        ]);
+                    }
+
                     $paper = new Paper;
                     $paper->owner_id = $actor->id;
                     $paper->public_id = (string) Str::ulid();
@@ -153,6 +163,13 @@ final class SavePaperDraft
             // Database rollback does not roll back filesystem writes.
             if (is_string($newFilePath)) {
                 Storage::disk('local')->delete($newFilePath);
+            }
+
+            if ($existing === null && $exception instanceof UniqueConstraintViolationException
+                && Paper::query()->where('owner_id', $actor->id)->exists()) {
+                throw ValidationException::withMessages([
+                    'paper' => 'You already own a paper. Continue your existing submission.',
+                ]);
             }
 
             throw $exception;

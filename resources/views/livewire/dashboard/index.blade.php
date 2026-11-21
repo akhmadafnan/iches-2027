@@ -153,16 +153,20 @@
                                     <p class="max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">{{ $nextStep['description'] }}</p>
                                 </div>
                                 @if ($intention === \App\Enums\RegistrationIntention::SubmitPaper)
-                                    <flux:badge color="emerald" size="sm" class="shrink-0 self-start">Draft available</flux:badge>
+                                    <flux:badge color="emerald" size="sm" class="shrink-0 self-start">{{ $ownedPaper ? ($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Draft in progress' : ucfirst($ownedPaper->status->value)) : 'Draft available' }}</flux:badge>
                                 @else
                                     <flux:badge color="amber" size="sm" class="shrink-0 self-start">Coming soon</flux:badge>
                                 @endif
                             </div>
                             <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-emerald-200/70 pt-4 dark:border-emerald-900">
                                 @if ($intention === \App\Enums\RegistrationIntention::SubmitPaper)
-                                    <flux:button :href="route('papers.create')" variant="primary" icon="plus" size="sm" wire:navigate>Start a paper draft</flux:button>
+                                    @if ($ownedPaper)
+                                        <flux:button :href="route($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'papers.edit' : 'papers.show', $ownedPaper->public_id)" variant="primary" icon="document-text" size="sm" wire:navigate>{{ $ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Continue draft' : 'View submitted paper' }}</flux:button>
+                                    @else
+                                        <flux:button :href="route('papers.create')" variant="primary" icon="plus" size="sm" wire:navigate>Start a paper draft</flux:button>
+                                    @endif
                                     <flux:button :href="route('papers.index')" variant="outline" icon="document-text" size="sm" wire:navigate>My Submissions</flux:button>
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">Drafts are available; abstract PDF submission is next.</p>
+                                    <p class="text-xs text-zinc-500 dark:text-zinc-400">One owned Paper ID per account; co-authorship on other papers is allowed.</p>
                                 @else
                                     <flux:button :href="route('profile.edit')" variant="primary" icon="pencil-square" size="sm" wire:navigate>Review my profile</flux:button>
                                     <p class="text-xs text-zinc-500 dark:text-zinc-400">Planned module: {{ $nextStep['module'] }}</p>
@@ -249,8 +253,8 @@
                                 <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Next development phase</p>
                                 <p class="mt-1 text-xs leading-5 text-zinc-600 dark:text-zinc-400">
                                     {{ match ($role) {
-                                        \App\Enums\UserRole::Admin => 'Event settings, five programs, and eight tracks are active. Paper drafts are now available; submission and review workflows follow in ACAD-003–004 and REV-001–003.',
-                                        \App\Enums\UserRole::Reviewer => 'Available submissions, atomic self-claim, and structured review workflow will follow in REV-001–003.',
+                                        \App\Enums\UserRole::Admin => 'Event settings, five programs, conference tracks, abstract submission and reviewer workflows are active.',
+                                        \App\Enums\UserRole::Reviewer => 'REV-001–003 are active: available papers, exclusive claims, and General Comments with Accept/Reject review.',
                                         default => 'Service configuration and mobile QR scanning will follow in the QRS modules.',
                                     } }}
                                 </p>

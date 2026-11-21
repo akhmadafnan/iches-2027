@@ -3,6 +3,7 @@
 namespace App\Livewire\Conference;
 
 use App\Actions\Conference\SavePaperDraft;
+use App\Enums\PaperStatus;
 use App\Enums\ProgramCode;
 use App\Models\ConferenceTrack;
 use App\Models\Paper;
@@ -114,6 +115,14 @@ class PaperEditor extends Component
 
             $corresponding = $owned->authors->search(fn ($author) => $author->is_corresponding);
             $this->correspondingIndex = $corresponding === false ? 0 : (int) $corresponding;
+
+            return;
+        }
+
+        $ownedPaper = Paper::query()->ownedBy($actor)->first();
+        if ($ownedPaper !== null) {
+            $route = $ownedPaper->status === PaperStatus::Draft ? 'papers.edit' : 'papers.show';
+            $this->redirectRoute($route, $ownedPaper->public_id, navigate: true);
 
             return;
         }

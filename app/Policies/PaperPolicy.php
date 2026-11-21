@@ -15,7 +15,7 @@ class PaperPolicy
 
     public function create(User $actor): bool
     {
-        return true;
+        return ! $actor->papers()->exists();
     }
 
     public function view(User $actor, Paper $paper): bool

@@ -328,8 +328,8 @@ class PaperReviewWorkflowTest extends TestCase
         $reviewer = $this->reviewer();
         $author = User::factory()->create();
         $claimed = $this->paper($author);
-        $draft = $this->paper($author);
-        $submitted = $this->paper($author);
+        $draft = $this->paper(User::factory()->create());
+        $submitted = $this->paper(User::factory()->create());
 
         foreach ([$claimed, $draft, $submitted] as $paper) {
             app(ClaimPaper::class)->handle($reviewer, $paper->public_id);

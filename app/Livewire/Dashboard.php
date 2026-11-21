@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\PaperStatus;
 use App\Enums\RegistrationIntention;
 use App\Enums\UserRole;
 use App\Models\User;
@@ -21,6 +22,7 @@ class Dashboard extends Component
 
         $role = $user->role ?? UserRole::User;
         $intention = $user->registration_intention ?? RegistrationIntention::ExplorePrograms;
+        $ownedPaper = $intention === RegistrationIntention::SubmitPaper ? $user->papers()->first() : null;
 
         $summary = $role === UserRole::Admin ? [
             'accounts' => User::query()->count(),
@@ -43,11 +45,19 @@ class Dashboard extends Component
         };
 
         $nextStep = match ($intention) {
-            RegistrationIntention::SubmitPaper => [
+            RegistrationIntention::SubmitPaper => $ownedPaper === null ? [
                 'title' => 'Start your paper draft',
-                'description' => 'You can now prepare a private paper draft, select one of eight academic tracks, and record the author list. Abstract text, PDF upload and final submission follow in the next phases.',
-                'module' => 'ACAD-002 / Draft available',
-            ],
+                'description' => 'Create your one conference paper and complete its title, track, authors, abstract, keywords and PDF before submission.',
+                'module' => 'ACAD-005 / One owned submission',
+            ] : ($ownedPaper->status === PaperStatus::Draft ? [
+                'title' => 'Continue your paper draft',
+                'description' => "Continue editing {$ownedPaper->reference}. Your permanent Paper ID stays the same when you submit.",
+                'module' => 'ACAD-005 / Draft in progress',
+            ] : [
+                'title' => 'Track your submitted paper',
+                'description' => "Paper {$ownedPaper->reference} has been submitted. Follow its review progress in My Submissions; no second paper can be created.",
+                'module' => 'ACAD-005 / Submitted paper',
+            ]),
             RegistrationIntention::JoinConference => [
                 'title' => 'Prepare for conference participation',
                 'description' => 'Conference enrollment and online/onsite participation settings will be available when program registration launches.',
@@ -68,6 +78,7 @@ class Dashboard extends Component
             'workspaceRoute' => $workspaceRoute,
             'heroDescription' => $heroDescription,
             'nextStep' => $nextStep,
+            'ownedPaper' => $ownedPaper,
             'canVerifyPayments' => Gate::forUser($user)->allows('verify-payments'),
             'canPublishDecisions' => Gate::forUser($user)->allows('publish-decisions'),
         ]);
