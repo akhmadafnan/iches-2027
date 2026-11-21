@@ -9,9 +9,11 @@
                 <h1 class="text-3xl font-semibold tracking-tight sm:text-[34px]">My Submissions</h1>
                 <p class="mt-2 max-w-xl text-sm leading-7 text-emerald-50/85">Start and manage your conference paper drafts. Each draft stays private until you submit it in a later step.</p>
             </div>
-            <flux:button :href="route('papers.create')" variant="primary" class="!bg-white !text-emerald-950 hover:!bg-emerald-50" icon="plus" wire:navigate>
-                New paper draft
-            </flux:button>
+            @if ($totalPapers > 0)
+                <flux:button :href="route('papers.create')" variant="primary" class="!bg-white !text-emerald-950 hover:!bg-emerald-50" icon="plus" wire:navigate>
+                    New paper draft
+                </flux:button>
+            @endif
         </div>
     </section>
 
@@ -43,13 +45,17 @@
                 <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Paper directory</h2>
                 <p class="mt-1 text-sm text-zinc-500">Your personal list of paper drafts and reference numbers.</p>
             </div>
-            <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Find a title or paper ID" aria-label="Find my papers" class="w-full sm:w-72" />
+            @if ($totalPapers > 0 || trim($search) !== '')
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" placeholder="Find a title or paper ID" aria-label="Find my papers" class="w-full sm:w-72" />
+            @endif
         </div>
         @if ($papers->isEmpty())
-            <div class="flex flex-col items-center gap-3 px-6 py-12 text-center">
-                <div class="mb-1 flex size-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"><flux:icon.document-text class="size-7" /></div>
-                <p class="text-base font-semibold text-zinc-900 dark:text-white">{{ trim($search) !== '' ? 'No matching papers' : 'No paper drafts found' }}</p>
-                <p class="max-w-sm text-sm leading-6 text-zinc-500">{{ trim($search) !== '' ? 'Try a different title or paper ID.' : 'Create your first draft to register a paper title, research track, and author list.' }}</p>
+            <div class="flex min-h-[330px] flex-col items-center justify-center gap-4 px-6 py-12 text-center sm:min-h-[360px]">
+                <div class="mb-1 flex size-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"><flux:icon.document-text class="size-7" /></div>
+                <div class="space-y-2">
+                    <h3 class="text-lg font-semibold tracking-tight text-zinc-900 dark:text-white">{{ trim($search) !== '' ? 'No matching papers' : 'No paper drafts found' }}</h3>
+                    <p class="mx-auto max-w-[340px] text-sm leading-6 text-zinc-500 dark:text-zinc-400">{{ trim($search) !== '' ? 'Try another title or paper reference.' : 'Create your first draft to register the paper title, research track, and authors.' }}</p>
+                </div>
                 <flux:button size="sm" variant="primary" icon="plus" class="mt-2" :href="route('papers.create')" wire:navigate>Start a draft</flux:button>
             </div>
         @else
@@ -88,6 +94,7 @@
             </flux:table>
         </div>
         @endif
+        @if ($papers->total() > 0)
         <div class="flex flex-col gap-3 border-t border-zinc-100 bg-zinc-50/65 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-950/40 sm:flex-row sm:items-center sm:justify-between">
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                 <span class="font-semibold tabular-nums text-zinc-800 dark:text-zinc-100">Page {{ $papers->currentPage() }} of {{ $papers->lastPage() }}</span>
@@ -99,6 +106,7 @@
                 <flux:button size="sm" variant="outline" icon:trailing="chevron-right" wire:click="nextPage" :disabled="! $papers->hasMorePages()">Next</flux:button>
             </div>
         </div>
+        @endif
     </section>
 
     <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">

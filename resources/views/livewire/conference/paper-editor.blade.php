@@ -64,19 +64,92 @@
                         <div class="mb-4 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2">
                                 <div class="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">{{ $index + 1 }}</div>
-                                <p class="text-sm font-semibold text-zinc-900 dark:text-white">Author {{ $index + 1 }}</p>
+                                <p class="whitespace-nowrap text-sm font-semibold text-zinc-900 dark:text-white">Author {{ $index + 1 }}</p>
                             </div>
-                            <div class="flex items-center gap-1">
+                            <div class="flex shrink-0 items-center gap-0 sm:gap-1">
                                 <flux:button type="button" size="sm" variant="ghost" icon="arrow-up" wire:click="moveAuthor({{ $index }}, 'up')" :disabled="$index === 0" tooltip="Move author up" />
                                 <flux:button type="button" size="sm" variant="ghost" icon="arrow-down" wire:click="moveAuthor({{ $index }}, 'down')" :disabled="$index === count($authors) - 1" tooltip="Move author down" />
-                                <flux:button type="button" size="sm" variant="ghost" icon="trash" wire:click="removeAuthor({{ $index }})" :disabled="count($authors) === 1">Remove</flux:button>
+                                <flux:button type="button" size="sm" variant="ghost" icon="trash" wire:click="removeAuthor({{ $index }})" :disabled="count($authors) === 1" tooltip="Remove author" aria-label="Remove author {{ $index + 1 }}" />
                             </div>
                         </div>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <flux:input wire:model="authors.{{ $index }}.name" label="Full name" placeholder="Author name" required />
                             <flux:input wire:model="authors.{{ $index }}.email" type="email" label="Email address" placeholder="author@example.com" required />
-                            <flux:input wire:model="authors.{{ $index }}.institution" label="Institution / affiliation" placeholder="University or organization" />
-                            <flux:input wire:model="authors.{{ $index }}.country" label="Country" placeholder="Country" />
+                        </div>
+
+                        <div class="mt-5 space-y-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Institution / affiliation <span class="text-red-600">*</span></p>
+                                @if (($author['affiliation_source'] ?? '') === 'manual')
+                                    <flux:button type="button" size="sm" variant="ghost" icon="magnifying-glass" wire:click="useRorAffiliation({{ $index }})">Search ROR instead</flux:button>
+                                @elseif (($author['affiliation_source'] ?? '') === 'ror')
+                                    <flux:badge color="emerald" size="sm">ROR verified</flux:badge>
+                                @endif
+                            </div>
+
+                            @if (($author['affiliation_source'] ?? '') === 'manual')
+                                <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900 dark:bg-amber-950/20">
+                                    <flux:input wire:model="authors.{{ $index }}.institution" label="Official institution name (not in ROR)" placeholder="Enter the full organization name" required />
+                                    <p class="mt-2 text-xs leading-5 text-amber-800 dark:text-amber-200">
+                                        Unverified institution: no ROR ID will be assigned. Use only when the institution genuinely cannot be found in the registry.
+                                    </p>
+                                </div>
+                            @else
+                                <div class="relative">
+                                    <flux:input
+                                        wire:model.live.debounce.450ms="authors.{{ $index }}.institution_query"
+                                        icon="magnifying-glass"
+                                        label="Search ROR by full university name or acronym"
+                                        placeholder="e.g. UNISYA, Universitas Islam Syarifuddin"
+                                        autocomplete="off"
+                                        aria-label="Search ROR institution for author {{ $index + 1 }}"
+                                    />
+                                    <div wire:loading wire:target="authors.{{ $index }}.institution_query" class="mt-2 text-xs text-zinc-500">Searching ROR...</div>
+                                    @if (count($affiliationResults[$index] ?? []) > 0 && ($author['affiliation_source'] ?? '') !== 'ror')
+                                        <div class="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+                                            @foreach ($affiliationResults[$index] as $result)
+                                                <button type="button" wire:key="ror-{{ $index }}-{{ str_replace('https://ror.org/', '', $result['id']) }}"
+                                                    wire:click="selectInstitution({{ $index }}, @js($result['id']))"
+                                                    class="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none dark:hover:bg-emerald-950/40 dark:focus:bg-emerald-950/40">
+                                                    <span class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $result['name'] }}</span>
+                                                    <span class="text-xs text-zinc-500">{{ $result['aliases'] ? $result['aliases'].' · ' : '' }}{{ $result['location'] }} · {{ str_replace('https://ror.org/', '', $result['id']) }}</span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+
+                                @if (($author['affiliation_source'] ?? '') === 'ror' && filled($author['ror_id'] ?? null))
+                                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 dark:border-emerald-900 dark:bg-emerald-950/20">
+                                        <div>
+                                            <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-200">{{ $author['institution'] }}</p>
+                                            <p class="mt-1 text-xs text-emerald-700 dark:text-emerald-300">Verified ROR ID:
+                                                <a class="underline underline-offset-2" href="{{ $author['ror_id'] }}" target="_blank" rel="noopener noreferrer">{{ str_replace('https://ror.org/', '', $author['ror_id']) }}</a>
+                                            </p>
+                                        </div>
+                                        <flux:icon.check-circle class="size-5 shrink-0 text-emerald-700" />
+                                    </div>
+                                @elseif (($author['affiliation_source'] ?? '') === 'legacy')
+                                    <p class="text-xs leading-5 text-amber-700 dark:text-amber-300">Previously entered affiliation has no verified ROR ID. Please select an organization or explicitly mark it as unlisted.</p>
+                                @else
+                                    <p class="text-xs leading-5 text-zinc-500">Select the exact organization from ROR suggestions; typing alone does not verify an affiliation.</p>
+                                @endif
+                                @if (filled($affiliationErrors[$index] ?? ''))
+                                    <p role="alert" class="text-xs text-red-600">{{ $affiliationErrors[$index] }}</p>
+                                @endif
+                                @if (! count($affiliationResults[$index] ?? []) && ($affiliationSearched[$index] ?? false) && empty($affiliationErrors[$index]) && ($author['affiliation_source'] ?? '') !== 'ror')
+                                    <p class="text-xs text-zinc-500">No active ROR match found. Check spelling, search an abbreviation, or use the unlisted option.</p>
+                                @endif
+                                @if (($author['affiliation_source'] ?? '') !== 'ror')
+                                    <flux:button type="button" size="sm" variant="ghost" icon="information-circle" wire:click="useManualAffiliation({{ $index }})">Institution not listed in ROR</flux:button>
+                                @endif
+                            @endif
+                            @error("authors.{$index}.affiliation_source") <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            @error("authors.{$index}.ror_id") <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div class="mt-4">
+                            <flux:input wire:model="authors.{{ $index }}.country" label="Author country (independent of institution)" placeholder="Country" />
                         </div>
                     </div>
                 @endforeach

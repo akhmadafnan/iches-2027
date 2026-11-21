@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $name
  * @property string $email
  * @property string|null $institution
+ * @property string|null $ror_id
+ * @property string|null $affiliation_source
  * @property string|null $country
  * @property bool $is_corresponding
  */
@@ -22,6 +24,8 @@ class PaperAuthor extends Model
         'name',
         'email',
         'institution',
+        'ror_id',
+        'affiliation_source',
         'country',
         'is_corresponding',
     ];

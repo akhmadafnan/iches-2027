@@ -41,7 +41,7 @@ class PaperDraftManagementTest extends TestCase
             $owner,
             null,
             ['title' => $title, 'conference_track_id' => $this->track()->id],
-            [['name' => $owner->name, 'email' => $owner->email, 'institution' => $owner->institution, 'country' => $owner->country]],
+            [['name' => $owner->name, 'email' => $owner->email, 'institution' => $owner->institution, 'country' => $owner->country, 'affiliation_source' => 'manual']],
             0,
         );
     }
@@ -70,7 +70,8 @@ class PaperDraftManagementTest extends TestCase
         Livewire::actingAs($owner)->test(PaperEditor::class)
             ->assertSet('authors.0.name', 'Afnan Academic')
             ->assertSet('authors.0.email', 'afnan.demo@example.test')
-            ->assertSet('authors.0.institution', 'UNISYA')
+            ->assertSet('authors.0.institution_query', 'UNISYA')
+            ->assertSet('authors.0.institution', '')
             ->assertSet('authors.0.country', 'Indonesia')
             ->assertSet('correspondingIndex', 0);
     }
@@ -82,6 +83,7 @@ class PaperDraftManagementTest extends TestCase
         Livewire::actingAs($owner)->test(PaperEditor::class)
             ->set('title', 'Ethical Innovations for Inclusive Education')
             ->set('conferenceTrackId', (string) $this->track()->id)
+            ->call('useManualAffiliation', 0)
             ->call('save')
             ->assertHasNoErrors()
             ->assertRedirect(route('papers.index'));
@@ -113,10 +115,12 @@ class PaperDraftManagementTest extends TestCase
         Livewire::actingAs($owner)->test(PaperEditor::class)
             ->set('title', 'Community and Society Research Paper')
             ->set('conferenceTrackId', (string) $track->id)
+            ->call('useManualAffiliation', 0)
             ->call('addAuthor')
             ->set('authors.1.name', 'Colleague One')
             ->set('authors.1.email', 'COLLEAGUE@EXAMPLE.COM')
             ->set('authors.1.institution', 'Partner University')
+            ->set('authors.1.affiliation_source', 'manual')
             ->set('authors.1.country', 'Malaysia')
             ->set('correspondingIndex', 1)
             ->call('save')
@@ -172,6 +176,8 @@ class PaperDraftManagementTest extends TestCase
             ->call('addAuthor')
             ->set('authors.1.name', 'Additional Contributor')
             ->set('authors.1.email', 'contributor@example.com')
+            ->set('authors.1.institution', 'Partner Institution')
+            ->set('authors.1.affiliation_source', 'manual')
             ->call('save')
             ->assertHasNoErrors()
             ->assertRedirect(route('papers.index'));
@@ -281,6 +287,7 @@ class PaperDraftManagementTest extends TestCase
         Livewire::actingAs($owner)->test(PaperEditor::class)
             ->set('title', 'Academic Paper for Testing Correspondence')
             ->set('conferenceTrackId', (string) $this->track()->id)
+            ->call('useManualAffiliation', 0)
             ->set('correspondingIndex', 99)
             ->call('save')
             ->assertHasErrors('correspondingIndex');
@@ -298,6 +305,7 @@ class PaperDraftManagementTest extends TestCase
         Livewire::actingAs($owner)->test(PaperEditor::class)
             ->set('title', 'New Draft with Disabled Track')
             ->set('conferenceTrackId', (string) $track->id)
+            ->call('useManualAffiliation', 0)
             ->call('save')
             ->assertHasErrors('conferenceTrackId');
 

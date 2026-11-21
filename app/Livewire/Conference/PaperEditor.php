@@ -7,11 +7,16 @@ use App\Enums\ProgramCode;
 use App\Models\ConferenceTrack;
 use App\Models\Paper;
 use App\Models\User;
+use App\Services\RorOrganizationService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -27,9 +32,18 @@ class PaperEditor extends Component
     public string $conferenceTrackId = '';
 
     /**
-     * @var list<array{key: string, name: string, email: string, institution: string, country: string}>
+     * @var list<array{key: string, name: string, email: string, institution: string, country: string, ror_id: string, affiliation_source: string, institution_query: string}>
      */
     public array $authors = [];
+
+    /** @var array<int, list<array{id: string, name: string, aliases: string, location: string}>> */
+    public array $affiliationResults = [];
+
+    /** @var array<int, string> */
+    public array $affiliationErrors = [];
+
+    /** @var array<int, bool> */
+    public array $affiliationSearched = [];
 
     public int $correspondingIndex = 0;
 
@@ -52,6 +66,9 @@ class PaperEditor extends Component
                 'email' => $author->email,
                 'institution' => $author->institution ?? '',
                 'country' => $author->country ?? '',
+                'ror_id' => $author->ror_id ?? '',
+                'affiliation_source' => $author->affiliation_source ?? (filled($author->institution) ? 'legacy' : ''),
+                'institution_query' => $author->institution ?? '',
             ])->all());
 
             $corresponding = $owned->authors->search(fn ($author) => $author->is_corresponding);
@@ -66,8 +83,11 @@ class PaperEditor extends Component
             'key' => (string) Str::ulid(),
             'name' => $actor->name,
             'email' => $actor->email,
-            'institution' => $actor->institution ?? '',
+            'institution' => '',
             'country' => $actor->country ?? '',
+            'ror_id' => '',
+            'affiliation_source' => '',
+            'institution_query' => $actor->institution ?? '',
         ]];
     }
 
@@ -79,6 +99,9 @@ class PaperEditor extends Component
             'email' => '',
             'institution' => '',
             'country' => '',
+            'ror_id' => '',
+            'affiliation_source' => '',
+            'institution_query' => '',
         ];
     }
 
@@ -96,6 +119,7 @@ class PaperEditor extends Component
             $this->correspondingIndex--;
         }
 
+        $this->clearAffiliationSearch();
         $this->resetValidation();
     }
 
@@ -119,6 +143,103 @@ class PaperEditor extends Component
             $this->correspondingIndex = $index;
         }
 
+        $this->clearAffiliationSearch();
+        $this->resetValidation();
+    }
+
+    /**
+     * Typeahead search is triggered only for an institution query, not every author field.
+     * Editing a previously selected label invalidates its ROR identifier.
+     */
+    public function updatedAuthors(mixed $value, string $key): void
+    {
+        if (preg_match('/^(\\d+)\\.institution_query$/', $key, $matches) !== 1) {
+            return;
+        }
+
+        $index = (int) $matches[1];
+
+        if (! isset($this->authors[$index])) {
+            return;
+        }
+
+        $this->authors[$index]['ror_id'] = '';
+        $this->authors[$index]['institution'] = '';
+        $this->authors[$index]['affiliation_source'] = '';
+        $this->affiliationResults[$index] = [];
+        $this->affiliationErrors[$index] = '';
+        $this->affiliationSearched[$index] = false;
+
+        $term = trim(is_string($value) ? $value : '');
+
+        if (mb_strlen($term) < 2) {
+            return;
+        }
+
+        $this->affiliationSearched[$index] = true;
+
+        try {
+            $this->affiliationResults[$index] = app(RorOrganizationService::class)->search($term);
+        } catch (RequestException|ConnectionException $exception) {
+            $this->affiliationErrors[$index] = 'ROR search is temporarily unavailable. Try again or select the unlisted-institution option.';
+        }
+    }
+
+    public function selectInstitution(int $index, string $rorId): void
+    {
+        if (! isset($this->authors[$index])) {
+            return;
+        }
+
+        try {
+            $organization = app(RorOrganizationService::class)->resolve($rorId);
+        } catch (InvalidArgumentException|RequestException|ConnectionException $exception) {
+            $this->affiliationErrors[$index] = 'Unable to verify this ROR organization. Please retry.';
+
+            return;
+        }
+
+        if ($organization === null) {
+            $this->affiliationErrors[$index] = 'The selected ROR organization is not active.';
+
+            return;
+        }
+
+        $this->authors[$index]['institution'] = $organization['name'];
+        $this->authors[$index]['institution_query'] = $organization['name'];
+        $this->authors[$index]['ror_id'] = $organization['id'];
+        $this->authors[$index]['affiliation_source'] = 'ror';
+        $this->affiliationResults[$index] = [];
+        $this->affiliationErrors[$index] = '';
+        $this->resetValidation();
+    }
+
+    public function useManualAffiliation(int $index): void
+    {
+        if (! isset($this->authors[$index])) {
+            return;
+        }
+
+        $this->authors[$index]['institution'] = $this->authors[$index]['institution'] ?: trim($this->authors[$index]['institution_query']);
+        $this->authors[$index]['ror_id'] = '';
+        $this->authors[$index]['affiliation_source'] = 'manual';
+        $this->affiliationResults[$index] = [];
+        $this->affiliationErrors[$index] = '';
+        $this->resetValidation();
+    }
+
+    public function useRorAffiliation(int $index): void
+    {
+        if (! isset($this->authors[$index])) {
+            return;
+        }
+
+        $this->authors[$index]['institution_query'] = $this->authors[$index]['institution_query'] ?: $this->authors[$index]['institution'];
+        $this->authors[$index]['institution'] = '';
+        $this->authors[$index]['ror_id'] = '';
+        $this->authors[$index]['affiliation_source'] = '';
+        $this->affiliationResults[$index] = [];
+        $this->affiliationErrors[$index] = '';
         $this->resetValidation();
     }
 
@@ -140,6 +261,8 @@ class PaperEditor extends Component
             'authors.*.name' => ['required', 'string', 'min:2', 'max:150'],
             'authors.*.email' => ['required', 'email:rfc', 'max:254', 'distinct:ignore_case'],
             'authors.*.institution' => ['nullable', 'string', 'max:255'],
+            'authors.*.ror_id' => ['nullable', 'string', 'max:48'],
+            'authors.*.affiliation_source' => ['required', Rule::in(['ror', 'manual'])],
             'authors.*.country' => ['nullable', 'string', 'max:120'],
             'correspondingIndex' => ['required', 'integer', 'min:0'],
         ]);
@@ -152,6 +275,8 @@ class PaperEditor extends Component
             'name' => $author['name'],
             'email' => $author['email'],
             'institution' => $author['institution'] ?? null,
+            'ror_id' => $author['ror_id'] ?? null,
+            'affiliation_source' => $author['affiliation_source'],
             'country' => $author['country'] ?? null,
         ], array_values($data['authors']));
 
@@ -188,5 +313,12 @@ class PaperEditor extends Component
                 ->orderBy('id')
                 ->get(['id', 'name']),
         ]);
+    }
+
+    private function clearAffiliationSearch(): void
+    {
+        $this->affiliationResults = [];
+        $this->affiliationErrors = [];
+        $this->affiliationSearched = [];
     }
 }

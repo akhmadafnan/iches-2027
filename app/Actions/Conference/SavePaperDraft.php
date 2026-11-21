@@ -7,16 +7,20 @@ use App\Enums\ProgramCode;
 use App\Models\ConferenceTrack;
 use App\Models\Paper;
 use App\Models\User;
+use App\Services\RorOrganizationService;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 final class SavePaperDraft
 {
     /**
      * @param  array{title: string, conference_track_id: int}  $input
-     * @param  list<array{name: string, email: string, institution?: string|null, country?: string|null}>  $authors
+     * @param  list<array{name: string, email: string, institution?: string|null, country?: string|null, ror_id?: string|null, affiliation_source?: string|null}>  $authors
      */
     public function handle(
         User $actor,
@@ -50,7 +54,11 @@ final class SavePaperDraft
             throw ValidationException::withMessages(['conferenceTrackId' => 'Select an available conference track.']);
         }
 
-        return DB::transaction(function () use ($actor, $existing, $input, $authors, $correspondingIndex, $track): Paper {
+        // Resolve the authoritative ROR record on the server. A browser-provided
+        // organization name is never accepted as a ROR-verified affiliation.
+        $normalizedAuthors = $this->normalizeAffiliations($authors);
+
+        return DB::transaction(function () use ($actor, $existing, $input, $normalizedAuthors, $correspondingIndex, $track): Paper {
             if ($existing !== null) {
                 $paper = Paper::query()->whereKey($existing->id)->lockForUpdate()->firstOrFail();
                 Gate::forUser($actor)->authorize('update', $paper);
@@ -72,12 +80,14 @@ final class SavePaperDraft
 
             $paper->authors()->delete();
 
-            foreach ($authors as $position => $author) {
+            foreach ($normalizedAuthors as $position => $author) {
                 $paper->authors()->create([
                     'position' => $position + 1,
                     'name' => trim($author['name']),
                     'email' => mb_strtolower(trim($author['email'])),
-                    'institution' => filled($author['institution'] ?? null) ? trim($author['institution']) : null,
+                    'institution' => $author['institution'],
+                    'ror_id' => $author['ror_id'],
+                    'affiliation_source' => $author['affiliation_source'],
                     'country' => filled($author['country'] ?? null) ? trim($author['country']) : null,
                     'is_corresponding' => $position === $correspondingIndex,
                 ]);
@@ -85,5 +95,73 @@ final class SavePaperDraft
 
             return $paper->load('authors', 'conferenceTrack');
         });
+    }
+
+    /**
+     * @param  list<array{name: string, email: string, institution?: string|null, country?: string|null, ror_id?: string|null, affiliation_source?: string|null}>  $authors
+     * @return list<array{name: string, email: string, institution: string, country?: string|null, ror_id: string|null, affiliation_source: string}>
+     */
+    private function normalizeAffiliations(array $authors): array
+    {
+        $ror = app(RorOrganizationService::class);
+        $normalized = [];
+
+        foreach ($authors as $index => $author) {
+            $source = $author['affiliation_source'] ?? null;
+
+            if ($source === 'ror') {
+                try {
+                    $organization = $ror->resolve($author['ror_id'] ?? '');
+                } catch (InvalidArgumentException $exception) {
+                    throw ValidationException::withMessages([
+                        "authors.{$index}.ror_id" => 'Please select a valid ROR organization from search results.',
+                    ]);
+                } catch (RequestException|ConnectionException $exception) {
+                    throw ValidationException::withMessages([
+                        "authors.{$index}.ror_id" => 'ROR is temporarily unavailable. Please try again; your draft has not been saved.',
+                    ]);
+                }
+
+                if ($organization === null) {
+                    throw ValidationException::withMessages([
+                        "authors.{$index}.ror_id" => 'The selected organization is not active in ROR.',
+                    ]);
+                }
+
+                $normalized[] = [
+                    ...$author,
+                    'institution' => $organization['name'],
+                    'ror_id' => $organization['id'],
+                    'affiliation_source' => 'ror',
+                ];
+
+                continue;
+            }
+
+            if ($source === 'manual') {
+                $name = trim($author['institution'] ?? '');
+
+                if (mb_strlen($name) < 3 || mb_strlen($name) > 255) {
+                    throw ValidationException::withMessages([
+                        "authors.{$index}.institution" => 'Enter the full institution name (3–255 characters) for a manual affiliation.',
+                    ]);
+                }
+
+                $normalized[] = [
+                    ...$author,
+                    'institution' => $name,
+                    'ror_id' => null,
+                    'affiliation_source' => 'manual',
+                ];
+
+                continue;
+            }
+
+            throw ValidationException::withMessages([
+                "authors.{$index}.affiliation_source" => 'Select an organization from ROR or explicitly choose the unlisted-institution option.',
+            ]);
+        }
+
+        return $normalized;
     }
 }
