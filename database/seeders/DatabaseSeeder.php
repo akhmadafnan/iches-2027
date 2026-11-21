@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(EventMasterSeeder::class);
+        $this->call(ConferenceTrackSeeder::class);
 
         if (app()->environment('local', 'testing')) {
             $this->call(DemoAccountsSeeder::class);

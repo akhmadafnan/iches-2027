@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\ManageConferenceTracks;
 use App\Livewire\Admin\ManageEventSettings;
 use App\Livewire\Admin\ManagePrograms;
 use App\Livewire\Admin\ManageUsers;
@@ -14,6 +15,10 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::livewire('admin/programs', ManagePrograms::class)
         ->middleware('can:manage-programs')
         ->name('admin.programs');
+
+    Route::livewire('admin/conference-tracks', ManageConferenceTracks::class)
+        ->middleware('can:manage-conference-tracks')
+        ->name('admin.tracks');
 
     Route::livewire('admin/event-settings', ManageEventSettings::class)
         ->middleware('can:manage-event-settings')

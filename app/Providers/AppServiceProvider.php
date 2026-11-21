@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('manage-users', fn (User $user): bool => $user->role === UserRole::Admin);
         Gate::define('manage-programs', fn (User $user): bool => $user->role === UserRole::Admin);
+        Gate::define('manage-conference-tracks', fn (User $user): bool => $user->role === UserRole::Admin);
         Gate::define('manage-event-settings', fn (User $user): bool => $user->role === UserRole::Admin);
         Gate::define('review-papers', fn (User $user): bool => $user->role === UserRole::Reviewer);
         Gate::define('scan-services', fn (User $user): bool => $user->role === UserRole::Committee);

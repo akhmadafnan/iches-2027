@@ -21,6 +21,7 @@
                     <flux:sidebar.group :heading="__('Workspace')" class="grid">
                     @can('manage-users')
                         <flux:sidebar.item icon="squares-2x2" :href="route('admin.programs')" :current="request()->routeIs('admin.programs')" wire:navigate>{{ __('Programs') }}</flux:sidebar.item>
+                        <flux:sidebar.item icon="book-open" :href="route('admin.tracks')" :current="request()->routeIs('admin.tracks')" wire:navigate>{{ __('Conference Tracks') }}</flux:sidebar.item>
                         <flux:sidebar.item icon="adjustments-horizontal" :href="route('admin.event-settings')" :current="request()->routeIs('admin.event-settings')" wire:navigate>{{ __('Event Settings') }}</flux:sidebar.item>
                         <flux:sidebar.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>
                             {{ __('Users & Access') }}

@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Submission, enrollment, payments, QR and other operational workflows are not implemented yet; the five official program master records and event settings are now implemented.**
 
-> **Current status (20 November 2026): FND-001 through FND-006 implemented and automated-tested.** Laravel 13/Livewire 4, Herd HTTPS, Fortify authentication/profile onboarding, role/assignment controls, role-aware dashboards, and **five TOR-based program masters + Event Settings + seven Important Dates** are implemented. Admin UI UAT is pending owner review. Academic submissions/review, participation enrollment, finance and QR remain TODO. Public landing design is on HOLD. No production URL is known.
+> **Current status (21 November 2026): FND-001 through FND-006 owner UAT PASS; ACAD-001 implemented and automated/browser-tested, awaiting owner UAT.** Laravel 13/Livewire 4, Herd HTTPS, Fortify account onboarding, role-based dashboards, five TOR program masters, Event Settings, seven Important Dates, and the eight official Conference Tracks are available. **Paper draft/submission (ACAD-002 onwards), reviews, participation enrollment, finance and QR are not yet implemented.** Public website design remains on HOLD.
 
 ## Start here
 
@@ -15,6 +15,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [Product Requirements (PRD)](docs/PRD.md) | Actors, business rules, modules, acceptance |
 | [Task Backlog](docs/TASKS.md) | Prioritized P0/P1/P2 tasks, dependencies and outcomes |
 | [FND-006 TOR Master Data Baseline](docs/FND-006-TOR-BASELINE.md) | Verbatim source verification, canonical program codes, dates and safeguards |
+| [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md) | Eight immutable-source TOR titles, track administration and UAT |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -107,6 +108,16 @@ Four existing `@iches.id` demo accounts are **not** forced into onboarding. Thei
 7. Review desktop and mobile layout. On narrow screens tables scroll **inside** their card; no horizontal overflow should appear across the entire document.
 
 **Automated verification:** **95 tests / 450 assertions PASS** (11 new FND-006 tests), Pint **74 files**, PHPStan no errors, Blade compilation and npm build PASS. MySQL migration `2026_11_20_000005` ran safely; re-running `EventMasterSeeder` retains **1 event, 5 programs, 7 milestones** and does not overwrite Admin modifications. **Manual owner UI/UAT remains to be confirmed**; no direct visual browser inspection is claimed for FND-006.
+
+## UAT ACAD-001 — Conference Tracks (local only)
+
+1. As local-only `admin@iches.id` (password `password`), open `https://iches-2027.test/admin/conference-tracks`. Verify eight English TOR titles, TRK-01 through TRK-08, all initially Active.
+2. Check the **No.** column, **Page 1 of 1** bottom-left, and **Previous / Next** buttons bottom-right. Search and filter Active/Inactive.
+3. Click **Edit track**: permanent code and original TOR title are read-only. Edit the display title, description, sort order, or availability; click **Save track**, refresh and verify persistence. Restore any test changes afterward.
+4. Test invalid order or duplicated display name: changes must be rejected. The last remaining active track cannot be disabled.
+5. On mobile, horizontally scroll the table within its card. Sign in as `user@iches.id` and verify the Admin URL returns **403 Forbidden**.
+
+Source: [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md). The actual paper author track selector is a future **ACAD-003** feature; this phase supplies the safe active-track Eloquent query, not the paper submission form. **Verification:** 105 application tests / 546 assertions PASS; Laravel Pint 79 files PASS; PHPStan and npm build PASS; Edge desktop/mobile visual QA and role-based HTTP 403 checks PASS. **Owner UAT is pending.**
 
 ## Core application areas
 

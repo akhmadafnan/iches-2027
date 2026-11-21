@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\ProgramCode;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -28,6 +29,14 @@ class Program extends Model
         'delivery_mode',
         'sort_order',
     ];
+
+    /**
+     * @return HasMany<ConferenceTrack, $this>
+     */
+    public function conferenceTracks(): HasMany
+    {
+        return $this->hasMany(ConferenceTrack::class);
+    }
 
     protected function casts(): array
     {

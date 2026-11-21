@@ -12,9 +12,12 @@
                     Manage the five official activities in one place, with names, dates, venues and participation formats sourced from the ICHES TOR.
                 </p>
             </div>
-            <flux:button :href="route('admin.event-settings')" variant="primary" class="!bg-white !text-emerald-950 hover:!bg-emerald-50" icon:trailing="arrow-up-right" wire:navigate>
+            <div class="flex flex-wrap items-center gap-2">
+                <flux:button :href="route('admin.tracks')" variant="outline" class="!border-white/30 !text-white hover:!bg-white/10" icon="book-open" wire:navigate>Conference Tracks</flux:button>
+                <flux:button :href="route('admin.event-settings')" variant="primary" class="!bg-white !text-emerald-950 hover:!bg-emerald-50" icon:trailing="arrow-up-right" wire:navigate>
                 Event Settings
-            </flux:button>
+                </flux:button>
+            </div>
         </div>
     </section>
 
