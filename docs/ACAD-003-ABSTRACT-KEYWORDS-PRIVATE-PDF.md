@@ -1,6 +1,6 @@
 # ACAD-003 — Abstract, OJS-style Keywords & Private PDF
 
-**Status:** IMPLEMENTED, verified in local MySQL/Edge and automated tests; **awaiting owner UAT**. Changes are version-controlled on main.
+**Status:** **DONE — OWNER UAT PASS (21 November 2026)**. Implemented and verified in local MySQL/Edge and automated tests; implementation commit `ccf1ba9` synced with `origin/main`. ACAD-004 is a separate task.
 **Date:** 21 November 2026.
 **Source:** [PRD §AC-04](PRD.md), [TASKS](TASKS.md); builds on owner-approved ACAD-002 Paper Editor.
 
@@ -35,7 +35,7 @@
 - Microsoft Edge headless on the real Herd HTTPS application: authenticated existing Draft opened successfully; abstract/keyword/PDF sections rendered; Enter creates a keyword chip, case-insensitive duplicate blocked, second chip added/removed, mobile 390px has zero horizontal overflow, JavaScript page errors none; no Submit button.
 - Microsoft Edge uploaded a local temporary PDF through the Livewire file input and showed its filename/selected status without persisting anything. **No real paper was saved by the browser QA**. Private file create/replacement/removal/download behavior is proven by automated feature tests, not by an owner manual browser cycle.
 
-## Owner UAT — complete before ACAD-004
+## Owner UAT — PASSED (21 November 2026)
 
 1. Login on Laptop 2 at `https://iches-2027.test` (local demo account, or your own test account), open `/my/submissions` and **Edit draft** or **New paper draft**.
 2. Confirm the compact authors/affiliation modal from ACAD-002 is unchanged. Record title/track/authors once; save as **Draft** and note `ICH27-P...`.
@@ -45,7 +45,7 @@
 6. Verify another account cannot open the Draft edit route or download the private PDF; reviewer must not see any Draft.
 7. Verify status stays **Draft**, no Submit button, no payment or email triggered. Inspect on desktop and mobile.
 
-**Decision gate:** Owner marks ACAD-003 UAT PASS/FAIL after testing. Do not begin ACAD-004 or invent official academic limits before explicit approval.
+**Decision gate:** Owner explicitly confirmed **ACAD-003 UAT PASS** on 21 November 2026. Academic submission limits remain a separate rule-setting decision; ACAD-004 is not yet authorized or implemented.
 
 ## Known academic decisions to set before ACAD-004
 
