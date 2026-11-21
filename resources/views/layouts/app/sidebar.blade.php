@@ -63,6 +63,8 @@
                 </p>
             </flux:sidebar.nav>
 
+            <x-workspace-role-switcher />
+
             <x-desktop-user-menu class="hidden lg:block" :name="auth()->user()->name" />
         </flux:sidebar>
 
@@ -95,6 +97,19 @@
                                 </div>
                             </div>
                         </div>
+                    </flux:menu.radio.group>
+
+                    <flux:menu.separator />
+
+                    <flux:menu.radio.group>
+                        <div class="px-2 py-1 text-xs font-semibold text-zinc-500">Active workspace: {{ auth()->user()->activeRole()->label() }}</div>
+                        @foreach (auth()->user()->assignedRoles() as $membership)
+                            <form method="POST" action="{{ route('workspace.switch-role') }}">
+                                @csrf
+                                <input type="hidden" name="role" value="{{ $membership->value }}" />
+                                <flux:menu.item as="button" type="submit" :icon="auth()->user()->activeRole() === $membership ? 'check-circle' : 'arrow-right-circle'">{{ $membership->label() }}</flux:menu.item>
+                            </form>
+                        @endforeach
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />

@@ -126,17 +126,22 @@
                                 <span class="whitespace-nowrap text-sm text-zinc-600 dark:text-zinc-300">{{ $user->email }}</span>
                             </flux:table.cell>
                             <flux:table.cell class="!py-4">
-                                <flux:badge
-                                    size="sm"
-                                    :color="match ($user->role) {
-                                        \App\Enums\UserRole::Admin => 'emerald',
-                                        \App\Enums\UserRole::Reviewer => 'blue',
-                                        \App\Enums\UserRole::Committee => 'amber',
-                                        default => 'zinc',
-                                    }"
-                                >
-                                    {{ ucfirst($user->role->value) }}
-                                </flux:badge>
+                                <div class="flex max-w-[260px] flex-wrap gap-1.5">
+                                    @foreach ($user->roleAssignments as $membership)
+                                        <flux:badge
+                                            size="sm"
+                                            :color="match ($membership->role) {
+                                                \App\Enums\UserRole::Superadmin => 'violet',
+                                                \App\Enums\UserRole::Admin => 'emerald',
+                                                \App\Enums\UserRole::Reviewer => 'blue',
+                                                \App\Enums\UserRole::Committee => 'amber',
+                                                default => 'zinc',
+                                            }"
+                                        >
+                                            {{ $membership->role->label() }}{{ $user->role === $membership->role ? ' · Primary' : '' }}
+                                        </flux:badge>
+                                    @endforeach
+                                </div>
                             </flux:table.cell>
                             <flux:table.cell align="end" class="!py-4">
                                 @can('updateAccess', $user)
@@ -218,14 +223,33 @@
                 </div>
 
                 <div class="space-y-2">
-                    <flux:select wire:model="role" label="Primary role" required>
+                    <flux:select wire:model.live="role" label="Default role on login" required>
                         @foreach ($roles as $availableRole)
-                            <flux:select.option :value="$availableRole->value">{{ ucfirst($availableRole->value) }}</flux:select.option>
+                            @if ($availableRole !== \App\Enums\UserRole::Superadmin || $canAssignSuperadmin)
+                                <flux:select.option :value="$availableRole->value">{{ $availableRole->label() }}</flux:select.option>
+                            @endif
                         @endforeach
                     </flux:select>
                     <p class="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                        The primary role controls access to Admin, Reviewer, or Committee workspaces.
+                        The default role must also be selected below. Switching workspaces never switches account identity.
                     </p>
+                    <div class="mt-3 space-y-2 rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                        <flux:heading size="sm">Assigned roles (multiple allowed)</flux:heading>
+                        <p class="text-xs text-zinc-500">Only these roles appear in the sidebar switcher. The active role controls module permissions.</p>
+                        <div class="grid gap-2 sm:grid-cols-2">
+                            @foreach ($roles as $availableRole)
+                                @if ($availableRole !== \App\Enums\UserRole::Superadmin || $canAssignSuperadmin)
+                                    <label class="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 p-2 text-sm dark:border-zinc-700">
+                                        <input type="checkbox" wire:model="assignedRoles" value="{{ $availableRole->value }}" class="size-4 rounded border-zinc-300 accent-emerald-700" />
+                                        <span>{{ $availableRole->label() }}</span>
+                                    </label>
+                                @endif
+                            @endforeach
+                        </div>
+                        @error('assignedRoles') <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        @error('assignedRoles.*') <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                        @error('roles') <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
                 </div>
 
                 <div class="space-y-3 rounded-xl border border-zinc-200 px-4 py-4 dark:border-zinc-700">
@@ -236,7 +260,7 @@
                     <flux:checkbox wire:model="finance" label="Finance verification" />
                     <flux:checkbox wire:model="academicAuthority" label="Academic decision authority" />
                     <p class="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                        These duties require a Committee or Admin primary role.
+                        These duties require Committee, Admin or Superadmin membership and are effective only in an authorized active workspace.
                     </p>
                 </div>
 

@@ -20,17 +20,18 @@ class Dashboard extends Component
         $user = Auth::user();
         abort_unless($user instanceof User, 403);
 
-        $role = $user->role ?? UserRole::User;
+        $role = $user->activeRole();
         $intention = $user->registration_intention ?? RegistrationIntention::ExplorePrograms;
         $ownedPaper = $intention === RegistrationIntention::SubmitPaper ? $user->papers()->first() : null;
 
-        $summary = $role === UserRole::Admin ? [
+        $summary = in_array($role, [UserRole::Admin, UserRole::Superadmin], true) ? [
             'accounts' => User::query()->count(),
             'verified' => User::query()->whereNotNull('email_verified_at')->count(),
-            'staff' => User::query()->where('role', '!=', UserRole::User->value)->count(),
+            'staff' => User::query()->whereHas('roleAssignments', fn ($q) => $q->where('role', '!=', UserRole::User->value))->count(),
         ] : null;
 
         $workspaceRoute = match ($role) {
+            UserRole::Superadmin => 'admin.users',
             UserRole::Admin => 'admin.users',
             UserRole::Reviewer => 'reviewer.workspace',
             UserRole::Committee => 'committee.workspace',
@@ -38,6 +39,7 @@ class Dashboard extends Component
         };
 
         $heroDescription = match ($role) {
+            UserRole::Superadmin => 'All installed workspaces are available in your root administration context. Switching roles will restrict access to that role.',
             UserRole::Admin => 'Manage accounts, five official programs and event settings from your ICHES workspace.',
             UserRole::Reviewer => 'Your academic review workspace is ready for the upcoming paper review workflow.',
             UserRole::Committee => 'Your operations workspace is ready for the upcoming onsite services workflow.',

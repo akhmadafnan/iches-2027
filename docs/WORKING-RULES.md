@@ -112,4 +112,4 @@ Jika fitur belum dibahas, jangan menjadikannya dependency palsu. Buat implementa
 
 ## 11. Peralihan chat / perubahan kebijakan
 
-Dalam chat baru **wajib membaca docs/CURRENT-STATE-AND-DECISIONS.md terlebih dahulu**. ACAD-005 adalah next coding task hanya jika owner GO; jangan lompat coding DEC/LoA/Finance. Docs-only tidak mengubah source maupun database. Untuk source, tetap UAT owner sebelum scoped commit/push. Riwayat DONE lama boleh disimpan, tetapi logika bisnis lawas tidak boleh dihidupkan kembali.
+Dalam chat baru **wajib membaca docs/CURRENT-STATE-AND-DECISIONS.md terlebih dahulu**. ACAD-005 serta DEC-BULK-001/MSG-001B sudah DONE. AUTH-MR-001 (Superadmin + multi-role + switch workspace) **sudah OWNER UAT PASS dan ditutup melalui scoped commit/push**. DOC-LOA-001 boleh dipersiapkan setelah GO khusus owner; jangan mulai coding LoA/Finance tanpa persetujuan terpisah. Docs-only tidak mengubah source maupun database. Untuk source, tetap UAT owner sebelum scoped commit/push. Riwayat DONE lama boleh disimpan, tetapi logika bisnis lawas tidak boleh dihidupkan kembali.

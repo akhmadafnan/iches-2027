@@ -35,7 +35,7 @@ class RoleAccessTest extends TestCase
             foreach ($routes as $route => $allowedRole) {
                 $response = $this->actingAs($user)->get(route($route));
 
-                if ($role === $allowedRole) {
+                if ($role === $allowedRole || $role === UserRole::Superadmin) {
                     $response->assertOk();
                 } else {
                     $response->assertForbidden();

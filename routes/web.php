@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PaperAbstractDownloadController;
 use App\Http\Controllers\ReviewerAbstractDownloadController;
+use App\Http\Controllers\SwitchActiveRoleController;
 use App\Livewire\Academic\AcademicDecisions;
 use App\Livewire\Admin\ManageConferenceTracks;
 use App\Livewire\Admin\ManageEventSettings;
@@ -19,6 +20,10 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+
+    Route::post('workspace/switch-role', SwitchActiveRoleController::class)
+        ->middleware('throttle:30,1')
+        ->name('workspace.switch-role');
 
     Route::livewire('my/submissions', MyPapers::class)->name('papers.index');
     Route::livewire('my/submissions/create', PaperEditor::class)->name('papers.create');

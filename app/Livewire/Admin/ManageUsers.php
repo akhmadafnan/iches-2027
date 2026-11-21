@@ -36,6 +36,11 @@ class ManageUsers extends Component
 
     public string $role = 'user';
 
+    /** @var list<string> */
+    public array $assignedRoles = [];
+
+    public string $editingOriginalRole = 'user';
+
     public bool $finance = false;
 
     public bool $academicAuthority = false;
@@ -64,10 +69,22 @@ class ManageUsers extends Component
         $this->editingName = $target->name;
         $this->editingEmail = $target->email;
         $this->role = $target->role->value;
+        $this->editingOriginalRole = $target->role->value;
+        $this->assignedRoles = array_map(fn (UserRole $role): string => $role->value, $target->assignedRoles());
         $this->finance = $target->hasGlobalDuty(StaffDuty::Finance);
         $this->academicAuthority = $target->hasGlobalDuty(StaffDuty::AcademicAuthority);
         $this->resetValidation();
         $this->showEditModal = true;
+    }
+
+    public function updatedRole(string $value): void
+    {
+        // Legacy one-role accounts behave as a role replacement; multi-role accounts retain other roles.
+        if ($this->assignedRoles === [$this->editingOriginalRole]) {
+            $this->assignedRoles = [$value];
+        } elseif (! in_array($value, $this->assignedRoles, true)) {
+            $this->assignedRoles[] = $value;
+        }
     }
 
     public function cancel(): void
@@ -84,6 +101,8 @@ class ManageUsers extends Component
         $validated = $this->validate([
             'editingUserId' => ['required', 'integer', 'exists:users,id'],
             'role' => ['required', Rule::enum(UserRole::class)],
+            'assignedRoles' => ['required', 'array', 'min:1', 'max:5'],
+            'assignedRoles.*' => ['required', 'string', 'distinct', Rule::enum(UserRole::class)],
             'finance' => ['boolean'],
             'academicAuthority' => ['boolean'],
         ]);
@@ -100,6 +119,7 @@ class ManageUsers extends Component
             UserRole::from($validated['role']),
             $validated['finance'],
             $validated['academicAuthority'],
+            $validated['assignedRoles'],
         );
 
         $this->editingUserId = null;
@@ -121,13 +141,17 @@ class ManageUsers extends Component
                             ->orWhere('email', 'like', $term);
                     });
                 })
-                ->when($this->roleFilter !== 'all', fn (Builder $query) => $query->where('role', $this->roleFilter))
+                ->when($this->roleFilter !== 'all', fn (Builder $query) => $query->whereHas('roleAssignments',
+                    fn (Builder $roles) => $roles->where('role', $this->roleFilter)))
+                ->with('roleAssignments')
                 ->orderBy('name')
                 ->orderBy('id')
                 ->paginate(10),
             'roles' => UserRole::cases(),
+            'canAssignSuperadmin' => Auth::user() instanceof User && Auth::user()->isActiveAs(UserRole::Superadmin),
             'totalAccounts' => User::query()->count(),
-            'staffAccounts' => User::query()->where('role', '!=', UserRole::User->value)->count(),
+            'staffAccounts' => User::query()->whereHas('roleAssignments',
+                fn (Builder $roles) => $roles->where('role', '!=', UserRole::User->value))->count(),
             'delegatedDuties' => StaffAssignment::query()->count(),
         ]);
     }

@@ -33,24 +33,26 @@ class AppServiceProvider extends ServiceProvider
 
     private function configureAuthorization(): void
     {
-        Gate::define('manage-users', fn (User $user): bool => $user->role === UserRole::Admin);
-        Gate::define('manage-programs', fn (User $user): bool => $user->role === UserRole::Admin);
-        Gate::define('manage-conference-tracks', fn (User $user): bool => $user->role === UserRole::Admin);
-        Gate::define('manage-event-settings', fn (User $user): bool => $user->role === UserRole::Admin);
-        Gate::define('review-papers', fn (User $user): bool => $user->role === UserRole::Reviewer);
-        Gate::define('scan-services', fn (User $user): bool => $user->role === UserRole::Committee);
-        Gate::define('verify-payments', fn (User $user): bool => in_array($user->role, [UserRole::Committee, UserRole::Admin], true)
-            && $user->hasGlobalDuty(StaffDuty::Finance));
-        Gate::define('publish-decisions', fn (User $user): bool => in_array($user->role, [UserRole::Committee, UserRole::Admin], true)
-            && $user->hasGlobalDuty(StaffDuty::AcademicAuthority));
-        Gate::define(
-            'moderate-session',
-            fn (User $user, int $sessionId): bool => $user->hasScopedDuty(StaffDuty::Moderator, 'session', $sessionId),
-        );
-        Gate::define(
-            'manage-cohost',
-            fn (User $user, int $institutionId): bool => $user->hasScopedDuty(StaffDuty::CoHostPic, 'institution', $institutionId),
-        );
+        // Active workspace determines capabilities. Inactive assigned roles grant nothing.
+        // Superadmin is a root administrative context, not user impersonation.
+        $root = static fn (User $user): bool => $user->isActiveAs(UserRole::Superadmin);
+        $admin = static fn (User $user): bool => $root($user) || $user->isActiveAs(UserRole::Admin);
+        $staff = static fn (User $user): bool => $admin($user) || $user->isActiveAs(UserRole::Committee);
+
+        Gate::define('manage-users', $admin);
+        Gate::define('manage-programs', $admin);
+        Gate::define('manage-conference-tracks', $admin);
+        Gate::define('manage-event-settings', $admin);
+        Gate::define('review-papers', fn (User $user): bool => $root($user) || $user->isActiveAs(UserRole::Reviewer));
+        Gate::define('scan-services', fn (User $user): bool => $root($user) || $user->isActiveAs(UserRole::Committee));
+        Gate::define('verify-payments', fn (User $user): bool => $root($user)
+            || ($staff($user) && $user->hasGlobalDuty(StaffDuty::Finance)));
+        Gate::define('publish-decisions', fn (User $user): bool => $root($user)
+            || ($staff($user) && $user->hasGlobalDuty(StaffDuty::AcademicAuthority)));
+        Gate::define('moderate-session', fn (User $user, int $sessionId): bool => $root($user)
+            || $user->hasScopedDuty(StaffDuty::Moderator, 'session', $sessionId));
+        Gate::define('manage-cohost', fn (User $user, int $institutionId): bool => $root($user)
+            || $user->hasScopedDuty(StaffDuty::CoHostPic, 'institution', $institutionId));
     }
 
     /**

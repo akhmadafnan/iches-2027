@@ -59,6 +59,60 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Factory, Fortify registration and other normal account creation all grant the initial role.
+        static::created(function (self $user): void {
+            $user->role = $user->role ?? UserRole::User;
+            $user->roleAssignments()->firstOrCreate(['role' => $user->role->value]);
+        });
+    }
+
+    /** @return HasMany<UserRoleAssignment, $this> */
+    public function roleAssignments(): HasMany
+    {
+        return $this->hasMany(UserRoleAssignment::class);
+    }
+
+    public function hasRole(UserRole $role): bool
+    {
+        return $this->roleAssignments()->where('role', $role->value)->exists();
+    }
+
+    /** @return list<UserRole> */
+    public function assignedRoles(): array
+    {
+        /** @var list<string|UserRole> $values */
+        $values = $this->roleAssignments()->orderBy('id')->pluck('role')->values()->all();
+
+        return array_map(static fn (string|UserRole $value): UserRole => $value instanceof UserRole ? $value : UserRole::from($value), $values);
+    }
+
+    public function activeRole(): UserRole
+    {
+        // Session is a UI choice, NEVER an authorization source without a live membership check.
+        $session = request()->hasSession() ? request()->session() : null;
+        if ($session !== null && (int) $session->get('access.active_role_user_id') === $this->id) {
+            $value = $session->get('access.active_role');
+            $selected = is_string($value) ? UserRole::tryFrom($value) : null;
+            if ($selected !== null && $this->hasRole($selected)) {
+                return $selected;
+            }
+        }
+
+        $primary = $this->role ?? UserRole::User;
+        if ($this->hasRole($primary)) {
+            return $primary;
+        }
+
+        return $this->assignedRoles()[0] ?? UserRole::User;
+    }
+
+    public function isActiveAs(UserRole $role): bool
+    {
+        return $this->activeRole() === $role;
+    }
+
     /** @return HasMany<StaffAssignment, $this> */
     public function staffAssignments(): HasMany
     {

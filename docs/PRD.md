@@ -36,7 +36,7 @@ Complex field quotas, bundled facility breakdown, generic reviewer rubric builde
 | Assigned Moderator | Confirm paper Presented/No Show | Assigned session only |
 | Assigned Co-Host PIC | Manage institution's representatives | Own institution only |
 
-Four broad access categories: User, Reviewer, Committee, Admin; the last four activities above are **assignments/permissions**, not additional public-selectable roles. A user with multiple assignments stays one account.
+**Five fixed access roles:** Participant (User), Reviewer, Committee, Administrator, Superadmin. **One account may have several assigned roles, but only ONE selected active role per session governs module permissions.** All workspaces enforce the active role server-side; switching role never impersonates a different account. Superadmin active context opens all installed workspaces but cannot bypass paper ownership/reviewer conflict or audit. Only active Superadmin can grant Superadmin to another account. Existing Finance/Academic Authority and scoped Moderator/CoHost duties remain additional resource-scoped permissions for Committee/Admin; active Superadmin has those module gates centrally. Registration never grants elevated roles. See [AUTH-MR-001 contract](AUTH-MR-001-SUPERADMIN-MULTIROLE.md).
 
 Registration captures: name, email, password, institution, country, and **intention** (Submit Paper / Join Conference / Explore Programs). Intention influences dashboard guidance, not permission. Upload profile photo later. User may join another program without registering again.
 
@@ -67,7 +67,8 @@ Guest → one Account → Profile → Personal Dashboard → **one owned Confere
 | ACC-03 | Personal dashboard with dynamic program cards | Single account supports multiple programs |
 | ACC-04 | Profile editor and personal affiliation | Users cannot edit each other's data |
 | ACC-05 | Photo upload + 1:1 modal crop | Drag/zoom/reset/confirm; validated square result stored |
-| ACC-06 | Admin role and scoped staff assignment | Actions checked server-side, forbidden returns 403 |
+| ACC-06 | Active-role gates with scoped staff assignments | Actions checked server-side for current authorized role, forbidden returns 403 |
+| ACC-07 | SUPERADMIN + multi-role membership + Switch Workspace | Additive membership migration, preserved legacy primary role, only active roles permitted; admin never self-elevates or grants Superadmin; role switch checks live membership and logs actor; sidebar desktop/mobile |
 
 ### 5.2 Academic Conference
 | ID | Function | Acceptance |

@@ -1,7 +1,7 @@
 # Architecture note — UUID v7, email workflow & reviewer continuity
 
 **Recorded:** 21 November 2026
-**Status:** REV-001..003 FINAL UAT PASS and UUID v7 forward policy APPLIED; decision/LoA/Finance notifications NOT IMPLEMENTED. Active contract: [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md).
+**Status (updated 21 November 2026):** REV-001..003 and DEC-BULK-001/MSG-001B OWNER UAT PASS. UUID v7 forward policy implemented for all six independent review/decision/notification entities; real decision/correction outbox is DONE (mailer log), but LoA/Finance notifications are NOT IMPLEMENTED. ARCH-002 conversion of legacy BIGINT PKs remains unapproved. Active contract: [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md).
 **Sources:** Master Blueprint, PRD AC-06/07 and COM-01/02, TASKS, latest owner direction.
 **Safety:** No destructive migration of existing IDs and no outbound email to real users.
 
@@ -24,7 +24,9 @@ Laravel 13 supports native UUID v7 generation through HasUuids and Str::uuid7().
 4. If ALL existing critical primary keys must become UUID v7, create separate ARCH-002 migration work: full FK/external-reference inventory, backup, idempotent backfill with new UUID v7 columns, testing and dual read/writes, URL/file-path compatibility, rollback test, only then possible PK conversion. No destructive migration without explicit authorization.
 5. Do not change or regenerate the permanent human-readable Paper ID even after an ID architecture upgrade.
 
-REV-001 remains read-only. REV-002 now applies this forward-key standard through an additive UUID v7 paper_review_claims table without converting any old paper/user primary key. ARCH-002 full legacy conversion remains an unapproved separate project.
+**Source + MySQL audit on 21 November 2026:** The following six tables have `CHAR(36)` UUID primary keys, with Laravel Eloquent `HasUuids` calling `Str::uuid7()`: `paper_review_claims`, `paper_reviews`, `paper_review_events`, `paper_decisions`, `paper_decision_events`, `decision_notifications`. Their UUID foreign keys use matching `foreignUuid` definitions. Their references to legacy `papers.id` / `users.id` remain BIGINT FKs. The existing real review and claim IDs contain a UUID version-7 nibble (`-7xxx-`).
+
+**Not UUID v7:** `papers.id`, `users.id`, `user_roles.id`, `paper_authors.id`, `conference_tracks.id`, `programs.id` and most other master/assignment PKs remain BIGINT; `papers.public_id` remains unique ULID (26 characters); `papers.reference` remains immutable human Paper ID. `Str::uuid()` used for temporary PDF filenames is separate from business-entity primary keys and does not imply UUID v7. Thus **UUID v7 has been completed for the selected NEW academic transaction tables, not for every key in the application**. ARCH-002 full legacy conversion remains an unapproved separate project.
 
 ## B. Emails required by PRD COM-01 / COM-02
 
