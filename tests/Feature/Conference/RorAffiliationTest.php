@@ -84,14 +84,17 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Community-Based Education and Responsibility')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->set('authors.0.institution_query', 'UNISYA')
+            ->call('editAuthor', 0)
+            ->set('authorDraft.institution_query', 'UNISYA')
             ->assertSee('Universitas Islam Syarifuddin Lumajang')
             ->assertSee('Lumajang, Indonesia')
-            ->call('selectInstitution', 0, 'https://ror.org/041rf3s62')
-            ->assertSet('authors.0.affiliation_source', 'ror')
-            ->assertSet('authors.0.ror_id', 'https://ror.org/041rf3s62')
+            ->call('selectInstitution', 'https://ror.org/041rf3s62')
+            ->assertSet('authorDraft.affiliation_source', 'ror')
+            ->assertSet('authorDraft.ror_id', 'https://ror.org/041rf3s62')
             ->assertDontSee('Institution not listed in ROR')
-            ->set('authors.0.institution', 'Forged institution name')
+            ->set('authorDraft.institution', 'Forged institution name')
+            ->call('saveAuthor')
+            ->assertSet('authors.0.institution', 'Universitas Islam Syarifuddin Lumajang')
             ->call('save')
             ->assertHasNoErrors()
             ->assertRedirect(route('papers.index'));
@@ -111,9 +114,10 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Digital Inclusion and Human Development')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->set('authors.0.institution_query', 'UNISYA')
-            ->call('save')
-            ->assertHasErrors('authors.0.affiliation_source');
+            ->call('editAuthor', 0)
+            ->set('authorDraft.institution_query', 'UNISYA')
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.affiliation_source');
 
         $this->assertDatabaseCount('papers', 0);
     }
@@ -124,13 +128,14 @@ class RorAffiliationTest extends TestCase
         $actor = User::factory()->create(['institution' => 'UNISYA']);
 
         Livewire::actingAs($actor)->test(PaperEditor::class)
-            ->set('authors.0.institution_query', 'UNISYA')
-            ->call('selectInstitution', 0, 'https://ror.org/041rf3s62')
-            ->assertSet('authors.0.affiliation_source', 'ror')
-            ->set('authors.0.institution_query', 'U')
-            ->assertSet('authors.0.ror_id', '')
-            ->assertSet('authors.0.affiliation_source', '')
-            ->assertSet('authors.0.institution', '');
+            ->call('editAuthor', 0)
+            ->set('authorDraft.institution_query', 'UNISYA')
+            ->call('selectInstitution', 'https://ror.org/041rf3s62')
+            ->assertSet('authorDraft.affiliation_source', 'ror')
+            ->set('authorDraft.institution_query', 'U')
+            ->assertSet('authorDraft.ror_id', '')
+            ->assertSet('authorDraft.affiliation_source', '')
+            ->assertSet('authorDraft.institution', '');
     }
 
     public function test_explicit_manual_fallback_has_no_fabricated_ror_identifier(): void
@@ -140,8 +145,10 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Inclusive Community Service and Research')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->call('useManualAffiliation', 0)
-            ->set('authors.0.institution', 'Unlisted Community Institute')
+            ->call('editAuthor', 0)
+            ->call('useManualAffiliation')
+            ->set('authorDraft.institution', 'Unlisted Community Institute')
+            ->call('saveAuthor')
             ->call('save')
             ->assertHasNoErrors();
 
@@ -158,9 +165,10 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Educational Society and Sustainability')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->call('useManualAffiliation', 0)
-            ->call('save')
-            ->assertHasErrors('authors.0.institution');
+            ->call('editAuthor', 0)
+            ->call('useManualAffiliation')
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.institution');
 
         $this->assertDatabaseCount('papers', 0);
     }
@@ -172,10 +180,11 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Education in Contemporary Civilization')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->set('authors.0.affiliation_source', 'ror')
-            ->set('authors.0.ror_id', 'https://evil.example/not-a-ror')
-            ->call('save')
-            ->assertHasErrors('authors.0.ror_id');
+            ->call('editAuthor', 0)
+            ->set('authorDraft.affiliation_source', 'ror')
+            ->set('authorDraft.ror_id', 'https://evil.example/not-a-ror')
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.ror_id');
 
         $this->assertDatabaseCount('papers', 0);
     }
@@ -192,10 +201,11 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Islamic Education and Social Accountability')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->set('authors.0.affiliation_source', 'ror')
-            ->set('authors.0.ror_id', 'https://ror.org/041rf3s62')
-            ->call('save')
-            ->assertHasErrors('authors.0.ror_id');
+            ->call('editAuthor', 0)
+            ->set('authorDraft.affiliation_source', 'ror')
+            ->set('authorDraft.ror_id', 'https://ror.org/041rf3s62')
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.ror_id');
 
         $this->assertDatabaseCount('papers', 0);
     }
@@ -212,10 +222,11 @@ class RorAffiliationTest extends TestCase
         Livewire::actingAs($actor)->test(PaperEditor::class)
             ->set('title', 'Educational Innovation and Institutional Ethics')
             ->set('conferenceTrackId', (string) $this->track()->id)
-            ->set('authors.0.affiliation_source', 'ror')
-            ->set('authors.0.ror_id', 'https://ror.org/041rf3s62')
-            ->call('save')
-            ->assertHasErrors('authors.0.ror_id');
+            ->call('editAuthor', 0)
+            ->set('authorDraft.affiliation_source', 'ror')
+            ->set('authorDraft.ror_id', 'https://ror.org/041rf3s62')
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.ror_id');
 
         $this->assertDatabaseCount('papers', 0);
     }
@@ -235,11 +246,12 @@ class RorAffiliationTest extends TestCase
         $paper->authors()->update(['affiliation_source' => null, 'ror_id' => null]);
 
         Livewire::actingAs($actor)->test(PaperEditor::class, ['paper' => $paper])
-            ->assertSet('authors.0.affiliation_source', 'legacy')
-            ->assertSet('authors.0.institution', 'Historical Institution')
+            ->call('editAuthor', 0)
+            ->assertSet('authorDraft.affiliation_source', 'legacy')
+            ->assertSet('authorDraft.institution', 'Historical Institution')
             ->set('title', 'Historical Paper Draft with Manual Institution Revised')
-            ->call('save')
-            ->assertHasErrors('authors.0.affiliation_source');
+            ->call('saveAuthor')
+            ->assertHasErrors('authorDraft.affiliation_source');
 
         $this->assertSame('Historical Paper Draft with Manual Institution', $paper->fresh()->title);
     }

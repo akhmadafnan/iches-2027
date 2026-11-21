@@ -52,122 +52,47 @@
                     <div class="flex size-10 items-center justify-center rounded-xl bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-400"><flux:icon.users class="size-5" /></div>
                     <div>
                         <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Authors &amp; affiliations</h2>
-                        <p class="mt-1 text-sm text-zinc-500">Arrange authors in publication order and select one contact author.</p>
+                        <p class="mt-1 text-sm text-zinc-500">Contributors in publication order. Use Edit to view or change their details.</p>
                     </div>
                 </div>
-                <flux:button type="button" size="sm" variant="outline" icon="plus" wire:click="addAuthor">Add co-author</flux:button>
+                <flux:button type="button" size="sm" variant="outline" icon="plus" wire:click="addAuthor">Add author</flux:button>
             </div>
 
-            <div class="space-y-4 p-5 sm:p-6">
+            <div class="divide-y divide-zinc-100 px-5 dark:divide-zinc-800 sm:px-6">
                 @foreach ($authors as $index => $author)
-                    <div wire:key="author-{{ $author['key'] }}" class="rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-800/40 sm:p-5">
-                        <div class="mb-4 flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-2">
-                                <div class="flex size-7 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">{{ $index + 1 }}</div>
-                                <p class="whitespace-nowrap text-sm font-semibold text-zinc-900 dark:text-white">Author {{ $index + 1 }}</p>
-                            </div>
-                            <div class="flex shrink-0 items-center gap-0 sm:gap-1">
-                                <flux:button type="button" size="sm" variant="ghost" icon="arrow-up" wire:click="moveAuthor({{ $index }}, 'up')" :disabled="$index === 0" tooltip="Move author up" />
-                                <flux:button type="button" size="sm" variant="ghost" icon="arrow-down" wire:click="moveAuthor({{ $index }}, 'down')" :disabled="$index === count($authors) - 1" tooltip="Move author down" />
-                                <flux:button type="button" size="sm" variant="ghost" icon="trash" wire:click="removeAuthor({{ $index }})" :disabled="count($authors) === 1" tooltip="Remove author" aria-label="Remove author {{ $index + 1 }}" />
-                            </div>
-                        </div>
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <flux:input wire:model="authors.{{ $index }}.name" label="Full name" placeholder="Author name" required />
-                            <flux:input wire:model="authors.{{ $index }}.email" type="email" label="Email address" placeholder="author@example.com" required />
-                        </div>
-
-                        <div class="mt-5 space-y-3">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Institution / affiliation <span class="text-red-600">*</span></p>
-                                @if (($author['affiliation_source'] ?? '') === 'manual')
-                                    <flux:button type="button" size="sm" variant="ghost" icon="magnifying-glass" wire:click="useRorAffiliation({{ $index }})">Search ROR instead</flux:button>
-                                @elseif (($author['affiliation_source'] ?? '') === 'ror')
-                                    <flux:badge color="emerald" size="sm">ROR verified</flux:badge>
-                                @endif
-                            </div>
-
-                            @if (($author['affiliation_source'] ?? '') === 'manual')
-                                <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900 dark:bg-amber-950/20">
-                                    <flux:input wire:model="authors.{{ $index }}.institution" label="Official institution name (not in ROR)" placeholder="Enter the full organization name" required />
-                                    <p class="mt-2 text-xs leading-5 text-amber-800 dark:text-amber-200">
-                                        Unverified institution: no ROR ID will be assigned. Use only when the institution genuinely cannot be found in the registry.
-                                    </p>
-                                </div>
-                            @else
-                                <div class="relative">
-                                    <flux:input
-                                        wire:model.live.debounce.450ms="authors.{{ $index }}.institution_query"
-                                        icon="magnifying-glass"
-                                        label="Search ROR by full university name or acronym"
-                                        placeholder="e.g. UNISYA, Universitas Islam Syarifuddin"
-                                        autocomplete="off"
-                                        aria-label="Search ROR institution for author {{ $index + 1 }}"
-                                    />
-                                    <div wire:loading wire:target="authors.{{ $index }}.institution_query" class="mt-2 text-xs text-zinc-500">Searching ROR...</div>
-                                    @if (count($affiliationResults[$index] ?? []) > 0 && ($author['affiliation_source'] ?? '') !== 'ror')
-                                        <div class="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-xl border border-zinc-200 bg-white p-1.5 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
-                                            @foreach ($affiliationResults[$index] as $result)
-                                                <button type="button" wire:key="ror-{{ $index }}-{{ str_replace('https://ror.org/', '', $result['id']) }}"
-                                                    wire:click="selectInstitution({{ $index }}, @js($result['id']))"
-                                                    class="flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition hover:bg-emerald-50 focus:bg-emerald-50 focus:outline-none dark:hover:bg-emerald-950/40 dark:focus:bg-emerald-950/40">
-                                                    <span class="text-sm font-semibold text-zinc-900 dark:text-white">{{ $result['name'] }}</span>
-                                                    <span class="text-xs text-zinc-500">{{ $result['aliases'] ? $result['aliases'].' · ' : '' }}{{ $result['location'] }} · {{ str_replace('https://ror.org/', '', $result['id']) }}</span>
-                                                </button>
-                                            @endforeach
-                                        </div>
+                    <div wire:key="author-summary-{{ $author['key'] }}" class="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:gap-4">
+                        <div class="flex min-w-0 flex-1 items-start gap-3">
+                            <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-xs font-semibold tabular-nums text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">{{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</div>
+                            <div class="min-w-0 flex-1 space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <p class="text-sm font-semibold leading-6 text-zinc-900 dark:text-white">{{ $author['name'] ?: 'Unnamed author' }}</p>
+                                    @if ($correspondingIndex === $index)
+                                        <flux:badge color="emerald" size="sm">Corresponding</flux:badge>
                                     @endif
                                 </div>
-
-                                @if (($author['affiliation_source'] ?? '') === 'ror' && filled($author['ror_id'] ?? null))
-                                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3 dark:border-emerald-900 dark:bg-emerald-950/20">
-                                        <div>
-                                            <p class="text-sm font-semibold text-emerald-900 dark:text-emerald-200">{{ $author['institution'] }}</p>
-                                            <p class="mt-1 text-xs text-emerald-700 dark:text-emerald-300">Verified ROR ID:
-                                                <a class="underline underline-offset-2" href="{{ $author['ror_id'] }}" target="_blank" rel="noopener noreferrer">{{ str_replace('https://ror.org/', '', $author['ror_id']) }}</a>
-                                            </p>
-                                        </div>
-                                        <flux:icon.check-circle class="size-5 shrink-0 text-emerald-700" />
-                                    </div>
-                                @elseif (($author['affiliation_source'] ?? '') === 'legacy')
-                                    <p class="text-xs leading-5 text-amber-700 dark:text-amber-300">Previously entered affiliation has no verified ROR ID. Please select an organization or explicitly mark it as unlisted.</p>
-                                @else
-                                    <p class="text-xs leading-5 text-zinc-500">Select the exact organization from ROR suggestions; typing alone does not verify an affiliation.</p>
+                                <p class="break-words text-sm leading-6 text-zinc-500 dark:text-zinc-400">{{ $author['institution'] ?: 'Affiliation not selected — edit to choose an institution' }}</p>
+                                @if ($errors->has("authors.{$index}.affiliation_source") || $errors->has("authors.{$index}.ror_id") || $errors->has("authors.{$index}.institution"))
+                                    <p class="text-xs text-red-600">Please complete or verify this contributor's institution.</p>
                                 @endif
-                                @if (filled($affiliationErrors[$index] ?? ''))
-                                    <p role="alert" class="text-xs text-red-600">{{ $affiliationErrors[$index] }}</p>
-                                @endif
-                                @if (! count($affiliationResults[$index] ?? []) && ($affiliationSearched[$index] ?? false) && empty($affiliationErrors[$index]) && ($author['affiliation_source'] ?? '') !== 'ror')
-                                    <p class="text-xs text-zinc-500">No active ROR match found. Check spelling, search an abbreviation, or use the unlisted option.</p>
-                                @endif
-                                @if (($author['affiliation_source'] ?? '') !== 'ror')
-                                    <flux:button type="button" size="sm" variant="ghost" icon="information-circle" wire:click="useManualAffiliation({{ $index }})">Institution not listed in ROR</flux:button>
-                                @endif
-                            @endif
-                            @error("authors.{$index}.affiliation_source") <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
-                            @error("authors.{$index}.ror_id") <p role="alert" class="text-xs text-red-600">{{ $message }}</p> @enderror
+                            </div>
                         </div>
-
-                        <div class="mt-4">
-                            <flux:input wire:model="authors.{{ $index }}.country" label="Author country (independent of institution)" placeholder="Country" />
+                        <div class="flex shrink-0 items-center justify-end gap-1 sm:justify-start">
+                            @if ($correspondingIndex !== $index)
+                                <flux:button type="button" size="sm" variant="ghost" icon="check-circle" wire:click="setCorrespondingAuthor({{ $index }})" tooltip="Make corresponding author" aria-label="Make author {{ $index + 1 }} corresponding" />
+                            @endif
+                            <flux:button type="button" size="sm" variant="ghost" icon="arrow-up" wire:click="moveAuthor({{ $index }}, 'up')" :disabled="$index === 0" tooltip="Move up" aria-label="Move author {{ $index + 1 }} up" />
+                            <flux:button type="button" size="sm" variant="ghost" icon="arrow-down" wire:click="moveAuthor({{ $index }}, 'down')" :disabled="$index === count($authors) - 1" tooltip="Move down" aria-label="Move author {{ $index + 1 }} down" />
+                            <flux:button type="button" size="sm" variant="outline" icon="pencil-square" wire:click="editAuthor({{ $index }})" aria-label="Edit author {{ $index + 1 }}">Edit</flux:button>
+                            <flux:button type="button" size="sm" variant="ghost" icon="trash" wire:click="removeAuthor({{ $index }})" wire:confirm="Remove this author from the draft? Changes take effect when the paper is saved." :disabled="count($authors) === 1" tooltip="Remove author" aria-label="Remove author {{ $index + 1 }}" />
                         </div>
                     </div>
                 @endforeach
+            </div>
 
-                @error('authors') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
-
-                <div class="grid gap-3 rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 dark:border-emerald-900 dark:bg-emerald-950/20 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] sm:items-center">
-                    <div>
-                        <p class="text-sm font-semibold text-emerald-950 dark:text-emerald-100">Corresponding author</p>
-                        <p class="mt-1 text-xs leading-5 text-emerald-800/80 dark:text-emerald-300">This author is the primary academic contact. Only your account can manage this draft.</p>
-                    </div>
-                    <flux:select wire:model="correspondingIndex" aria-label="Corresponding author">
-                        @foreach ($authors as $index => $author)
-                            <flux:select.option :value="$index">Author {{ $index + 1 }}{{ filled($author['name']) ? ' — '.$author['name'] : '' }}</flux:select.option>
-                        @endforeach
-                    </flux:select>
-                </div>
-                @error('correspondingIndex') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('authors') <p class="px-6 pb-3 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('correspondingIndex') <p class="px-6 pb-3 text-sm text-red-600">{{ $message }}</p> @enderror
+            <div class="border-t border-zinc-100 bg-zinc-50/50 px-6 py-3 text-xs leading-5 text-zinc-500 dark:border-zinc-800 dark:bg-zinc-950/30">
+                Exactly one corresponding author is designated. Contributor edits are included when you save the paper Draft.
             </div>
         </section>
 
@@ -185,4 +110,6 @@
             </div>
         </div>
     </form>
+
+    @include('livewire.conference.partials.author-modal')
 </div>

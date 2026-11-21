@@ -1,6 +1,6 @@
 # ACAD-002 — Paper Drafts, Authors & Permanent Identifiers
 
-**Status:** ACAD-002 revised with ROR affiliation lookup and centered empty state (21 Nov 2026). **130 tests / 710 assertions PASS**, Pint **91 files PASS**, PHPStan no errors, Blade/npm build PASS, Edge desktop/mobile and real ROR selection PASS, MySQL transaction smoke PASS/rollback. **Owner revision UAT pending.**
+**Status:** ACAD-002 Paper Draft and ROR functional owner UAT PASS. **OJS-style compact contributor directory + Flux modal Add/Edit refinement implemented on 21 Nov 2026**, with **137 tests / 763 assertions PASS**, Pint **92 files PASS**, PHPStan, Blade and npm build PASS. New modal owner UI UAT pending; ACAD-003 not started.
 **Functional contract:** [PRD §5.2 AC-03](PRD.md), [TASKS](TASKS.md), [Master Blueprint §3.1](../MASTER-BLUEPRINT-ICHES-2027.md).
 **Technology:** Laravel 13, official Livewire Starter Kit/Livewire 4, Flux UI Emerald, MySQL.
 
@@ -10,7 +10,7 @@
 - `/my/submissions/create` — creates a **Draft**, never an actual academic submission.
 - `/my/submissions/{paper:public_id}/edit` — edits only the current owner's Draft. Other accounts cannot even open this edit URL, and a non-Draft cannot be edited.
 - Metadata: working paper title, one **active** TOR Conference Track, ordered authors, full name, email, **explicit institution affiliation** (ROR selected or unlisted/manual), optional author country independent of campus country, and **exactly one corresponding author**.
-- Author controls: add, remove, move up/down, and change corresponding author. The authenticated user's profile is prefilled into the **first row only as a convenience**, but the order and corresponding author remain editable. Coauthor records do **not** confer paper ownership or give coauthors account access.
+- Author controls: compact publication-order directory showing **only name, institution, and corresponding badge**. Buttons manage Add/Edit (Flux modal), remove with confirmation, up/down and corresponding designation. The authenticated user's profile prefills the first contributor record as a convenience; it is not considered ROR-verified until selected. Coauthors never receive ownership or access to the account.
 - Paper ownership is always the authenticated **creator's account**; every verified, profile-complete account can create personal Drafts, independent of whether their global system role is User, Reviewer, Committee or Admin.
 
 ## Database and identity
@@ -43,16 +43,25 @@ Additive migration: `2026_11_21_000002_create_papers_and_paper_authors_tables.ph
 - Validation and behavior tested with **11 dedicated ROR tests**, 130 full tests / 710 assertions, Pint 91, PHPStan, Edge real API search `UNISYA` -> [UNISYA ROR record](https://ror.org/041rf3s62), modal/select interaction, mobile 390px, and MySQL create/edit/rollback without persisted fake papers.
 
 
+## OJS-style Author & Affiliation UI refinement — 21 November 2026
+
+- The Paper Draft page now shows a **compact author directory**, displaying the ordered contributor's **name, institution, and corresponding author status** only. Emails, country and ROR fields are available inside the modal, not spread across the parent page.
+- **Add author** and each **Edit** button open a class-backed Livewire/Flux modal with name, email, ROR lookup, optional country and corresponding author choice. Search-by-acronym, canonical ROR IDs and explicit unlisted/manual fallback are unchanged.
+- Modal edits use a separate temporary `authorDraft`. **Cancel discards all unsaved modal changes**, including a newly drafted coauthor; **Save author** validates name/email/affiliation and stages a contributor in the editor. The outer **Save draft** remains the only action that persists paper/author records to MySQL.
+- The directory supports **Move Up/Down**, **Make corresponding**, **Edit** and **Remove** (with confirmation). Corresponding index adjusts after reordering/removal and remains exactly one author. Duplicate author emails are rejected case-insensitively within the modal.
+- No database migration, altered Paper ID, new status, academic submission, keywords, PDF upload, review, or public-page changes. Existing Draft authors and their ROR IDs are loaded into the modal unchanged.
+- The existing 25 Paper/ROR tests remain PASS, plus **7 new targeted modal tests** covering cancel/add/edit, duplicate checks, ROR selection, corresponding order and stable Paper ID. Full suite **137 tests / 763 assertions PASS**, Pint **92 files PASS**, PHPStan no errors, Blade/npm build PASS. Edge browser QA confirms ROR dropdown, Cancel, coauthor staging and responsive directory on desktop/mobile; owner UI UAT remains pending.
+
 ## Manual UAT
 
 1. On **Laptop 2** (`DESKTOP-PE5D86C`), log in to `https://iches-2027.test` using **local-only** `user@iches.id` / `password`.
 2. Open `/my/submissions` in the sidebar. Verify the centered empty state and the **New paper draft** action, both on desktop and mobile.
 3. Open `/my/submissions/create`. Enter a title and choose one of the eight conference tracks. The initial author row prefills name and email; any profile institution is only a search hint until the user selects an official ROR result.
-4. In each author row type **UNISYA** or **Universitas Islam Syarifuddin**, select **Universitas Islam Syarifuddin Lumajang** (ROR `041rf3s62`) and verify the green ROR badge. Add a coauthor and repeat the search, or explicitly use **Institution not listed in ROR** to enter an unverified affiliation. Move authors up/down, choose a corresponding author, then **Save draft**.
+4. The contributor list shows only names, affiliations and corresponding status. Click **Edit author 1** (or **Add author**) to open a Flux modal with name/email/ROR/country/corresponding controls. Search **UNISYA** or **Universitas Islam Syarifuddin**, choose the actual ROR `041rf3s62` result, then click **Save author**. For an unlisted institution select the explicit manual fallback. Contributor changes are staged until the separate outer **Save draft** button is clicked.
 5. Return to My Submissions: see a stable `ICH27-P...` paper ID and status **Draft**. Click **Edit draft**, update fields, save again, refresh and confirm **the paper ID does not change**.
-6. Try the same email for two author rows, invalid email, missing title/track, or missing author name: validation must block saving.
+6. Test **Add author → type → Cancel** and **Edit author → change fields → Cancel**: contributor directory must not change. Try duplicate email, invalid email, missing institution, invalid ROR, and incomplete details within the modal; **Save author** must reject invalid data. Missing paper title/track must still prevent Save draft.
 7. Log in as a different local account and try the first user's edit URL; it must return **404**, and their My Submissions list must not expose the original paper.
-8. Verify mobile index empty state (centered with no pagination) and editor dropdown at 390px without document overflow. Test that typing a campus name without clicking a ROR result cannot save as verified. A manually saved UAT Draft remains in its owner's account; no delete workflow is supplied yet.
+8. Verify compact contributor list, **modal with ROR suggestions** and corresponding controls in 390px mobile without page-level overflow. Typing a campus name without selecting an actual ROR result cannot save as verified. A manually saved UAT Draft stays in its owner's account until further authorized action. The app has no paper delete workflow in ACAD-002.
 
 ## Explicitly not implemented
 

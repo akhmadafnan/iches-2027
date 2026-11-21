@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Paper Drafts and Conference Track administration are now implemented; final abstract/PDF submission, reviewer workflows, enrollment, payments, QR and other operations remain future phases.**
 
-> **Current status (21 November 2026): FND-001 through FND-006 and ACAD-001 owner UAT PASS; ACAD-002 Draft Papers improved with ROR organization lookup and UI alignment; revision UAT pending.** Laravel 13/Livewire 4, Herd HTTPS, Fortify onboarding, role dashboards, five programs, Event Settings, seven dates, eight TOR tracks, and owner-managed Draft paper metadata/coauthors with permanent references are available. **Abstract/PDF upload and submission (ACAD-003/004), review, enrollment, finance and QR are NOT yet available.** Public website design remains on HOLD.
+> **Current status (21 November 2026): FND-001 through FND-006 and ACAD-001 owner UAT PASS; ACAD-002 Paper Drafts/ROR functionality owner UAT PASS, with an OJS-style Add/Edit Author modal refinement now ready for owner UI UAT.** Laravel 13/Livewire 4, Herd HTTPS, Fortify onboarding, role dashboards, five programs, Event Settings, seven dates, eight TOR tracks, and owner-managed Draft paper metadata/coauthors with permanent references are available. **Abstract/PDF upload and submission (ACAD-003/004), review, enrollment, finance and QR are NOT yet available.** Public website design remains on HOLD.
 
 ## Start here
 
@@ -16,7 +16,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [Task Backlog](docs/TASKS.md) | Prioritized P0/P1/P2 tasks, dependencies and outcomes |
 | [FND-006 TOR Master Data Baseline](docs/FND-006-TOR-BASELINE.md) | Verbatim source verification, canonical program codes, dates and safeguards |
 | [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md) | Eight immutable-source TOR titles, track administration and UAT |
-| [ACAD-002 Paper Drafts](docs/ACAD-002-PAPER-DRAFTS.md) | Owner-managed Drafts, ROR-verified author/coauthor affiliations, permanent IDs, UAT and security |
+| [ACAD-002 Paper Drafts](docs/ACAD-002-PAPER-DRAFTS.md) | Owner-managed Drafts, compact contributor list, Flux Add/Edit modal, ROR affiliations, permanent IDs and UAT |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -124,13 +124,13 @@ Source: [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md). The ac
 
 1. Log in at `https://iches-2027.test/login` as `user@iches.id` / `password` (local demo only), then open **My Submissions** or `https://iches-2027.test/my/submissions`.
 2. If the directory is empty, click **Start a draft**; otherwise select **New paper draft**. Enter a paper title and one of the eight official academic tracks.
-3. For each author/coauthor, search **UNISYA** or an official university name/acronym, then **click the actual ROR result**. Confirm the official name and ROR ID appear in a green verified panel. Merely typing a name does not verify it. If an institution truly is absent from ROR, select **Institution not listed in ROR** to explicitly save an unverified manual affiliation (no ROR ID). Add/reorder coauthors, choose a corresponding author, then **Save draft**. No Submit action or reviewer eligibility exists yet.
-4. Verify a permanent `ICH27-P...` ID in My Submissions. Reopen via **Edit draft**, change title/authors and save again; the paper ID must stay the same.
+3. The Authors & Affiliations card displays only contributor **name, institution, and corresponding status**. Click **Edit** for the first author or **Add author**: a Flux modal opens with full name/email, ROR search, country, and corresponding options. Search **UNISYA**, click the real ROR result, confirm verified name+ID, then click **Save author**. The directory updates in memory; the outer **Save draft** writes it to MySQL. For an organization absent from ROR use the explicit unverified/manual option (no fabricated ROR ID).
+4. Open **Add author**, type provisional details and click **Cancel**: no blank co-author must appear. Open **Edit** on an existing author, change a field and cancel: the directory must remain unchanged. Add a valid co-author, use Up/Down or Make corresponding in the directory, then **Save draft**. Reopen and confirm the saved author list and the permanent `ICH27-P...` ID are unchanged by re-editing.
 5. Try a missing/invalid title, duplicate author emails or invalid author data; the form must reject them.
 6. Log in as another account; the other user's paper must not appear, and its private edit URL must return **404**.
-7. On a phone-sized window, verify the centered empty state (no zero-record pagination), responsive ROR dropdown and coauthor controls without horizontal overflow. The account profile's plain-text institution is a search hint only; **My Profile ROR integration is not included in this revision**.
+7. On mobile verify the **compact author directory**, scrolling Flux modal and ROR suggestions; no whole-page horizontal overflow. Profile institution text remains only a search hint; **My Profile ROR integration and ACAD-003 Keywords/PDF are explicitly outside this refinement**.
 
-See [ACAD-002 implementation and full UAT checklist](docs/ACAD-002-PAPER-DRAFTS.md). **Revision verification:** 130 tests / 710 assertions PASS, Pint 91 files PASS, PHPStan/Blade/npm PASS, real ROR API and Edge desktop/mobile 390px PASS, MySQL create/edit/rollback PASS, no JS errors. **Owner revision UAT pending.**
+See [ACAD-002 implementation and full UAT checklist](docs/ACAD-002-PAPER-DRAFTS.md). **OJS-style author-modal refinement verification:** 137 tests / 763 assertions PASS, Pint 92 files PASS, PHPStan/Blade/npm build PASS; Edge Add/Edit, ROR search, Cancel, coauthor ordering and mobile 390px PASS. **New modal owner UI UAT pending.**
 
 ## Core application areas
 
