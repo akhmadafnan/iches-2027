@@ -30,7 +30,7 @@ class PaperDetails extends Component
         $paper = Paper::query()
             ->ownedBy($user)
             ->where('public_id', $this->paperPublicId)
-            ->with(['authors', 'conferenceTrack', 'statusHistories', 'reviewClaims.review'])
+            ->with(['authors', 'conferenceTrack', 'statusHistories', 'reviewClaims.review', 'decision.events'])
             ->firstOrFail();
 
         Gate::authorize('view', $paper);

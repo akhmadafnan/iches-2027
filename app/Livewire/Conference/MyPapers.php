@@ -91,7 +91,7 @@ class MyPapers extends Component
 
         $query = Paper::query()->ownedBy($user);
         $papers = $query
-            ->with(['conferenceTrack', 'authors'])
+            ->with(['conferenceTrack', 'authors', 'decision'])
             ->when(trim($this->search) !== '', function (Builder $builder): void {
                 $term = '%'.trim($this->search).'%';
                 $builder->where(fn (Builder $filter) => $filter
@@ -114,7 +114,7 @@ class MyPapers extends Component
             'readyPaperIds' => $readyIds,
             'totalPapers' => Paper::query()->ownedBy($user)->count(),
             'draftCount' => Paper::query()->ownedBy($user)->where('status', PaperStatus::Draft->value)->count(),
-            'submittedCount' => Paper::query()->ownedBy($user)->where('status', PaperStatus::Submitted->value)->count(),
+            'submittedCount' => Paper::query()->ownedBy($user)->whereIn('status', [PaperStatus::Submitted->value, PaperStatus::Accepted->value, PaperStatus::Rejected->value])->count(),
         ]);
     }
 }

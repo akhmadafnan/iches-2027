@@ -53,11 +53,15 @@ class Dashboard extends Component
                 'title' => 'Continue your paper draft',
                 'description' => "Continue editing {$ownedPaper->reference}. Your permanent Paper ID stays the same when you submit.",
                 'module' => 'ACAD-005 / Draft in progress',
+            ] : (in_array($ownedPaper->status, [PaperStatus::Accepted, PaperStatus::Rejected], true) ? [
+                'title' => 'Academic decision published: '.ucfirst($ownedPaper->status->value),
+                'description' => "Paper {$ownedPaper->reference} has a published academic decision. Open your submission to see the decision date and approved General Comments.",
+                'module' => 'DEC-BULK-001 / Published decision',
             ] : [
                 'title' => 'Track your submitted paper',
                 'description' => "Paper {$ownedPaper->reference} has been submitted. Follow its review progress in My Submissions; no second paper can be created.",
                 'module' => 'ACAD-005 / Submitted paper',
-            ]),
+            ])),
             RegistrationIntention::JoinConference => [
                 'title' => 'Prepare for conference participation',
                 'description' => 'Conference enrollment and online/onsite participation settings will be available when program registration launches.',

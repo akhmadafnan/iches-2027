@@ -153,7 +153,7 @@
                                     <p class="max-w-2xl text-sm leading-6 text-zinc-600 dark:text-zinc-300">{{ $nextStep['description'] }}</p>
                                 </div>
                                 @if ($intention === \App\Enums\RegistrationIntention::SubmitPaper)
-                                    <flux:badge color="emerald" size="sm" class="shrink-0 self-start">{{ $ownedPaper ? ($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Draft in progress' : ucfirst($ownedPaper->status->value)) : 'Draft available' }}</flux:badge>
+                                    <flux:badge color="emerald" size="sm" class="shrink-0 self-start">{{ $ownedPaper ? ($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Draft in progress' : (in_array($ownedPaper->status, [\App\Enums\PaperStatus::Accepted, \App\Enums\PaperStatus::Rejected], true) ? 'Published '.ucfirst($ownedPaper->status->value) : ucfirst($ownedPaper->status->value))) : 'Draft available' }}</flux:badge>
                                 @else
                                     <flux:badge color="amber" size="sm" class="shrink-0 self-start">Coming soon</flux:badge>
                                 @endif
@@ -161,7 +161,7 @@
                             <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-emerald-200/70 pt-4 dark:border-emerald-900">
                                 @if ($intention === \App\Enums\RegistrationIntention::SubmitPaper)
                                     @if ($ownedPaper)
-                                        <flux:button :href="route($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'papers.edit' : 'papers.show', $ownedPaper->public_id)" variant="primary" icon="document-text" size="sm" wire:navigate>{{ $ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Continue draft' : 'View submitted paper' }}</flux:button>
+                                        <flux:button :href="route($ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'papers.edit' : 'papers.show', $ownedPaper->public_id)" variant="primary" icon="document-text" size="sm" wire:navigate>{{ $ownedPaper->status === \App\Enums\PaperStatus::Draft ? 'Continue draft' : (in_array($ownedPaper->status, [\App\Enums\PaperStatus::Accepted, \App\Enums\PaperStatus::Rejected], true) ? 'View published decision' : 'View submitted paper') }}</flux:button>
                                     @else
                                         <flux:button :href="route('papers.create')" variant="primary" icon="plus" size="sm" wire:navigate>Start a paper draft</flux:button>
                                     @endif
@@ -243,7 +243,14 @@
                                         <flux:badge color="emerald">Academic decision authority</flux:badge>
                                     @endif
                                 </div>
-                                <p class="mt-2 text-xs leading-5 text-emerald-800 dark:text-emerald-300">Assignment recorded. Dedicated finance and academic decision actions are not yet available.</p>
+                                <div class="mt-3 flex flex-wrap items-center gap-2">
+                                    @if ($canPublishDecisions)
+                                        <flux:button size="sm" variant="primary" :href="route('academic.decisions')" icon="clipboard-document-check" wire:navigate>Open Academic Decisions</flux:button>
+                                    @endif
+                                    @if ($canVerifyPayments)
+                                        <p class="text-xs text-emerald-800 dark:text-emerald-300">Finance verification workspace is not yet available.</p>
+                                    @endif
+                                </div>
                             </div>
                         @endif
 

@@ -50,7 +50,7 @@
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Abstract review</h2>
-                            <p class="mt-1 text-sm text-zinc-500">General Comments and an Accept / Reject recommendation. Suggestions for improving the full paper belong in your comments.</p>
+                            <p class="mt-1 text-sm text-zinc-500">General Comments are shared automatically with the author after the academic decision is published. Suggestions for improving the Full Paper belong here. Do not include reviewer identity, private personal details or internal-only notes.</p>
                         </div>
                         <flux:badge size="sm" :color="$reviewSubmitted ? 'emerald' : 'amber'">{{ $reviewSubmitted ? 'Review Submitted' : 'Review Draft' }}</flux:badge>
                     </div>
@@ -75,14 +75,14 @@
                                 <h3 class="text-sm font-semibold text-zinc-900 dark:text-white">Recommendation</h3>
                                 <flux:badge class="mt-2" :color="$review?->recommendation?->value === 'accept' ? 'emerald' : 'zinc'">{{ ucfirst($review?->recommendation?->value ?? '') }}</flux:badge>
                             </div>
-                            <p class="border-t border-zinc-200 pt-4 text-xs leading-5 text-zinc-500 dark:border-zinc-800">This review is submitted and locked. The recommendation is internal; the author sees only a review-completed milestone until an academic decision is formally published.</p>
+                            <p class="border-t border-zinc-200 pt-4 text-xs leading-5 text-zinc-500 dark:border-zinc-800">This review is submitted and locked. The recommendation remains internal. General Comments become visible to the author only after the academic decision is formally published.</p>
                         </div>
                     @else
                         <div class="mt-5 space-y-5">
                             <div>
                                 <label for="review-general-comments" class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">General Comments <span class="text-red-600">*</span></label>
                                 <textarea id="review-general-comments" wire:model="generalComments" rows="6" maxlength="10000" placeholder="Write your general assessment and any improvements the author should consider when preparing the full paper..." class="block w-full resize-y rounded-xl border border-zinc-300 bg-white p-3 text-sm leading-6 text-zinc-900 placeholder:text-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" aria-describedby="review-comments-help"></textarea>
-                                <p id="review-comments-help" class="mt-1 text-xs leading-5 text-zinc-500">Required when submitting the review; optional while saving a draft. Maximum 10,000 characters.</p>
+                                <p id="review-comments-help" class="mt-1 text-xs leading-5 text-zinc-500">Required on review submission; optional on draft. Maximum 10,000 characters. Your General Comments will be shown to the author after publication, regardless of an Accepted or Rejected outcome.</p>
                                 @error('generalComments') <p role="alert" class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                             </div>
                             <fieldset>
@@ -187,7 +187,7 @@
                         <flux:text size="sm">Paper ID: {{ $paper->reference }}</flux:text>
                     </div>
                 </div>
-                <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-300">Your General Comments and {{ ucfirst($recommendation ?? '') }} recommendation will be submitted as an internal academic review. Once submitted, it cannot be edited. This does not publish a final decision to the author.</p>
+                <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-300">Your General Comments will be shared automatically with the author when Academic Authority publishes a decision (Accepted or Rejected). The {{ ucfirst($recommendation ?? '') }} recommendation stays internal; your identity is not shown. Review submission itself does not publish anything and cannot be edited.</p>
                 @error('review') <p role="alert" class="text-sm text-red-600">{{ $message }}</p> @enderror
                 @error('generalComments') <p role="alert" class="text-sm text-red-600">{{ $message }}</p> @enderror
                 @error('recommendation') <p role="alert" class="text-sm text-red-600">{{ $message }}</p> @enderror

@@ -17,7 +17,7 @@
                     </flux:sidebar.item>
                 </flux:sidebar.group>
 
-                @canany(['manage-users', 'review-papers', 'scan-services'])
+                @canany(['manage-users', 'review-papers', 'scan-services', 'publish-decisions'])
                     <flux:sidebar.group :heading="__('Workspace')" class="grid">
                     @can('manage-users')
                         <flux:sidebar.item icon="squares-2x2" :href="route('admin.programs')" :current="request()->routeIs('admin.programs')" wire:navigate>{{ __('Programs') }}</flux:sidebar.item>
@@ -26,6 +26,9 @@
                         <flux:sidebar.item icon="users" :href="route('admin.users')" :current="request()->routeIs('admin.users')" wire:navigate>
                             {{ __('Users & Access') }}
                         </flux:sidebar.item>
+                    @endcan
+                    @can('publish-decisions')
+                        <flux:sidebar.item icon="clipboard-document-check" :href="route('academic.decisions')" :current="request()->routeIs('academic.decisions')" wire:navigate>{{ __('Academic Decisions') }}</flux:sidebar.item>
                     @endcan
                     @can('review-papers')
                         <flux:sidebar.item icon="book-open" :href="route('reviewer.workspace')" :current="request()->routeIs('reviewer.workspace')" wire:navigate>

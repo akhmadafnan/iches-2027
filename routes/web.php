@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PaperAbstractDownloadController;
 use App\Http\Controllers\ReviewerAbstractDownloadController;
+use App\Livewire\Academic\AcademicDecisions;
 use App\Livewire\Admin\ManageConferenceTracks;
 use App\Livewire\Admin\ManageEventSettings;
 use App\Livewire\Admin\ManagePrograms;
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::livewire('admin/users', ManageUsers::class)
         ->middleware('can:manage-users')
         ->name('admin.users');
+
+    Route::livewire('academic/decisions', AcademicDecisions::class)
+        ->middleware('can:publish-decisions')
+        ->name('academic.decisions');
 
     Route::livewire('reviewer/workspace', AvailablePapers::class)
         ->middleware('can:review-papers')

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -57,6 +58,18 @@ class Paper extends Model
     public function conferenceTrack(): BelongsTo
     {
         return $this->belongsTo(ConferenceTrack::class);
+    }
+
+    /** @return HasOne<PaperDecision, $this> */
+    public function decision(): HasOne
+    {
+        return $this->hasOne(PaperDecision::class);
+    }
+
+    /** @return HasMany<DecisionNotification, $this> */
+    public function decisionNotifications(): HasMany
+    {
+        return $this->hasMany(DecisionNotification::class)->orderByDesc('decision_version');
     }
 
     /** @return HasMany<PaperReview, $this> */

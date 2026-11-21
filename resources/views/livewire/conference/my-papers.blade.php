@@ -30,7 +30,7 @@
         </div>
         <div class="flex items-center gap-4 rounded-2xl border border-zinc-200/80 bg-white px-5 py-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div class="flex size-12 items-center justify-center rounded-xl bg-sky-50 text-sky-700 dark:bg-sky-950 dark:text-sky-400"><flux:icon.check-circle class="size-6" /></div>
-            <div><p class="text-xs font-medium text-zinc-500">Submitted papers</p><p class="mt-1 text-[26px] font-semibold leading-none tabular-nums text-zinc-900 dark:text-white">{{ $submittedCount }}</p></div>
+            <div><p class="text-xs font-medium text-zinc-500">Submitted / decided</p><p class="mt-1 text-[26px] font-semibold leading-none tabular-nums text-zinc-900 dark:text-white">{{ $submittedCount }}</p></div>
         </div>
     </div>
 
@@ -58,26 +58,35 @@
         @else
             <p class="flex items-center gap-1.5 px-6 pt-3 text-xs text-zinc-500 md:hidden"><flux:icon.arrows-right-left class="size-3.5" /> Swipe inside the table to view more columns</p>
         <div class="overflow-x-auto px-4 pb-1">
-            <flux:table class="w-full min-w-[740px] lg:min-w-0">
+            <flux:table class="w-full min-w-[1040px] table-fixed">
                 <flux:table.columns class="bg-zinc-50/80 dark:bg-zinc-800/50">
-                    <flux:table.column class="w-14 !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">No.</flux:table.column>
-                    <flux:table.column class="w-32 !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Paper ID</flux:table.column>
+                    <flux:table.column class="w-[60px] !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">No.</flux:table.column>
+                    <flux:table.column class="w-[150px] !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Paper ID</flux:table.column>
                     <flux:table.column class="!py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Paper title / track</flux:table.column>
-                    <flux:table.column class="w-28 !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Status</flux:table.column>
-                    <flux:table.column class="w-28 !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Updated</flux:table.column>
-                    <flux:table.column class="w-28 !py-4 !text-[11px] !font-semibold uppercase !tracking-wider" align="end">Action</flux:table.column>
+                    <flux:table.column class="w-[180px] !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Status</flux:table.column>
+                    <flux:table.column class="w-[145px] !py-4 !text-[11px] !font-semibold uppercase !tracking-wider">Updated</flux:table.column>
+                    <flux:table.column class="w-[90px] !py-4 !text-[11px] !font-semibold uppercase !tracking-wider" align="end">Action</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
                     @foreach ($papers as $paper)
                         <flux:table.row :key="$paper->id" class="transition-colors hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20">
                             <flux:table.cell class="!py-4 text-sm tabular-nums text-zinc-400">{{ ($papers->currentPage() - 1) * $papers->perPage() + $loop->iteration }}</flux:table.cell>
                             <flux:table.cell class="!py-4 font-mono text-xs font-semibold text-emerald-700 dark:text-emerald-400">{{ $paper->reference }}</flux:table.cell>
-                            <flux:table.cell class="!py-4">
-                                <p class="break-words text-sm font-semibold leading-6 text-zinc-900 dark:text-white">{{ $paper->title }}</p>
+                            <flux:table.cell class="!py-4 min-w-0">
+                                <p class="min-w-0 break-words text-sm font-semibold leading-6 text-zinc-900 dark:text-white">{{ $paper->title }}</p>
                                 <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $paper->conferenceTrack?->name }}</p>
                             </flux:table.cell>
-                            <flux:table.cell class="!py-4"><flux:badge :color="$paper->status->value === 'submitted' ? 'emerald' : 'amber'" size="sm">{{ ucfirst($paper->status->value) }}</flux:badge></flux:table.cell>
-                            <flux:table.cell class="!py-4 text-sm text-zinc-600 dark:text-zinc-300">{{ $paper->updated_at?->format('d M Y') }}</flux:table.cell>
+                            <flux:table.cell class="!py-4 align-middle">
+                                @if (in_array($paper->status->value, ['accepted', 'rejected'], true))
+                                    <div class="flex min-w-0 flex-col items-start gap-1.5" aria-label="Published {{ ucfirst($paper->status->value) }}">
+                                        <span class="whitespace-nowrap text-[11px] font-medium leading-4 text-zinc-500 dark:text-zinc-400">Published decision</span>
+                                        <flux:badge :color="$paper->status->value === 'accepted' ? 'emerald' : 'rose'" size="sm" class="!whitespace-nowrap">{{ ucfirst($paper->status->value) }}</flux:badge>
+                                    </div>
+                                @else
+                                    <flux:badge :color="$paper->status->value === 'submitted' ? 'sky' : 'amber'" size="sm" class="!whitespace-nowrap">{{ ucfirst($paper->status->value) }}</flux:badge>
+                                @endif
+                            </flux:table.cell>
+                            <flux:table.cell class="!py-4 whitespace-nowrap text-sm tabular-nums text-zinc-600 dark:text-zinc-300">{{ $paper->updated_at?->timezone('Asia/Jakarta')->format('d M Y') }}</flux:table.cell>
                             <flux:table.cell class="!py-4" align="end">
                                 <div class="flex items-center justify-end gap-1.5">
                                 @if ($paper->status->value === 'draft')

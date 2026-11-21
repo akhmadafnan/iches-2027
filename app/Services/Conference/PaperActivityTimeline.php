@@ -16,7 +16,7 @@ final class PaperActivityTimeline
      */
     public function forOwner(Paper $paper): array
     {
-        $paper->loadMissing(['statusHistories', 'reviewClaims.review']);
+        $paper->loadMissing(['statusHistories', 'reviewClaims.review', 'decision.events']);
 
         $events = [];
 
@@ -66,6 +66,20 @@ final class PaperActivityTimeline
                     'label' => 'Reviewer assignment released',
                     'detail' => null,
                     'occurred_at' => $claim->released_at,
+                ];
+            }
+        }
+
+        if ($paper->decision !== null) {
+            foreach ($paper->decision->events as $decisionEvent) {
+                $events[] = [
+                    'label' => $decisionEvent->event_type === 'corrected'
+                        ? 'Published decision corrected'
+                        : 'Published '.ucfirst($decisionEvent->to_outcome),
+                    'detail' => $decisionEvent->event_type === 'corrected'
+                        ? 'Version '.$decisionEvent->version.' · '.ucfirst($decisionEvent->to_outcome)
+                        : 'Version '.$decisionEvent->version,
+                    'occurred_at' => $decisionEvent->occurred_at,
                 ];
             }
         }

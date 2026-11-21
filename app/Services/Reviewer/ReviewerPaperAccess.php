@@ -36,8 +36,17 @@ final class ReviewerPaperAccess
 
     public function canPreview(Paper $paper, User $reviewer): bool
     {
-        if ($paper->status !== PaperStatus::Submitted || $this->authoredBy($paper, $reviewer)) {
+        if ($this->authoredBy($paper, $reviewer)) {
             return false;
+        }
+
+        if ($paper->status !== PaperStatus::Submitted) {
+            // Keep a submitted review readable to its original reviewer after publication.
+            return in_array($paper->status, [PaperStatus::Accepted, PaperStatus::Rejected], true)
+                && $paper->reviewClaims()->where('reviewer_id', $reviewer->id)
+                    ->whereNotNull('active_paper_id')
+                    ->whereHas('review', fn ($query) => $query->where('status', 'submitted'))
+                    ->exists();
         }
 
         return ! $paper->reviewClaims()

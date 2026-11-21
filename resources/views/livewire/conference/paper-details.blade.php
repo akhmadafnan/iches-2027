@@ -54,6 +54,25 @@
                 </div>
             </section>
 
+            @if ($paper->decision)
+                <section class="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/25">
+                    <h2 class="text-lg font-semibold">Published academic decision</h2>
+                    <flux:badge class="mt-3" :color="$paper->decision->outcome === 'accepted' ? 'emerald' : 'rose'" size="sm">{{ ucfirst($paper->decision->outcome) }}</flux:badge>
+                    <p class="mt-3 text-xs text-zinc-600 dark:text-zinc-300">Published {{ $paper->decision->published_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB · Decision version {{ $paper->decision->version }}</p>
+                    @if (filled($paper->decision->public_comments))
+                        <h3 class="mt-5 text-sm font-semibold">Reviewer General Comments</h3>
+                        <p class="mt-2 whitespace-pre-line break-words text-sm leading-7 text-zinc-700 dark:text-zinc-200">{{ $paper->decision->public_comments }}</p>
+                    @else
+                        <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300">No General Comments were provided with the finalized review.</p>
+                    @endif
+                    @if ($paper->decision->outcome === 'accepted')
+                        <p class="mt-4 text-xs leading-6 text-zinc-600 dark:text-zinc-300">Acceptance is published. Official LoA generation, payment and Full Paper upload are separate workflows that are not yet available.</p>
+                    @else
+                        <p class="mt-4 text-xs leading-6 text-zinc-600 dark:text-zinc-300">This submission is not eligible for LoA, payment or Full Paper unless an authorized correction changes the published decision.</p>
+                    @endif
+                </section>
+            @endif
+
             <section
                 class="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 class="text-lg font-semibold">Abstract</h2>
@@ -103,7 +122,7 @@
                         :href="route('papers.edit', $paper->public_id)" wire:navigate class="w-full">Edit draft
                     </flux:button>
                 @else
-                    <p class="mt-3 text-xs leading-5 text-zinc-500">Editing is locked. Reviewer assignment and future published academic milestones will appear here when recorded; reviewer identities remain private.</p>
+                    <p class="mt-3 text-xs leading-5 text-zinc-500">Editing is locked. Academic milestones appear here when recorded; reviewer identities and internal decisions remain private.</p>
                 @endif
             </section>
         </aside>
