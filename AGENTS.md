@@ -1,7 +1,8 @@
 # AGENTS.md — ICHES 2027 Coding Agent Instructions
 
 **Repository:** akhmadafnan/iches-2027  
-**Status sekarang (21 Nov 2026):** FND-001 through FND-006 completed with owner UAT PASS; ACAD-001 owner UAT PASS and ACAD-002 implemented and automated/browser-tested locally in `D:\PINJAM-AFNAN\iches-2027` at Herd HTTPS `https://iches-2027.test`. Fortify login, registration, private photo/profile onboarding, role gates and staff assignments are active. Four local-only seeded accounts use `user`, `reviewer`, `committee`, `admin`. The `/dashboard` route is **App\Livewire\Dashboard** (class-based) with live Admin account counts, Reviewer/Committee workspace shortcuts, and a User CTA chosen by `registration_intention`; the private sidebar shows only authorized role links. Admin `/admin/users` changes other users' roles and delegated Finance/Academic Authority; Moderator/CoHost PIC authorization remains resource-scoped. Reviewer/Committee workspaces are still placeholders, NOT working review/QR modules. FND-006 supplies five immutable-code program masters, singleton Event Settings and seven TOR Important Dates via Admin-only `/admin/programs` and `/admin/event-settings`; mutations are guarded by Gates/validation, event start hour is NULL until approved, and seed reruns never overwrite Admin edits. User-facing program enrollment, ACAD submission/review, payments and QR remain TODO. FND-006 owner UAT PASS. ACAD-001 adds 8 official TOR Section E.2 Conference Tracks (`TRK-01`...`TRK-08`), immutable codes/official titles, editable display details/order/availability, and Admin-only `/admin/conference-tracks`; idempotent seed runs after EventMasterSeeder. Active track selection query is available for the future author form. ACAD-001 owner UAT PASS. ACAD-002 adds owner-scoped Paper/Author models, immutable human reference and ULID, Draft-only transactional saving, corresponding/ordered coauthors, Policy and private `/my/submissions` routes. Its 21 Nov revision adds ROR API v2 service, per-author canonical affiliation + verified ROR ID, explicit unlisted/manual fallback (unverified), and a centered no-pagination empty state. No invented ROR IDs; legacy affiliations remain unverified until reselected. My Profile affiliation is still free text and out of this revision's scope. The owner confirmed ACAD-002 Paper Draft/ROR UAT PASS, and requested an OJS-style **UI-only refinement**: compact ordered author directory showing name+institution+corresponding, buffered Flux modal for Add/Edit, cancel discards, ROR picker and server-side Save Draft unchanged. The owner confirmed ACAD-002 OJS-style modal UAT PASS and explicitly authorized ACAD-003. ACAD-003 adds nullable abstract text, JSON keyword tags (Enter/Add/Remove; case-insensitive duplicate guard), a 10MB validated PDF in Laravel private local storage, owner-only download and replacement/removal on Save Draft. It never changes Draft status, reviewer visibility, fees, or Paper identity. Numeric limits are **technical safety ceilings, not committee-approved academic requirements**. ACAD-003 is awaiting owner UAT. **Do not begin ACAD-004 without explicit owner instruction.** Do not implement new modules without owner instruction; demo password `password` is never for production.
+**ACTIVE STATUS (21 Nov 2026):** **READ [docs/CURRENT-STATE-AND-DECISIONS.md](docs/CURRENT-STATE-AND-DECISIONS.md) BEFORE ANY TASK.** FND-001..006, ACAD-001..004, REV-001..003 are DONE / OWNER UAT FINAL PASS; last source commit **154d919**. Existing reviewer flow is one active claim per abstract, no author name/affiliation in reviewer UI, General Comments + Accept/Reject, saved draft/final submitted/timelines. **NEXT is ACAD-005 ONLY ON OWNER GO** (one owned Paper ID per submitting account, coauthor elsewhere allowed). Then DEC-BULK-001 + MSG-001B (one-step authorized mass Publish & Notify, override/correction, queued personal email), DOC-LOA-001 (auto official LoA PDF + secure QR verification, no per-paper Drive links), FIN and FULL-001 (Published Accepted + applicable Finance Verified before Full Paper). Future modules are **APPROVED POLICY BUT NOT CODED**; legacy per-paper DEC-001/002, abstract Revisions Required, or payment-independent Full Paper are obsolete. No source implementation merely because this policy appears in docs.
+
 
 **Auth/onboarding update (20 Nov 2026):** Fortify Passkeys are disabled and their login/security UI, Vite entry and JS dependency removed. New registration redirects to `/settings/profile` and sets `profile_setup_required`; verified private routes enforce completion. A user must upload a server-validated JPG/PNG/WebP (private `local` disk, max 3 MB, min 200×200) before entering the dashboard. Photo retrieval is owner-only behind auth; existing seeded UAT accounts are intentionally exempt from mandatory onboarding. ID Card crop 1:1 is **still TODO (ID-001)**. Keep email verification and 2FA working. This applies to the authenticated app, not the public website design.
 
@@ -20,13 +21,14 @@ These repositories are **reference sources, not code to copy wholesale into this
 
 ## Read order (minimal token use)
 
-1. [docs/TASKS.md](docs/TASKS.md) — task ID, dependency, acceptance.
-2. [docs/PRD.md](docs/PRD.md) — only the sections related to the assigned task.
-3. [docs/WORKING-RULES.md](docs/WORKING-RULES.md) — simple working boundaries.
-4. [docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) — PHP/Laravel quality rules.
-5. [MASTER-BLUEPRINT-ICHES-2027.md](MASTER-BLUEPRINT-ICHES-2027.md) — high-level intent only if needed.
+1. [docs/CURRENT-STATE-AND-DECISIONS.md](docs/CURRENT-STATE-AND-DECISIONS.md) — locked policies, source-vs-plan, next task and new-chat handoff.
+2. [docs/TASKS.md](docs/TASKS.md) — task ID, dependency, acceptance.
+3. [docs/PRD.md](docs/PRD.md) — only task-relevant rules.
+4. [docs/WORKING-RULES.md](docs/WORKING-RULES.md) — coding/UAT/Git safety gates.
+5. [docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) — technical patterns.
+6. [MASTER-BLUEPRINT-ICHES-2027.md](MASTER-BLUEPRINT-ICHES-2027.md) — overall product and TOR context.
 
-Do **not** recursively ingest all repository docs, previous repo docs, or irrelevant files for every task.
+Do not ingest old repository docs or unrelated files. **An old UAT note is not a current implementation instruction.**
 
 ## ICHES application UI conventions — locked 20 Nov 2026
 
@@ -51,8 +53,10 @@ Do **not** recursively ingest all repository docs, previous repo docs, or irrele
 - Public user registration selects participation intention, **not privileged role**.
 - Five programs: International Conference, Research/PKM Upgrading, International MoU, International Community Service, Destination Study.
 - Abstract text + PDF valid Submitted immediately reviewer-claimable, **no administrative screening**.
-- Reviewer claims eligible papers, cannot claim own paper; reviewer recommendation ≠ final academic decision.
-- Accepted **Published** opens LoA and Full Paper regardless of payment Verified.
+- Reviewer claims exactly one active reviewer per abstract; no owner/co-author claim. General Comments + Accept/Reject only; reviewer recommendation is INTERNAL until AcademicAuthority bulk Publish & Notify.
+- One submitting owner account can own only one paper, even after Rejected; co-author elsewhere remains allowed (ACAD-005 TODO).
+- Published Accepted opens automatic LoA + invoice/payment; Full Paper ONLY after applicable Finance Verified (verified Co-Host institutional entitlement may substitute personal payment). Rejected has no forward academic access.
+- DEC-BULK-001 must replace per-paper DEC-001/002; AcademicAuthority can override with reason and correct published decision with audit. Author decision mail uses after-commit idempotent queue. LoA is auto PDF+QR and NEVER a per-paper Drive upload.
 - Co-Host: one IDR 3m institutional invoice, after Verified five representative slots/five paper entitlements; one sponsored paper per personal account, no duplicate personal Conference charge.
 - Personal IDR 1m International Package: **one** invoice, **four** program entitlements after Verified; MoU attendance ≠ signatory.
 - QR: one private token per person/event, many configurable Admin QR Services, no duplicate physical redemption, program attendance separate.
@@ -72,7 +76,7 @@ Do **not** recursively ingest all repository docs, previous repo docs, or irrele
 
 ## Per-task execution contract
 
-**Input:** task ID(s), expected flow, allowed scope and test target.  
+**Input:** owner-authorized task ID(s), expected flow, allowed scope and test target. When legacy sources conflict with CURRENT-STATE-AND-DECISIONS.md, respect latest product policy, but do not modify source outside explicit owner GO.
 **Action:** inspect only relevant code, implement minimal OOP solution, run safe targeted test when possible.  
 **Output:** short report — DONE/PARTIAL/BLOCKED, modified paths, test command and actual result, commit SHA if created, blockers.
 

@@ -1,8 +1,8 @@
 # PRODUCT REQUIREMENTS DOCUMENT — ICHES 2027
 
-**Version:** 1.0 | **Date:** 20 November 2026 | **Status:** Draft baseline for owner review, not authorization to code.  
+**Version:** 2.0 | **Updated:** 21 November 2026 | **Status:** CURRENT OWNER-APPROVED PRODUCT POLICY (future modules may still be TODO; no authorization to code).
 **Product owner:** Penyelenggara/pemilik proyek ICHES UNISYA.  
-**Source of truth:** [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md), this PRD, and [Tasks](TASKS.md). Old ICHES repository is a reference, not the new codebase.  
+**Source of truth (read order):** [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md) → [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md) → this PRD → [Tasks](TASKS.md). New owner-approved policies supersede obsolete historical text. Old ICHES repository is only a reference.
 **Frontend publik:** **HOLD** until separate discussion and approval. See [Public Frontend](PUBLIC-FRONTEND-TBD.md).
 
 ## 1. Product summary
@@ -12,7 +12,7 @@ ICHES 2027 is one responsive web application for an international conference and
 **Technical direction:** new Laravel + official Livewire Starter Kit monolith, Blade/Livewire/Tailwind, MySQL, no separate Vue/Inertia frontend. OOP PHP and idiomatic Laravel; see [engineering standard](OOP-LARAVEL-LIVEWIRE-STANDARDS.md).
 
 ### Goals
-- End-to-end working **Abstract Submission → Reviewer → Published Decision → Full Paper/LoA**.
+- End-to-end **one owned abstract → single reviewer Accept/Reject → bulk Published Decision & personal email → auto LoA + invoice → Finance Verified → Full Paper**.
 - One account for five programs and clear online/onsite eligibility.
 - One personal QR, two approved ID Card styles, multi-purpose Admin-configurable scanner services.
 - Simple manual bank-transfer finance, Co-Host institute invoice and personal international package.
@@ -42,7 +42,7 @@ Registration captures: name, email, password, institution, country, and **intent
 
 ## 3. Dates and business baseline
 
-Event is **5–6 January 2027**. TOR target: Abstract Submission **1–20 December 2026**, decision publication **22 December 2026**, Full Paper **23–28 December 2026**, registration/payment **24–28 December 2026**. Admin can change event/date configurations; start hour must not be invented. The Full Paper gate is **ACCEPT decision formally published to author**, independently of date and Finance Verified. Review begins on valid submitted abstracts without post-submission Administrative Screening.
+Event is **5–6 January 2027**. Legacy TOR target: Abstract Submission **1–20 December 2026**, decision publication **22 December 2026**, Full Paper **23–28 December 2026**, registration/payment **24–28 December 2026**. Admin can change event/date configurations; start hour must not be invented. **NEW HARD GATE: Full Paper requires BOTH Published Accepted AND Finance Verified for the applicable presenter/Co-Host obligation**. Legacy Full Paper and payment windows overlap inconsistently with this new gate: organizer must officially align deadlines before production; do not assume extra days, invent dates or bypass Finance. Review begins immediately on valid Submitted abstracts, without Administrative Screening.
 
 Product prices/relations retained from previous approved decisions:
 - **Co-Host:** IDR 3,000,000 per institution; one invoice; maximum five representatives, maximum five sponsored Conference papers, one paper per representative. Roster/paper entitlement activates only after institution Finance Verified. Sponsored paper does not receive a second personal Conference invoice. Every paper still undergoes academic review.
@@ -53,7 +53,7 @@ Product prices/relations retained from previous approved decisions:
 
 ## 4. Core lifecycle
 
-Guest → Account → Profile → Personal Dashboard → (Submit Paper / Conference Participant / Personal Package / Co-Host Representative) → Submission review and decisions if presenter → LoA & Full Paper if Accepted Published → program fee verification as applicable → session/program schedule → photo + ID Card/QR → attendance and services → publication of documents/certificates → reports.
+Guest → one Account → Profile → Personal Dashboard → **one owned Conference Paper (Draft → Submitted)** → exclusive Claim → General Comments + Accept/Reject review → authorized **Bulk Publish & Notify** with audited overrides → **Published Accepted** unlocks auto-generated LoA and payment/invoice; **Full Paper only after Verified** → sessions/program participation → attendance/services → certificates/reports. **Published Rejected** means read-only decision/comments with no continuation unless a published authorized correction is made. A user may co-author papers owned by other accounts.
 
 **Keep separate:** Submission status, internal decision, published decision, Full Paper, payment, package eligibility, attendance, physical-item redemption, paper Presented and certificate availability. They may coexist and never overwrite one another.
 
@@ -74,21 +74,33 @@ Guest → Account → Profile → Personal Dashboard → (Submit Paper / Confere
 |---|---|---|
 | AC-01 | Eight editable conference tracks | Track selectable in paper form |
 | AC-02 | Conference enrollment: Presenter/Participant, Online/Onsite | Program-level mode stored (not global user flag) |
-| AC-03 | New/edit Draft paper, metadata and co-authors | Owner-managed, stable unique paper ID |
+| AC-03 | One owned Conference paper per account, Draft metadata and co-authors | **ACAD-005 new hard rule:** unique papers.owner_id after safe duplicate audit; edit existing Draft only, block second paper at UI/server/DB even after Submitted/Rejected/Accepted; co-author on other papers allowed; stable human Paper ID/ULID |
 | AC-04 | Abstract text, keywords, PDF upload and Submit | Mandatory server validation; private files |
 | AC-05 | Direct eligibility after Submitted | No separate administrative screening |
 | AC-06 | Reviewer index filter + self-claim | **Owner decision 21 Nov 2026:** one active reviewer per abstract, exclusive self-claim; no own-paper/co-author claim; concurrent attempts cannot double-assign; release history retained. **Reviewer UI shows Paper ID and academic content, but not author names or affiliations**; existing PDF may still contain identity. Reviewer names are not exposed to authors in REV-002. |
 | AC-07 | Abstract review: General Comments + Accept/Reject only | Exclusive claimant can Save Draft (incomplete allowed) or Submit Review (comments and Accept/Reject required); UUID v7, timestamped audit, immutable after Submit; no numeric score, no Revisions Required and no automatic decision |
-| AC-08 | Internal academic Accept/Reject separate from Publish Decision | Only authorized academic authority decides; author sees Review completed date but no recommendation/comments/internal decision until explicitly published |
+| AC-08 | **One-step bulk academic publication** with authority-scoped exception overrides and published corrections | Default decision derives from Review Submitted Accept/Reject, authorized AcademicAuthority previews/overrides with mandatory reason, one Publish & Notify batch confirms per-paper decisions atomically/idempotently; author sees only published result/comments/date, no internal rationale or reviewer identity; subsequent corrections versioned/audited |
 | AC-09 | Superseded for abstract stage by owner decision 21 Nov 2026 | No abstract Revisions Required/resubmit; suggested improvements are written in General Comments and may guide Full Paper after an Accepted decision is published; original paper history remains intact |
 | AC-10 | My Submissions status timeline | Author knows current state and next action |
-| AC-11 | Accepted Published opens LoA and Full Paper | Not opened on internal accept; payment not prerequisite |
-| AC-12 | Full Paper upload and private access | Authorized users only |
+| AC-11 | Published Accepted opens automatic LoA + invoice/payment, NOT Full Paper | DOC-LOA-001 queues official PDF/QR after Published Accepted independent of payment. **FULL-001 only opens after Published Accepted AND applicable Finance Verified (including verified Co-Host sponsorship entitlement)**. Proof Uploaded/Pending/Correction Required never grants access |
+| AC-12 | Payment-gated Full Paper upload and private access | One existing Paper ID, server-side Published Accepted + relevant Finance Verified gate on form/upload/private read; Rejected locked; no duplicate regular invoice for paid Co-Host paper |
 | AC-13 | Parallel session, room, modality, moderator, paper placement | Presenter sees actual assigned session |
 | AC-14 | Online Join Zoom URL entered manually by Admin | No Zoom API; sensitive host info hidden |
 | AC-15 | Moderator marks Presented/No Show | Scoped to assigned session, not QR attendance |
 
-Review rubric, fixed reviewer count, automatic paper ranking and elaborate post-presentation evaluation are not prerequisites for initial delivery. Decisions remain authority-owned; reviewer recommendations never auto-publish final decisions.
+No rubric, numerical score, multi-reviewer voting or abstract Revisions Required. **Exactly one active reviewer claim per abstract is already locked and implemented.** Reviewer recommendations are prefilled **proposals** in an authorized bulk decision batch, never automatically published without one explicit authority confirmation.
+
+### 5.2A Locked bulk decision / LoA / finance contract (owner-approved 21 Nov 2026)
+
+**One submission:** enforce one paper per owner at database/server/UI; co-author role elsewhere does not consume quota. Existing duplicates require read-only audit and explicit handling before adding uniqueness.
+
+**Bulk Decisions:** only staff with an explicit AcademicAuthority assignment may Publish & Notify; reviewer Submit Review alone is private. Show ready Accept/Reject totals and selection, skip unreviewed/already-published, permit audited override (especially Reject → Accepted), maintain immutable reviewer recommendation, one decision per paper with versioned corrections, no manual DEC-001/DEC-002 click sequence. On published correction adjust LoA/payment/Full Paper eligibility and notify affected owner; any paid invoice requires Finance reconciliation rather than destructive reversal.
+
+**Email:** decision publication commits author-visible status and records a unique per-paper/event-version notification for the **owning submitter email**. Queue after commit, retry failed attempts and expose delivery states; do not leak reviewer identity, override reason or internal notes. LoA email only on actual document Issued. No real outbound mail from prototype.
+
+**Official LoA:** DOC-LOA-001 generates a PDF directly in system from an approved English template/signature/letter scheme, snapshot author/coauthor/track/title, private storage, stable official number, secure random QR verification token, public minimally revealing verification, revoke/supersede/reissue history. One currently valid LoA per Published Accepted paper; if generation fails, allow retry while Accepted remains valid. Never require one Google Drive link upload per paper. LoA does not wait for payment.
+
+**Hard finance gate:** Published Accepted allows invoice/proof; Finance verifies against real bank mutation. Only Published Accepted **plus Verified applicable payment entitlement** unlocks Full Paper. Co-Host verified institutional entitlement substitutes for individual Conference invoice; no double charge. Published Rejected can see read-only decision/comments only. This new rule explicitly supersedes legacy AC-11/FI-05 and TOR-derived payment-independent Full Paper language.
 
 ### 5.3 Five programs and package
 | ID | Function | Acceptance |
@@ -115,7 +127,7 @@ Review rubric, fixed reviewer count, automatic paper ranking and elaborate post-
 | FI-02 | Bank settings controlled by authorized Admin | No hardcoded actual bank details |
 | FI-03 | Payment proof JPG/JPEG/PNG/PDF in private storage | Upload validated, owner-scoped |
 | FI-04 | Pending/Verified/Correction Required with transaction history | Only Finance-authorized actor verifies against bank mutation |
-| FI-05 | Presenter regular invoice after Accepted Published | No invoice before publish; Full Paper independent of finance |
+| FI-05 | Regular presenter invoice after Accepted Published | No invoice before publish; no duplicate personal invoice if verified Co-Host sponsorship covers the paper; **Full Paper stays locked until that paper's applicable financial entitlement is Verified** |
 | FI-06 | Verified access triggers for bundle/Co-Host | One payment activates only corresponding entitlements |
 | FI-07 | Finance reporting and audit | Author, time and payment evidence traceable |
 
@@ -141,10 +153,10 @@ Use browser camera scanner first, HTTPS and tested device compatibility. If no n
 | ID | Function | Acceptance |
 |---|---|---|
 | DOC-01 | My Documents per user/paper | Only eligible links/files visible |
-| DOC-02 | Admin link LoA PDF from Drive or private file | Direct paper-specific link, no public directory of private LoAs |
+| DOC-02 | **DOC-LOA-001 auto-generate official LoA PDF + QR verification** | One authorized template, signer, number; after Published Accepted generate idempotently via queue, immutable snapshot, owner-private download/print, minimal public QR validity, versioned revoke/supersede/reissue and retry. **No per-paper Google Drive upload.** |
 | DOC-03 | Certificate links/files, publication by authorized staff | No automatic public certificate before release |
 | COM-01 | Key emails: verification, Submitted, Decision Published, LoA, Full Paper, Verified, schedule, certificate | Templates and on/off switches where useful |
-| COM-02 | Reliable delivery after transaction commit | Failure logged, no false transaction notifications |
+| COM-02 | Reliable personal decision notification/outbox | Publish & Notify writes idempotent per-paper recipient/event/version after DB commit; queue, retries, status monitor, no claims of delivery without provider proof, no early decision leaks. LoA notification after actual Issued. |
 | REP-01 | Admin filterable CSV/Excel exports | Paper, participants, finance, program, service and attendance, scope enforced |
 
 ### 5.7 Website PUBLIC — hold
@@ -160,13 +172,17 @@ Use browser camera scanner first, HTTPS and tested device compatibility. If no n
 
 ## 6. Status and transitions
 
-- **Paper:** Draft → Submitted → Review ongoing → Academic Decision internally → Decision Published (Accepted / Rejected) → Full Paper for Published Accepted → Scheduled → Presented or No Show.
-- **Review:** Available → Claimed → Draft Review → Submitted; assigned coordinator may release stale claim without erasing history.
-- **Finance:** Unpaid → Proof Submitted/Pending Verification → Verified or Correction Required.
-- **Enrollment:** Registered → Eligible/Active if criteria met → attended, separately per program.
-- **QR service:** Eligible → Scanned → Confirmed for physical goods, Already Used/Not Eligible blocked.
-- **Document:** Prepared → Published/Available.
-The actual database schema may use distinct tables/enums rather than a single mixed status.
+- **Paper ownership:** no paper → one Draft → Submitted; **no second paper for one owner**, co-author elsewhere permitted.
+- **Review:** Submitted → one exclusive reviewer Claimed → Review Draft → Review Submitted (Accept/Reject recommendation, INTERNAL). General Comments and reviewer identity remain private before publication.
+- **Decision publication:** eligible Review Submitted → default Accept/Reject proposed → authorized optional override → one batch Publish & Notify → Published Accepted / Rejected per paper; audited versioned correction only by AcademicAuthority. No mandatory manual internal decision per paper.
+- **LoA (independent):** Published Accepted → Pending/Generating → Issued or Failed/retry; later Revoked/Superseded by authorized correction. One active official PDF per paper; QR validity reflects current record.
+- **Finance:** Unpaid → Proof Submitted/Pending Verification → Verified or Correction Required; ONLY Finance-authorized actor confirms after bank mutation check.
+- **Full Paper entitlement:** requires **Published Accepted AND applicable Finance Verified** (regular presenter OR verified Co-Host sponsor), always server-enforced. Published Rejected has no downstream right.
+- **Enrollment:** Registered → Eligible/Active after applicable criteria verified → Attended, separately per program.
+- **QR service:** Eligible → Scanned → Confirmed for physical goods; Already Used/Not Eligible blocked.
+- **Other documents:** Prepared → Published/Available when actually issued. Do not conflate documents, attendance, payment, reviewer recommendation and decision.
+
+Actual database schemas may use separate event/version/audit tables rather than one mixed status.
 
 ## 7. Non-functional requirements
 
@@ -188,7 +204,7 @@ The actual database schema may use distinct tables/enums rather than a single mi
 | Before **5 January 2027** | Session/Zoom, ID Card QR, mobile scanner, program attendance | Test on real staff phones/network |
 | After event | Documents, certificates, data reports | Publication handoff separate |
 
-**High-value end-to-end acceptance:** register → submit real PDF → reviewer can claim and review → decision not leaked before Publish → author sees result and Full Paper; one Verified package unlocks exactly four programs; Co-Host only one institutional invoice; online-only excluded from print; scanner accepts eligible QR, rejects repeat and cannot double redeem concurrently; history appears in Admin.
+**High-value end-to-end acceptance:** register → one owned PDF abstract → exclusive reviewer Claim + Accept/Reject review → authorized bulk Publish & Notify, with audited override/correction and personal queued email → Published Accepted gets auto LoA PDF with public QR verification and invoice → **only Verified relevant payment** enables Full Paper. Published Rejected remains read-only. One Verified personal package unlocks exactly four programs; Co-Host has one institutional invoice and no duplicate presenter fee; scanner behavior remains separately tested.
 
 ## 9. Deliberately not a blocker
 
@@ -198,4 +214,4 @@ Do not debate field participant quotas, item-by-item facilities, intricate certi
 
 The [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md) sets vision. This PRD defines testable requirements. [TASKS](TASKS.md) maps requirements to implementation tasks. [WORKING-RULES](WORKING-RULES.md) defines execution behavior. [OOP Standards](OOP-LARAVEL-LIVEWIRE-STANDARDS.md) defines quality. A feature is **DONE only when actual tests/inspection confirm it**, not when code was merely written.
 
-**This PRD is planning documentation, not permission to start coding.**
+**This PRD is the owner-approved **product behavior contract**, not permission to start coding unfinished features. See [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md) for implemented vs planned.**

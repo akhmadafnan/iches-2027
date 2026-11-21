@@ -1,15 +1,15 @@
 # ATURAN MAIN PENGEMBANGAN — ICHES 2027
 
-**Versi:** 1.0 | **Tanggal:** 20 November 2026  
+**Versi:** 2.0 | **Diperbarui:** 21 November 2026
 **Tujuan:** cepat selesai, sesuai harapan pemilik proyek, tetap bisa dirawat dan tidak salah sasaran.  
-**Acuan:** [PRD](PRD.md), [TASKS](TASKS.md), [OOP Standards](OOP-LARAVEL-LIVEWIRE-STANDARDS.md).
+**Acuan utama:** [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md) → [PRD](PRD.md) → [TASKS](TASKS.md) → [OOP Standards](OOP-LARAVEL-LIVEWIRE-STANDARDS.md).
 
 ## 1. Prinsip utama
 
 1. **User journey first.** Utamakan fitur benar-benar bisa dipakai dari awal sampai akhir, bukan membuat banyak menu kosong.
 2. **Keep it simple.** Implementasi monolith Laravel Livewire yang idiomatis; pilih solusi sederhana dan stabil.
-3. **One source of truth.** Blueprint → PRD → TASKS → source/test. Jika bertentangan, keputusan eksplisit terbaru pemilik proyek mengatasi draft terdahulu; perbarui dokumen terkait.
-4. **No invented policy.** Jangan mengarang kategori tarif, bank, speaker, start hour, kuota, kriteria sertifikat, jumlah reviewer atau fasilitas baru.
+3. **One source of truth.** Keputusan terbaru pemilik proyek → CURRENT-STATE-AND-DECISIONS → PRD → TASKS → Blueprint → source/test. Bukti kode menetapkan mana yang benar-benar selesai, tetapi bukan alasan untuk menghidupkan produk lawas yang telah dicabut. Riwayat UAT/TOR dipertahankan sebagai arsip faktual.
+4. **No invented policy.** Reviewer satu orang per abstrak; paper satu milik akun owner; review hanya Accept/Reject; semua ini final. Jangan mengarang biaya, bank, signatory/nama/tanda tangan/penomoran LoA, jam acara, tanggal baru, fasilitas atau kewenangan.
 5. **No unauthorized public design.** Website publik dan copy frontend masih perlu diskusi terpisah. Backend dan dashboard privat boleh dikerjakan setelah GO CODING.
 6. **OOP Laravel.** Business logic di actions/services, authorization di policies, state terjaga, Livewire hanya UI orchestration.
 7. **Targeted verification.** Uji file/perubahan relevan; jangan menghabiskan waktu menjalankan seluruh suite berulang kali jika tidak dibutuhkan.
@@ -29,11 +29,11 @@ Satu task bisa dikerjakan oleh satu agent; hindari dua agent mengedit file yang 
 
 ## 3. Gerbang kerja praktis
 
-- **Dokumentasi sekarang:** boleh membuat/memperbarui README, PRD, task, aturan dan standar sesuai permintaan pengguna. Tidak membuat Laravel sebelum ada arahan.
+- **Dokumentasi sekarang:** permintaan owner boleh mengubah Blueprint/PRD/TASKS/README/AGENTS dan current contract agar kontradiksi lama diganti; **dokumen saja tidak mengizinkan edit source/migration/database dan tidak menyatakan fitur TODO sudah DONE.**
 - **GO CODING:** pemilik menyebut mulai/kerjakan task. Setelah GO, agent boleh mengedit source hanya untuk task yang disebut.
 - **Database:** migration pada database development/test yang diotorisasi; **tidak boleh** migrate:fresh, reset, truncate, drop atau merusak data real tanpa permintaan eksplisit.
 - **Git:** perubahan docs dapat langsung di-commit bila diminta seperti sesi ini. Untuk source, commit/push mengikuti ruang kerja yang disetujui pengguna; jangan merge/rebase/force push atau ganti default branch secara diam-diam.
-- **Production:** deployment, real email massal, mutasi rekening, pengiriman pesan kepada pengguna nyata, dan perubahan data real adalah tindakan terpisah yang memerlukan instruksi jelas.
+- **Production:** deployment, real bulk SMTP/queue, perubahan data atau keuangan sungguhan, dan penerbitan surat LoA resmi menggunakan identitas/tanda tangan yang disahkan memerlukan instruksi operasional terpisah.
 - **Blocker:** jika langkah penting tidak dapat diuji/diakses, hentikan langkah yang berisiko dan laporkan; lanjutkan bagian lain yang aman.
 
 Tidak perlu seremonial GO terpisah untuk hal remeh dalam satu task; tindakan destruktif/eksternal tetap tidak boleh diasumsikan.
@@ -60,7 +60,7 @@ Tidak perlu seremonial GO terpisah untuk hal remeh dalam satu task; tindakan des
 - File PDF/foto/bukti bayar divalidasi dan tidak dibagikan publik sembarangan.
 - Claim reviewer dan redemption QR menangani request bersamaan.
 - Pembayaran Verified harus sesuai pemeriksaan mutasi dan hanya oleh petugas berizin.
-- Decision internal tidak boleh bocor ke author.
+- Reviewer recommendation dan alasan internal override tidak bocor ke author; hasil hanya setelah AcademicAuthority Bulk Publish & Notify, komentar yang disetujui saja. Full Paper wajib Published Accepted DAN Finance Verified server-side.
 - Token QR bukan email/NIK/ID sequential mentah dan dapat direvoke.
 - Perubahan penting menyimpan actor dan timestamp.
 - Uji kegagalan/error state, tidak hanya happy path.
@@ -109,3 +109,7 @@ Jika fitur belum dibahas, jangan menjadikannya dependency palsu. Buat implementa
 - Pekerjaan yang belum bisa diuji **bukan** dinyatakan PASS.
 
 **Kesimpulan:** cepat, fokus pada fungsi, OOP standar, Git sederhana, dan tidak ada spekulasi konten publik.
+
+## 11. Peralihan chat / perubahan kebijakan
+
+Dalam chat baru **wajib membaca docs/CURRENT-STATE-AND-DECISIONS.md terlebih dahulu**. ACAD-005 adalah next coding task hanya jika owner GO; jangan lompat coding DEC/LoA/Finance. Docs-only tidak mengubah source maupun database. Untuk source, tetap UAT owner sebelum scoped commit/push. Riwayat DONE lama boleh disimpan, tetapi logika bisnis lawas tidak boleh dihidupkan kembali.

@@ -1,4 +1,6 @@
 # MASTER BLUEPRINT
+
+> **KEBIJAKAN AKTIF / PRIORITAS (21 NOVEMBER 2026):** Baca [Current State & Product Decisions](docs/CURRENT-STATE-AND-DECISIONS.md) terlebih dahulu. Ketentuan terbaru pemilik proyek menggantikan alur DEC manual per paper, LoA via Google Drive, dan Full Paper tanpa verifikasi pembayaran. Bab historis/TOR tetap dipertahankan sebagai referensi acara, bukan izin memakai alur yang sudah dicabut.
 ## ICHES 2027 — Integrated Conference & Event Management System
 
 **Versi:** 1.0 — Draft untuk Evaluasi Pemilik Proyek  
@@ -299,49 +301,29 @@ Form inti berisi:
 - Keywords.
 - Upload Abstract PDF.
 
-Pengguna dapat menyimpan draft sebelum mengirim.
+Pengguna dapat menyimpan Draft sebelum mengirim. **Satu akun pemilik/submitting author hanya boleh mempunyai satu Paper ID sejak Draft pertama**, tetapi tetap boleh menjadi co-author pada paper milik akun lain. Pemilik paper harus melanjutkan Draft yang sama; tidak boleh membuat paper kedua bahkan setelah Accepted/Rejected. Pembatasan perlu ditegakkan server dan database (ACAD-005, belum diimplementasikan).
 
 Setelah memilih Submit dan data dinyatakan valid, paper berstatus **Submitted** serta mendapatkan nomor submission.
 
 Tidak diperlukan tahap Administrative Screening setelah submission yang valid.
 
-## 5.2. Tahap 2 — Reviewer Self-Claim
+## 5.2. Tahap 2 — Reviewer Self-Claim dan Review
 
-Paper Submitted langsung tersedia di Reviewer Abstract Index.
+Abstrak Submitted langsung tersedia bagi reviewer, tanpa Administrative Screening.
 
-Reviewer dapat:
+**Satu abstrak hanya boleh mempunyai satu reviewer aktif**, melalui self-claim yang aman dari claim ganda. Reviewer tidak dapat mengklaim paper sendiri atau paper tempat ia tercatat sebagai co-author yang dapat diverifikasi.
 
-- Melihat daftar paper yang tersedia.
-- Mencari berdasarkan judul atau track.
-- Membuka abstrak dan PDF.
-- Mengklaim paper yang dapat direview.
-- Menyimpan draft review.
-- Mengirim rekomendasi dan komentar.
+Reviewer Workspace memiliki **Available Papers** dan **My Reviews**. Reviewer melihat Paper ID, judul, track, abstrak, keywords dan PDF privat; **nama/email/afiliasi author tidak ditampilkan dalam UI reviewer**. PDF unggahan penulis mungkin memuat identitas di dalam isinya; jangan menyatakan PDF telah dianonimkan tanpa proses terpisah.
 
-Reviewer tidak boleh mengklaim paper miliknya sendiri.
+Reviewer mengisi **satu General Comments** dan memilih rekomendasi **Accept atau Reject saja**. Save Draft boleh belum lengkap. Submit Review wajib lengkap, melalui konfirmasi, dicatat dengan timestamp dan dikunci. Tidak ada skor numerik atau revisi abstrak. Rekomendasi reviewer bersifat internal, bukan keputusan akademik resmi.
 
-Tampilan reviewer difokuskan pada dua daftar utama:
+## 5.3. Tahap 3 — Bulk Academic Decisions & Notify
 
-**Available Papers** dan **My Reviews**.
+**DEC-001/DEC-002 lama yang meminta keputusan manual per abstrak dinonaktifkan dan digantikan DEC-BULK-001.** Academic Authority yang mendapat penugasan khusus melihat seluruh paper dengan Review Submitted dalam satu workspace. Sistem menyiapkan default keputusan **Accepted atau Rejected** mengikuti rekomendasi reviewer, tetapi keputusan baru sah setelah petugas berwenang menjalankan **Publish & Notify** untuk seluruh/sekumpulan paper siap diumumkan.
 
-Tidak perlu membangun sistem komunikasi reviewer-author yang rumit.
+Petugas dapat melakukan override (khususnya reviewer Reject menjadi Accepted) dengan alasan internal wajib dan audit. Review yang belum Submitted tidak ikut; yang sudah Published dilewati secara idempotent. Publikasi batch menghasilkan keputusan individual dan tanggal publikasi yang benar, bukan satu status ambigu untuk seluruh paper.
 
-## 5.3. Tahap 3 — Keputusan akademik
-
-Petugas akademik yang berwenang membuka hasil review dan menetapkan keputusan.
-
-Status yang digunakan:
-
-- Accepted.
-- Rejected.
-
-Untuk seleksi abstrak **tidak ada status Revisions Required**. Reviewer hanya mengisi General Comments dan rekomendasi Accept/Reject. Saran perbaikan dari komentar digunakan pada penyusunan Full Paper jika keputusan Accepted resmi dipublikasikan.
-
-Keputusan internal belum otomatis terlihat oleh author.
-
-Setelah pihak berwenang memilih **Publish Decision**, hasil muncul di dashboard author dan dapat diinformasikan melalui email.
-
-Keputusan akhir tidak dibuat otomatis oleh rekomendasi reviewer.
+Setelah commit, author melihat keputusan resmi dan General Comments yang disetujui untuk dibagikan, **tanpa identitas reviewer, rekomendasi internal terpisah, atau alasan override**. Notifikasi keputusan personal ke akun pemilik submission masuk antrean email after-commit dengan deduplikasi, retry dan status pengiriman. Bila terjadi koreksi keputusan yang sudah Published, hanya Academic Authority boleh menjalankan koreksi resmi bertimestamp, mengaudit keputusan lama/baru, menyesuaikan hak lanjut dan mengirim email koreksi. Tidak ada tahapan keputusan manual dua langkah per paper.
 
 ## 5.4. Tahap 4 — Arahan Perbaikan Full Paper
 
@@ -349,18 +331,13 @@ Seleksi abstrak **tidak menggunakan status Revisions Required maupun pengiriman 
 
 Paper ID dan histori submission/review tetap dipertahankan. Tidak ada pembukaan kembali Draft abstrak atau tahapan revisi abstrak karena komentar reviewer. Rekomendasi reviewer tetap internal sampai keputusan dipublikasikan.
 
-## 5.5. Tahap 5 — LoA dan Full Paper
+## 5.5. Tahap 5 — LoA Otomatis, Pembayaran, lalu Full Paper
 
-Jika keputusan **Accepted telah resmi diumumkan**, dashboard menyediakan:
+**Published Accepted** membuka hasil keputusan, General Comments, **LoA otomatis**, dan proses invoice/pembayaran. **Tidak langsung membuka Full Paper**.
 
-- Status Accepted.
-- Tautan Letter of Acceptance.
-- Upload Full Paper.
-- Informasi langkah berikutnya.
+**DOC-LOA-001:** sistem otomatis membuat satu LoA resmi yang saat ini berlaku untuk setiap paper Published Accepted, memakai template Inggris yang telah disahkan, Paper ID, seluruh penulis/co-author, nomor dokumen resmi unik, tanggal, identitas pejabat/tanda tangan yang diotorisasi dan QR verifikasi. PDF disimpan privat, dapat Preview/Download/Print oleh pemilik paper; QR mengarah ke verifikasi dokumen publik dengan token acak (Valid/Revoked/Superseded/Not Found). Penerbitan via antrean idempotent; kegagalan generate dapat diulang tanpa membatalkan Accepted. Koreksi menerbitkan versi baru dan mencabut/menggantikan versi lama dengan audit. **Tidak menggunakan per-paper Google Drive upload/link sebagai alur utama.** LoA tidak bergantung pada Payment Verified.
 
-Admin dapat memasukkan tautan LoA PDF yang telah dibuat di Google Drive. Setiap author hanya melihat tautan yang terkait dengan paper miliknya.
-
-**Full Paper tidak perlu menunggu pembayaran Verified.**
+**FULL-001, aturan wajib:** author hanya dapat mengunggah Full Paper untuk paper yang **Published Accepted DAN kewajiban pembayaran terkait sudah Verified oleh Finance** (setelah cek bukti transfer dan mutasi rekening). Proof Uploaded/Pending/Correction Required bukan Verified. Paper Co-Host yang disponsori menggunakan hak institusi yang sah dan sudah Verified tanpa tagihan presenter kedua. Semua gate dicek server-side. Published Rejected hanya dapat melihat arsip keputusan/komentar, tanpa invoice LoA/Full Paper; pengecualian hanya melalui koreksi keputusan resmi oleh Academic Authority.
 
 ## 5.6. Tahap 6 — Parallel Session
 
@@ -694,7 +671,7 @@ Tidak menggunakan payment gateway pada versi pertama.
 
 **Invoice → Transfer Bank → Upload Bukti → Verifikasi → Status Updated.**
 
-Pengguna dapat membuka detail invoice dan melihat status pembayaran dari dashboard.
+Pengguna dapat membuka detail invoice dan melihat status pembayaran dari dashboard. **Untuk Conference Full Paper, Finance Verified merupakan syarat wajib bersama Published Accepted**; bukti transfer yang sekadar terunggah tidak cukup. Peran Finance harus terotorisasi dan memeriksa mutasi rekening resmi. Paper Co-Host yang pembayaran institusinya terverifikasi memakai entitlement tersebut, tanpa invoice pribadi kedua.
 
 ## 10.3. Ruang lingkup Finance
 
@@ -724,19 +701,15 @@ Verifikasi pembayaran tidak boleh secara otomatis membuat paper Accepted, mengon
 
 # BAB XI. DOKUMEN, SERTIFIKAT DAN NOTIFIKASI
 
-## 11.1. Document Center
+## 11.1. Document Center dan Automatic LoA
 
-Dokumen dapat dikelola melalui tautan PDF atau file yang disediakan Admin.
+Document Center menyajikan dokumen yang memang sudah tersedia serta berhak diakses pemiliknya: Letter of Acceptance (LoA), Full Paper Guidelines, Presentation Guidelines, Program Information dan sertifikat sesudah penerbitan.
 
-Prioritas awal:
+**LoA berbeda dengan sertifikat:** LoA menjadi bukti penerimaan akademik setiap paper Published Accepted dan harus **dihasilkan otomatis dalam sistem (DOC-LOA-001)**, bukan melalui upload link Google Drive per paper. Admin berwenang menyiapkan/menyetujui **satu template LoA resmi**, penomoran, serta penandatangan dan aset tanda tangan yang terotorisasi. Sistem menggunakan snapshot data paper/penulis, nomor unik, PDF privat, QR token aman ke halaman verifikasi publik, dan riwayat penerbitan/revoke/reissue serta checksum. Satu LoA aktif per paper, dengan histori versi. Penerbitan bulk/queue idempotent, status Pending/Generating/Issued/Failed/Revoked/Superseded dan retry per dokumen.
 
-- Letter of Acceptance.
-- Full Paper Guidelines.
-- Presentation Guidelines.
-- Program Information.
-- Certificate Link.
+Author memiliki Preview, Download PDF dan Print melalui reader; unduhan privat harus auth/paper-owner. Halaman verifikasi publik menampilkan metadata minimum dan status Valid/Revoked/Superseded/Not Found dengan rate limiting, tanpa membocorkan email/bukti bayar. QR online membuktikan kecocokan dengan database, bukan pengganti tanda tangan elektronik tersertifikasi. LoA yang belum disahkan oleh pejabat tidak boleh disebut Issued.
 
-Untuk mempercepat pembangunan, pembuatan LoA atau sertifikat secara otomatis bukan syarat awal. Admin dapat menautkan PDF yang sudah disiapkan.
+Sertifikat acara/program lainnya tetap proses domain terpisah dan mengikuti keputusan petugas yang berwenang. Infrastruktur PDF dan QR dapat digunakan ulang nanti.
 
 ## 11.2. Sertifikat
 
@@ -763,7 +736,9 @@ Email dikirim untuk peristiwa penting:
 
 Informasi lain cukup ditampilkan pada dashboard.
 
-Admin dapat mengaktifkan atau menonaktifkan jenis notifikasi yang tersedia.
+Untuk Decision Published, satu klik Publish & Notify mengantrekan email personal ke **akun owner submission** lewat outbox/queue setelah transaksi committed, bukan mengirim ratusan SMTP sinkron. Wajib dedupe, status Queued/Sent/Failed (Delivered hanya bila provider mengonfirmasi), retry dan monitoring petugas. LoA Available dikirim sesudah dokumen benar-benar Issued; koreksi Published menghasilkan email koreksi. Tidak ada pengiriman email real pada lingkungan prototype tanpa konfigurasi dan otorisasi eksplisit.
+
+Admin dapat mengaktifkan atau menonaktifkan jenis notifikasi yang tersedia sesuai kebijakan, tanpa mematikan jejak audit keputusan.
 
 ---
 
@@ -1073,7 +1048,7 @@ Aplikasi dinilai berhasil apabila skenario inti berikut dapat dijalankan:
 | 4 | Reviewer mengklaim paper | Tugas review tercatat pada akunnya |
 | 5 | Reviewer mengirim rekomendasi | Hasil tersedia untuk pihak akademik |
 | 6 | Keputusan diterbitkan | Author melihat hasil dan riwayat progres |
-| 7 | Paper Accepted | LoA dan Full Paper tersedia |
+| 7 | Paper Accepted | LoA dihasilkan otomatis; invoice/pembayaran aktif, Full Paper baru tersedia setelah Finance Verified |
 | 8 | Peserta membeli Paket Internasional | Satu invoice untuk empat program |
 | 9 | Pembayaran diverifikasi | Hak program yang bersangkutan aktif |
 | 10 | Anggota Co-Host mengirim paper | Jatah institusi tercatat tanpa tagihan ganda |

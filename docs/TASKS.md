@@ -1,13 +1,13 @@
 # IMPLEMENTATION TASK BACKLOG — ICHES 2027
 
-**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001..004 / REV-001..002 owner UAT FINAL PASS; REV-003 owner UAT FINAL PASS, checkpoint approved; ARCH-001 UUID v7 forward standard applied; MSG-001 email workflow planned; DEC-001 TODO.
-**Source:** [PRD](PRD.md) + [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md).  
+**Version:** 2.0 | **Updated:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001..004 / REV-001..003 owner UAT FINAL PASS (source checkpoint 154d919); **ACAD-005 NEXT TODO**. DEC-BULK-001, MSG-001B, DOC-LOA-001, FIN, FULL-001 policies approved but NOT CODED. Legacy manual DEC-001/002 and Full Paper without Finance Verified SUPERSEDED.
+**READ FIRST:** [Current State & Decisions](CURRENT-STATE-AND-DECISIONS.md), [PRD](PRD.md), [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md). New owner decisions take priority over old milestone/UAT snapshots.
 **Priority:** P0 = critical flow, P1 = essential follow-up, P2 = polish/post-event.  
 **Never treat TODO as implemented.** Code changes begin only when the owner instructs us to start coding.
 
 ## A. Working with the backlog
 
-- A task contains ID, PRD requirement, outcome, dependency, acceptance.
+- A task contains ID, PRD requirement, outcome, dependency, acceptance. Do not reintroduce manual per-paper DEC-001/002, Google Drive LoA, or Full Paper before Verified.
 - Execute tasks in **short, testable bundles**. Do not spend time creating empty modules or ceremonial architectural layers.
 - For each task record status TODO / IN PROGRESS / BLOCKED / DONE and a short proof (commit SHA, tests, browser scenario).
 - Accept minor reorganizations that reduce time, provided the PRD's essential business behavior remains correct.
@@ -28,17 +28,20 @@
 | **ACAD-002 [DONE — OWNER UAT PASS]** Draft paper, authors, ROR affiliations, stable IDs | AC-03 | FND-002, ACAD-001 | Paper Draft/ROR and OJS-style compact Add/Edit author modal owner UAT PASS; Cancel discards, corresponding and ordering retained, ROR verified. No Submit. |
 | **ACAD-003 [DONE — OWNER UAT PASS]** Abstract form and private PDF upload | AC-04 | ACAD-002 | OJS-style individual keyword tags, abstract text, local-private PDF upload/download/remove/replacement, validated files; 18 focused and 155 full tests PASS; Edge desktop/mobile 390px PASS; owner UAT PASS (21 Nov 2026); implementation commit `ccf1ba9`; no Submit. See [ACAD-003 evidence](ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md). |
 | **ACAD-004 [DONE — OWNER UAT PASS]** Submit action and version/status timeline | AC-04, AC-05, AC-10 | ACAD-003 | Icon-only Edit/Submit/View in My Submissions; Submit visible only after server-side persisted completeness; confirmation, atomic Draft→Submitted, owner-only read-only View, status/version history; no administrative screening; owner UAT PASS (21 Nov 2026), including final hero and abstract whitespace polish. [ACAD-004 evidence](ACAD-004-SUBMIT-STATUS-TIMELINE.md). |
+| **ACAD-005 [TODO — NEXT AFTER OWNER GO]** One owned paper per submitter | AC-03 | ACAD-004 | First audit existing duplicate owner data read-only (never auto-delete), then DB unique owner + authorization and create UI guard. One Draft/Paper ID per owner including Submitted/Accepted/Rejected; coauthor on other papers still allowed; concurrent creates safe, security/browser/UAT tests. APPROVED POLICY, NOT CODED. |
 | **REV-001 [DONE — OWNER UAT PASS]** Reviewer available index and filters | AC-06 | ACAD-004, FND-004 | Reviewer-only read-only Available Papers / preview / private PDF, title/ID search, eight track filters, pagination; Draft and own paper excluded; no claim yet. Owner UAT PASS (21 Nov 2026) with accepted directory and preview UI. See [REV-001 evidence](REV-001-REVIEWER-INDEX.md). |
 | **ARCH-001 [FORWARD STANDARD APPLIED]** UUID v7 new business entities, legacy-key audit | Cross-cutting | REV-001 | [Architecture review](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md): REV-002 claims now use UUID v7 PK and BIGINT legacy foreign keys, preserving paper ULID and human reference. ARCH-002 legacy PK migration remains separate and not authorized. |
 | **MSG-001A [PLANNED BEFORE PUBLIC SUBMISSION]** Submitted email confirmation | COM-01, COM-02 | ACAD-004, recipient policy | Transactional after-commit, idempotent event/version, local Mail fake + queue failure tests; **NOT IMPLEMENTED**. See [email roadmap](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md). |
 | **REV-002 [DONE — OWNER UAT FINAL PASS]** Exclusive reviewer self-claim and conflict check | AC-06 | REV-001, ARCH-001 | One active reviewer per abstract enforced by DB unique active_paper_id and transactional row lock; owner/coauthor denied; UI only Paper ID + academic content (no author names/affiliations); Claim confirmation, Available Papers / My Reviews, UUID v7 claim PK; release fields prepared but no unauthorized Release UI. See [REV-002 evidence](REV-002-EXCLUSIVE-SELF-CLAIM.md). |
 | **REV-003 [DONE — OWNER UAT FINAL PASS]** General Comments + Accept/Reject review | AC-07 | REV-002 | UUID v7 Review and audit events; assigned reviewer only; Save Draft incomplete permitted; Submit Review validates comments and Accept/Reject, confirms and locks; My Reviews progress and dated Review completed timeline; no decision/email leak. See [REV-003 evidence](REV-003-ABSTRACT-REVIEW.md). |
-| DEC-001 Internal academic decision | AC-08 | REV-003 | Authorized officer can decide; author sees nothing prematurely |
-| DEC-002 Explicit Publish Decision & tracking | AC-08, AC-10 | DEC-001 | Author notified by dashboard, status and history accurate |
-| **MSG-001B [PLANNED BEFORE DECISION RELEASE]** Published Accept/Reject decision and LoA email | COM-01, COM-02 | DEC-002 and document publication | No email on internal decision; publish-gated and after-commit with dedupe, privacy-safe links. **NOT IMPLEMENTED**. |
-| QA-001 P0 feature tests + browser user journey | ACC/AC/REV | All relevant P0 | Register→Submit→Review→Decision PASS or exact blocker listed |
+| **DEC-BULK-001 [TODO — POLICY APPROVED]** Bulk Publish & Notify, Steering override and correction | AC-08, AC-10 | REV-003, FND-004 | AcademicAuthority only; default final proposal from Review Submitted Accept/Reject; mandatory audited reason on override, preview and optional selected/all-ready batch; one Publish & Notify confirmation; skip unreviewed/already published; per-paper idempotent status and date; approved General Comments visible to owner after publish; authorized corrected published decision audited and emailed, no private leaks. No per-paper manual DEC stages. |
+| **DOC-LOA-001 [TODO — POLICY APPROVED]** Auto official LoA PDF + QR verification | DOC-01, DOC-02 | DEC-BULK-001, official template/signature | One valid document per Published Accepted paper; approved English master template, signed/numbered snapshot, background idempotent PDF generation, private owner Preview/Download/Print, random-token public QR verification, audit/revoke/reissue/failed retry. No per-paper Drive upload; LoA does not wait for payment. NOT CODED. |
+| **MSG-001B [TODO — P0 WITH DEC-BULK]** Published decision and LoA-available email outbox | COM-01, COM-02 | DEC-BULK-001 for decision mail; DOC-LOA-001 Issued for LoA mail | One personal decision message per paper owner/event/version, after-commit queued, retry/send failure visibility, versioned correction email, LoA notice only after document Issued; never leak reviewer identity/override rationale; no production SMTP without authorization. NOT IMPLEMENTED. |
+| QA-001 P0 feature tests + browser user journey | ACC/AC/REV/DEC/MSG | All relevant P0 | One owned paper → review → bulk publish, override/correction and queued personal message; later LoA QR and Verified gate. PASS only with actual evidence. |
 
-**Demo checkpoint (22 Nov 2026):** demonstrate the longest *fully working* P0 journey possible using real functions and clearly labeled demo users/data. **Not guaranteed production-ready**. Do not consume time on landing-page aesthetics before academic core works. QR prototype optional if time allows.
+**Historical demo checkpoint (22 Nov 2026; not proof of implementation):** demonstrate the longest *fully working* P0 journey possible using real functions and clearly labeled demo users/data. **Not guaranteed production-ready**. Do not consume time on landing-page aesthetics before academic core works. QR prototype optional if time allows.
+
+**HISTORICAL UAT EVIDENCE:** Dated FND/ACAD notes below describe the project at the time of those phases; old pending/TODO phrasing in snapshots cannot override the active task table or Current State & Decisions.
 
 **FND-001 evidence (20 Nov 2026):** official `laravel/livewire-starter-kit` branch `main` scaffold, PHP 8.4.27, PHP dependencies and npm dependencies locked, dedicated database `iches_2027`, five migrations Ran, locally linked `https://iches-2027.test` via Herd (Secure Site enabled 20 Nov 2026), 38 tests/97 assertions, Pint 45 files, PHPStan, and build PASS. Changes are limited to baseline Laravel app, configuration examples, README/agent/task status; no ICHES business module or final website content built.
 
@@ -64,18 +67,18 @@
 
 **ACAD-002 OJS-style UI refinement evidence (21 Nov 2026):** Owner accepted initial Paper Draft / ROR UAT and authorized a compact contributor list with Flux Add/Edit Author modal. `PaperEditor` stages changes in a separate `authorDraft` buffer; Cancel leaves original contributors untouched, Save Author validates full metadata and ROR, and final Save Draft persists them transactionally using existing `SavePaperDraft`. List shows name, institution, corresponding badge and quick order/corresponding/remove actions; no author email/country/ID clutter on the parent page. ROR API v2 integration and server validation remain intact. No migrations, no paper identity/status changes, no keywords/PDF/submission. **7 new modal tests, full 137 tests / 763 assertions PASS, Pint 92 files PASS, PHPStan no errors, Blade/Vite PASS**. Edge verified modal, ROR suggestions, Cancel, coauthor staging, desktop/mobile; owner UI UAT pending. See [ACAD-002 Paper Drafts](ACAD-002-PAPER-DRAFTS.md).
 
-## C. P1 — Academic Completion, Co-Host & Finance
+## C. P0 Critical Finance & Full Paper, plus P1 Co-Host/Packages
 
 | Task | PRD | Dependency | Acceptance / tangible output |
 |---|---|---|---|
-| **DEC-003 [NOT APPLICABLE FOR ABSTRACT STAGE]** Legacy abstract Revision Required flow | AC-09 superseded | — | Removed by owner policy: Abstract decision is Accept/Reject only. General Comments can guide Full Paper after Published Accept; no abstract revision/resubmit gate. |
-| DEC-004 Accepted Published unlocks Full Paper | AC-11, AC-12 | DEC-002 | Internal ACCEPT does not unlock; Verified not required |
-| DOC-001 Per-paper LoA document link in dashboard | DOC-01, DOC-02 | DEC-004 | Paper owner sees only own LoA URL/file |
-| FIN-001 Authorized bank settings | FI-02 | FND-004 | No fake bank information, authorized actor only |
-| FIN-002 Invoice models & snapshot of price/payer | FI-01 | FND-002 | Institution/personal invoices distinguished |
-| FIN-003 Private payment proof and status | FI-03, FI-04 | FIN-002 | Upload JPG/PNG/PDF, Pending not Verified |
-| FIN-004 Finance verification / correction / ledger | FI-04, FI-07 | FIN-003 | Finance authorization, matches real bank statement |
-| FIN-005 Regular presenter billing only on published ACCEPT | FI-05 | FIN-002, DEC-002 | No premature invoice; Full Paper remains independent |
+| **DEC-001/DEC-002/DEC-003 [SUPERSEDED]** Legacy manual decision/revision tasks | AC-08, AC-09 | — | DEC-BULK-001 replaces them. No manual per-paper decisions and no abstract Revisions Required. Names retained only for audit, never schedule them. |
+| **FULL-001 [TODO — P0 HARD GATE]** Full Paper after Published Accepted plus Finance Verified | AC-11, AC-12 | DEC-BULK-001, FIN-004, FIN-005 | Same Paper ID; server UI/upload/access lock until applicable presenter/Co-Host payment Verified, no proof-only bypass; Rejected cannot proceed. Old DEC-004 without payment is SUPERSEDED. |
+| **DOC-001 [SUPERSEDED]** Legacy manual per-paper PDF link | DOC-01, DOC-02 | DOC-LOA-001 | No more one-by-one Google Drive uploads; DOC-LOA-001 is the active automatic document work order. |
+| **FIN-001 [TODO — P0]** Official bank settings | FI-02 | FND-004 | Only authorized Admin; no invented bank details or real credentials |
+| **FIN-002 [TODO — P0]** Invoice and immutable price/payer snapshot | FI-01 | FIN-001, DEC-BULK-001 | Separate personal/institution obligation; verified Co-Host entitlement avoids double presenter charge |
+| **FIN-003 [TODO — P0]** Private bank-transfer proof and status | FI-03, FI-04 | FIN-002 | Validate JPG/PNG/PDF, owner-scoped; Uploaded/Pending never unlock Full Paper |
+| **FIN-004 [TODO — P0]** Finance Verified/Correction Required and ledger | FI-04, FI-07 | FIN-003 | Assigned Finance actor checks bank mutation; audit state changes, only Verified provides payment entitlement |
+| **FIN-005 [TODO — P0]** Presenter billing and verified Co-Host coverage | FI-05 | FIN-002, DEC-BULK-001 | Invoice after Published Accepted only; no second fee for sponsored paper; Verified payment is mandatory before Full Paper |
 | PACK-001 Personal IDR 1m package one order | PG-07 | FIN-002, FND-006 | One product, exactly four program entitlements |
 | PACK-002 Package deadline CRUD and server validation | PG-09 | PACK-001 | Admin can adjust, expired blocks new order only |
 | PACK-003 Verified unlocks four entitlements | PG-08, FI-06 | PACK-001, FIN-004 | Proof Submitted never unlocks; no duplicate order |
@@ -102,7 +105,7 @@
 | PROG-001 Program enrollment and onsite/online by program | PG-02 | FND-006 | Single account, multiple participation modes |
 | PROG-002 Program Admin forms: Upgrading and MoU | PG-03, PG-04 | PROG-001 | Agenda, speaker/institution/PIC/delegation, attendance |
 | PROG-003 Program Admin forms: PKM and Destination | PG-05, PG-06 | PROG-001 | Manifest, groups/PIC, itinerary and attendance |
-| SESS-001 Parallel session CRUD and paper assignment | AC-13 | DEC-002 | Accepted paper gets room/slot/track/moderator |
+| SESS-001 Parallel session CRUD and paper assignment | AC-13 | DEC-BULK-001 | Published Accepted paper gets room/slot/track/moderator; never infer Presented |
 | SESS-002 Online/onsite modes, Zoom URL | AC-14 | SESS-001 | Presenter sees link or room; no secret host credentials |
 | SESS-003 Moderator Presented/No Show workspace | AC-15 | SESS-001 | Only own assigned session can be marked |
 | QA-003 QR device/concurrency and session field test | QR/AC-13..15 | Tasks above | Real-phone scan, reject duplicate, online-only, session tests |
@@ -129,10 +132,10 @@
 ## F. Practical execution sequence
 
 **Sprint 0:** FND-001..006, ACAD-001..004.  
-**Sprint 1:** REV-001..003, DEC-001..002, QA-001.  
-**Sprint 2:** DEC-004 (Full Paper after Published Accept), finance and package, Co-Host, QA-002.
-**Sprint 3:** ID cards, QR service builder/scanner, session, program forms, QA-003.  
-**Sprint 4:** Notifications/reports/documents; public design after WEB-001; operational readiness.
+**Next on explicit coding GO:** ACAD-005; then DEC-BULK-001 + MSG-001B, DOC-LOA-001, FIN-001..005, FULL-001. All are planned modules, not source code yet.
+**Historical code checkpoint:** REV-001..003 already DONE; subsequent packages/Co-Host, sessions and QR follow core. Full Paper/payment TOR deadlines need official reconciliation, not invented extensions.
+**Next group:** ID cards, QR service builder/scanner, session, program forms, QA-003.
+**Production readiness:** SMTP/queue testing, template/signatory approvals, official bank verification, HTTPS QR domain, public design after WEB-001.
 
 These are **logical groups**, not commitments of exact hours. Always deliver a complete user-facing workflow, not a shell of disconnected modules.
 

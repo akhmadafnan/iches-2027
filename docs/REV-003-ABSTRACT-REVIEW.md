@@ -16,7 +16,7 @@
 - **My Reviews** shows a truthful per-paper badge: Claimed / Review Draft / Review Submitted.
 - Reviewer workflow timeline displays actual dates in **WIB** (Paper submitted, Claimed by you, Review draft saved, Review submitted). Events that have not occurred are labelled pending and never assigned fabricated timestamps.
 - Author Status Timeline gains **Review completed** with WIB date only after Submit Review. It does **NOT** show reviewer identity, comments, recommendation or internal academic decision.
-- **DEC-001** decides independently (Accept / Reject) and **DEC-002** must explicitly Publish Decision before author sees the official outcome or shareable comments. This stage does not send email, grant LoA/Full Paper, or change Paper status.
+- **NEW ACTIVE POLICY, replacing this original historic plan:** DEC-BULK-001 lets assigned AcademicAuthority publish accepted/rejected recommendations in bulk, after optional audited overrides. Author only sees published decision and approved General Comments after Publish & Notify; REV-003 itself sends no decision email, LoA or payment rights. See [current contract](CURRENT-STATE-AND-DECISIONS.md).
 
 ## Database / integrity
 

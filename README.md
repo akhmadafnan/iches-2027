@@ -3,14 +3,18 @@
 **The 6th International Conference on Humanity, Education, and Society (ICHES 2027)**  
 Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 2027**
 
-This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Paper Drafts and Conference Track administration are now implemented; final abstract/PDF submission, reviewer workflows, enrollment, payments, QR and other operations remain future phases.**
+This repository contains the official **Laravel 13 + Livewire 4 + Flux UI Emerald** ICHES 2027 application. **CURRENT CODE BASELINE (21 November 2026):** FND-001..006, ACAD-001..004 and REV-001..003 owner UAT FINAL PASS; last code commit **154d919**. Exclusive reviewer Claim (one reviewer per abstract), General Comments + Accept/Reject and dated timelines are implemented.
 
-> **Current status (21 November 2026): FND-001–006, ACAD-001 and ACAD-002 owner UAT PASS. ACAD-003 Abstract Text, OJS-style Keywords and Private PDF is implemented and awaiting owner UAT.** Laravel 13, Livewire 4, Flux UI Emerald, Herd HTTPS, ROR-verified coauthors and owner-scoped Draft PDFs are available. **ACAD-004 Submit, reviewer workflow, finance and QR remain TODO.** Public website design remains on HOLD.
+**POLICIES APPROVED, FEATURES NOT CODED:** ACAD-005 one owned paper per account (co-author elsewhere allowed); DEC-BULK-001 authorized one-step mass Publish & Notify with Steering Committee override/correction; MSG-001B personal after-commit emails; DOC-LOA-001 automatic official PDF + QR verification (NO manual Google Drive uploads); FIN-001..005 and FULL-001 mandatory **Published Accepted + Finance Verified** gate. Published Rejected cannot continue its paper workflow. These are future work; no GO coding has been given.
+
+> **READ FIRST IN EVERY NEW CHAT:** [CURRENT STATE & DECISIONS](docs/CURRENT-STATE-AND-DECISIONS.md). It supersedes old milestone/UAT text in this README. Source that is not yet coded must never be described as working.
+
 
 ## Start here
 
 | Document | Purpose |
 |---|---|
+| **[CURRENT STATE & DECISIONS](docs/CURRENT-STATE-AND-DECISIONS.md)** | **Active owner-approved policy, implemented-vs-TODO status, next work order, new-chat handoff** |
 | [Master Blueprint](MASTER-BLUEPRINT-ICHES-2027.md) | Project vision and full event process |
 | [Product Requirements (PRD)](docs/PRD.md) | Actors, business rules, modules, acceptance |
 | [Task Backlog](docs/TASKS.md) | Prioritized P0/P1/P2 tasks, dependencies and outcomes |
@@ -18,6 +22,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md) | Eight immutable-source TOR titles, track administration and UAT |
 | [ACAD-002 Paper Drafts](docs/ACAD-002-PAPER-DRAFTS.md) | Owner-managed Drafts, compact contributor list, Flux Add/Edit modal, ROR affiliations, permanent IDs and UAT |
 | [ACAD-003 Abstract / Keywords / Private PDF](docs/ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md) | Individual keyword tags (OJS style), text abstract, secure PDF, owner-only download and UAT |
+| [REV-003 Abstract Review](docs/REV-003-ABSTRACT-REVIEW.md) | Review Accept/Reject, General Comments, timelines, owner UAT FINAL PASS |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -60,12 +65,13 @@ Run `php artisan db:seed` in the `local` environment to create the following *ve
 | Committee | `committee@iches.id` | `password` |
 | Admin | `admin@iches.id` | `password` |
 
-**IMPORTANT:** These are disposable local/testing credentials only; never use them on an internet-accessible deployment. All new public registrations default to `user` regardless of submitted fields. Role/Gate/Policy checks are now active (FND-004). Admin can manage other users' roles and the global Finance/Academic Authority assignments. Specific Reviewer and Committee routes exist only as access-verified placeholders; the actual academic review and QR scan modules will be built in their respective tasks.
+**IMPORTANT:** Local-only demo accounts and passwords must never reach a public deployment. Public registration remains ordinary User, access roles require server gates. **Reviewer Workspace/Claim/Review Submitted are implemented and UAT PASS**; Academic Bulk Decisions, Finance, automatic LoA and QR scanner workflows are NOT yet implemented. Finance/AcademicAuthority duties require explicit assignments.
 
 **FND-003 + onboarding enhancement (20 Nov 2026):** `/settings/profile` edits name, email, institution and country, and now supports a securely validated **private profile-photo upload** (JPG/PNG/WebP, max 3 MB, min 200×200). New registrants are immediately redirected to `/settings/profile`; they must upload a photo before opening verified private dashboard/role pages. Existing accounts/seeded UAT users are not retroactively blocked. Photos are accessed only by their authenticated owner at `/settings/profile/photo`; they are not on a public storage disk. Login/password confirmation remain available; **Passkeys are fully disabled** in Fortify routes, auth/security UI and JS build. **Cropping a 1:1 ID Card photo remains ID-001 TODO.**
 
 **Verification (20 Nov 2026):** four demo roles seeded on MySQL, second seed run succeeded without duplicates; **49 tests / 165 assertions** passed; Pint **51 files** and PHPStan no errors; dedicated migration marked `Ran`.
 
+> **HISTORICAL UAT WALKTHROUGHS:** The dated onboarding/FND/ACAD sections below reflect earlier checkpoints, including old TODO claims. For current status and product behavior, use [CURRENT STATE & DECISIONS](docs/CURRENT-STATE-AND-DECISIONS.md) and [TASKS](docs/TASKS.md).
 ## UAT new-account onboarding and Passkeys (local only)
 
 1. Open `https://iches-2027.test/register` with a new test email; complete normal registration.
@@ -148,7 +154,7 @@ See [ACAD-003 technical evidence and security/UAT checklist](docs/ACAD-003-ABSTR
 ## Core application areas
 
 - **Personal account:** register once, choose initial intention, access multiple programs and personal dashboard.
-- **International Conference:** Abstract text/PDF, reviewer self-claim, academic decisions, revision, LoA, Full Paper, parallel session and Zoom.
+- **International Conference:** One owned abstract per submitter, exclusive one-reviewer claim and General Comments + Accept/Reject (DONE); bulk Publish & Notify with audited override, automatic LoA PDF/QR, payment-Verified-only Full Paper, sessions/Zoom (planned). No abstract Revisions Required.
 - **Four companion activities:** International MoU, Research & PKM Upgrading, International Community Service, Sustainable Destination Study.
 - **Payments:** manual bank transfer, one Co-Host institute invoice for max five representatives/papers, one IDR 1m personal bundle for four activities, verified finance workflow.
 - **Digital identity:** cropped square profile photo, Participant green and Committee navy ID Card, QR/ID Card PNG.
@@ -201,4 +207,4 @@ These are suggested GitHub About values until the repository metadata is set:
 
 The [previous repository](https://github.com/akhmadafnan/iches-unisya) is used only as an approved business reference; this is a fresh codebase. Confirmed TOR facts and earlier decisions are incorporated in the PRD, while unresolved implementation details are deliberately not turned into blockers.
 
-**Primary goal:** usable software quickly, with professional design and clean Laravel OOP; not paperwork or architectural overengineering.
+**Primary goal:** usable software quickly, with good UI and idiomatic Laravel; automate bulk academic decisions + LoA verification, preserve reviewer UAT, and do not bypass one-paper-per-owner or Finance Verified Full Paper policy.

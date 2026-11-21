@@ -1,7 +1,7 @@
 # ENGINEERING STANDARDS — OOP PHP, LARAVEL & LIVEWIRE
 
 **Versi:** 1.0 | **Tanggal:** 20 November 2026  
-**Wajib untuk seluruh code baru.** Fondasi Laravel 13 + Livewire 4 kini sudah terpasang pada proyek. Periksa versi paket aktual sebelum menambah fitur, bukan menggunakan asumsi lama.
+**Wajib untuk seluruh code baru.** Fondasi Laravel 13 + Livewire 4 kini sudah terpasang pada proyek. Periksa versi paket aktual sebelum menambah fitur, bukan menggunakan asumsi lama. Product rules follow [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md), not superseded earlier workflows.
 
 **Referensi resmi:**
 - [Laravel 13 Starter Kits — source 13.x](https://github.com/laravel/docs/blob/13.x/starter-kits.md) — official Livewire Starter Kit.
