@@ -1,6 +1,6 @@
 # ACAD-002 — Paper Drafts, Authors & Permanent Identifiers
 
-**Status:** ACAD-002 Paper Draft and ROR functional owner UAT PASS. **OJS-style compact contributor directory + Flux modal Add/Edit refinement implemented on 21 Nov 2026**, with **137 tests / 763 assertions PASS**, Pint **92 files PASS**, PHPStan, Blade and npm build PASS. New modal owner UI UAT pending; ACAD-003 not started.
+**Status:** ACAD-002 Paper Draft, ROR and OJS-style compact contributor modal **owner UAT PASS (21 Nov 2026)**. Historical automated checkpoint: 137 tests / 763 assertions PASS, Pint 92 files PASS, PHPStan, Blade and npm build PASS. ACAD-003 has since been implemented and is awaiting separate owner UAT; see [ACAD-003](ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md).
 **Functional contract:** [PRD §5.2 AC-03](PRD.md), [TASKS](TASKS.md), [Master Blueprint §3.1](../MASTER-BLUEPRINT-ICHES-2027.md).
 **Technology:** Laravel 13, official Livewire Starter Kit/Livewire 4, Flux UI Emerald, MySQL.
 
@@ -65,4 +65,4 @@ Additive migration: `2026_11_21_000002_create_papers_and_paper_authors_tables.ph
 
 ## Explicitly not implemented
 
-ACAD-003 adds **abstract text, keywords, and private PDF validation/upload** to the same owned Draft. ACAD-004 adds the **Submit** action, submission timestamp, and transition into reviewer eligibility. A saved Draft is never automatically available for Reviewer self-claim. No LoA, payment obligation, parallel session, public website content, or coauthor account-sharing workflow is introduced here.
+The subsequent ACAD-003 now adds **abstract text, OJS-style individual keywords, and private PDF validation/upload** to the same owned Draft (see [ACAD-003](ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md)). ACAD-004 adds the **Submit** action, submission timestamp, and transition into reviewer eligibility. A saved Draft is never automatically available for Reviewer self-claim. No LoA, payment obligation, parallel session, public website content, or coauthor account-sharing workflow is introduced here.

@@ -5,7 +5,7 @@ Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 20
 
 This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Paper Drafts and Conference Track administration are now implemented; final abstract/PDF submission, reviewer workflows, enrollment, payments, QR and other operations remain future phases.**
 
-> **Current status (21 November 2026): FND-001 through FND-006 and ACAD-001 owner UAT PASS; ACAD-002 Paper Drafts/ROR functionality owner UAT PASS, with an OJS-style Add/Edit Author modal refinement now ready for owner UI UAT.** Laravel 13/Livewire 4, Herd HTTPS, Fortify onboarding, role dashboards, five programs, Event Settings, seven dates, eight TOR tracks, and owner-managed Draft paper metadata/coauthors with permanent references are available. **Abstract/PDF upload and submission (ACAD-003/004), review, enrollment, finance and QR are NOT yet available.** Public website design remains on HOLD.
+> **Current status (21 November 2026): FND-001–006, ACAD-001 and ACAD-002 owner UAT PASS. ACAD-003 Abstract Text, OJS-style Keywords and Private PDF is implemented and awaiting owner UAT.** Laravel 13, Livewire 4, Flux UI Emerald, Herd HTTPS, ROR-verified coauthors and owner-scoped Draft PDFs are available. **ACAD-004 Submit, reviewer workflow, finance and QR remain TODO.** Public website design remains on HOLD.
 
 ## Start here
 
@@ -17,6 +17,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [FND-006 TOR Master Data Baseline](docs/FND-006-TOR-BASELINE.md) | Verbatim source verification, canonical program codes, dates and safeguards |
 | [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md) | Eight immutable-source TOR titles, track administration and UAT |
 | [ACAD-002 Paper Drafts](docs/ACAD-002-PAPER-DRAFTS.md) | Owner-managed Drafts, compact contributor list, Flux Add/Edit modal, ROR affiliations, permanent IDs and UAT |
+| [ACAD-003 Abstract / Keywords / Private PDF](docs/ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md) | Individual keyword tags (OJS style), text abstract, secure PDF, owner-only download and UAT |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -130,7 +131,19 @@ Source: [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md). The ac
 6. Log in as another account; the other user's paper must not appear, and its private edit URL must return **404**.
 7. On mobile verify the **compact author directory**, scrolling Flux modal and ROR suggestions; no whole-page horizontal overflow. Profile institution text remains only a search hint; **My Profile ROR integration and ACAD-003 Keywords/PDF are explicitly outside this refinement**.
 
-See [ACAD-002 implementation and full UAT checklist](docs/ACAD-002-PAPER-DRAFTS.md). **OJS-style author-modal refinement verification:** 137 tests / 763 assertions PASS, Pint 92 files PASS, PHPStan/Blade/npm build PASS; Edge Add/Edit, ROR search, Cancel, coauthor ordering and mobile 390px PASS. **New modal owner UI UAT pending.**
+See [ACAD-002 implementation and full UAT checklist](docs/ACAD-002-PAPER-DRAFTS.md). **OJS-style author-modal refinement verification:** 137 tests / 763 assertions PASS, Pint 92 files PASS, PHPStan/Blade/npm build PASS; Edge Add/Edit, ROR search, Cancel, coauthor ordering and mobile 390px PASS. **The owner confirmed ACAD-002 modal UI UAT PASS before approving ACAD-003.**
+
+## UAT ACAD-003 — Abstract, Keywords and Private PDF (local only)
+
+**ACAD-003 is implemented and awaiting your UAT.** Open My Submissions, then **Edit draft** on an existing Draft or start a new one. ACAD-002 title, track and OJS-style author modal stay unchanged.
+
+1. Enter the **Abstract text** (it may be unfinished during Draft). Type a keyword and press **Enter**, then use **Add keyword** for a second term. Confirm each appears as a separate removable tag.
+2. Enter the same keyword in a different capitalization: it must be rejected. Remove one tag via ×. Press **Save draft**, reopen and verify text/tags persist against the same Paper ID.
+3. Choose a genuine **PDF** (maximum 10 MB technical limit), click **Save draft**, reopen, and click **Download**. The file must be available only to the owning account.
+4. Upload a replacement PDF and Save Draft: the new file replaces the previous one. Test **Remove → Undo**, then **Remove → Save draft** to remove it deliberately.
+5. Test invalid/renamed PDF, check mobile at 390 px, and confirm **Draft / not submitted** remains unchanged. **There is no Submit action in ACAD-003**; ACAD-004 introduces that later.
+
+See [ACAD-003 technical evidence and security/UAT checklist](docs/ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md). Official word-count and keyword-count policies are not set yet; 10,000 abstract characters, up to 15 tags of 2–80 characters, and a 10 MB PDF limit are temporary technical safeguards only.
 
 ## Core application areas
 

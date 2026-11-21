@@ -11,18 +11,23 @@ use App\Services\RorOrganizationService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[Title('Paper Draft | ICHES 2027')]
 class PaperEditor extends Component
 {
+    use WithFileUploads;
+
     public ?string $editingPublicId = null;
 
     public string $paperReference = '';
@@ -30,6 +35,24 @@ class PaperEditor extends Component
     public string $title = '';
 
     public string $conferenceTrackId = '';
+
+    public string $abstractText = '';
+
+    /** @var list<string> */
+    public array $keywords = [];
+
+    public string $keywordInput = '';
+
+    /** @var UploadedFile|null */
+    public $abstractPdfUpload = null;
+
+    public bool $removeAbstractPdf = false;
+
+    public ?string $currentAbstractPdfName = null;
+
+    public ?int $currentAbstractPdfSize = null;
+
+    public ?string $currentAbstractPdfUploadedAt = null;
 
     /**
      * Staged author data: only saved to the paper when the outer Save Draft action runs.
@@ -73,6 +96,11 @@ class PaperEditor extends Component
             $this->paperReference = $owned->reference ?? '';
             $this->title = $owned->title;
             $this->conferenceTrackId = (string) $owned->conference_track_id;
+            $this->abstractText = $owned->abstract_text ?? '';
+            $this->keywords = $owned->keywords ?? [];
+            $this->currentAbstractPdfName = $owned->abstract_pdf_original_name;
+            $this->currentAbstractPdfSize = $owned->abstract_pdf_size;
+            $this->currentAbstractPdfUploadedAt = $owned->abstract_pdf_uploaded_at?->format('d M Y, H:i');
             $this->authors = array_values($owned->authors->map(fn ($author) => [
                 'key' => (string) Str::ulid(),
                 'name' => $author->name,
@@ -362,6 +390,83 @@ class PaperEditor extends Component
         $this->resetValidation();
     }
 
+    /**
+     * OJS-style keywords are entered individually; no comma-separated blob is stored.
+     */
+    public function addKeyword(): void
+    {
+        $keyword = Str::squish($this->keywordInput);
+
+        if ($keyword === '') {
+            $this->keywordInput = '';
+
+            return;
+        }
+
+        if (mb_strlen($keyword) < 2 || mb_strlen($keyword) > 80) {
+            $this->addError('keywordInput', 'Use 2–80 characters for each keyword.');
+
+            return;
+        }
+
+        if (count($this->keywords) >= 15) {
+            $this->addError('keywordInput', 'The technical Draft limit is 15 individual keywords.');
+
+            return;
+        }
+
+        foreach ($this->keywords as $existing) {
+            if (mb_strtolower($existing) === mb_strtolower($keyword)) {
+                $this->addError('keywordInput', 'This keyword has already been added.');
+
+                return;
+            }
+        }
+
+        $this->keywords[] = $keyword;
+        $this->keywordInput = '';
+        $this->resetValidation('keywordInput');
+        $this->resetValidation('keywords');
+    }
+
+    public function removeKeyword(int $index): void
+    {
+        if (! array_key_exists($index, $this->keywords)) {
+            return;
+        }
+
+        array_splice($this->keywords, $index, 1);
+        $this->resetValidation('keywords');
+    }
+
+    public function updatedAbstractPdfUpload(): void
+    {
+        $this->removeAbstractPdf = false;
+        $this->resetValidation('abstractPdfUpload');
+    }
+
+    public function discardSelectedPdf(): void
+    {
+        $this->abstractPdfUpload = null;
+        $this->resetValidation('abstractPdfUpload');
+    }
+
+    public function markPdfForRemoval(): void
+    {
+        if ($this->currentAbstractPdfName === null) {
+            return;
+        }
+
+        $this->abstractPdfUpload = null;
+        $this->removeAbstractPdf = true;
+        $this->resetValidation('abstractPdfUpload');
+    }
+
+    public function undoPdfRemoval(): void
+    {
+        $this->removeAbstractPdf = false;
+    }
+
     public function save(SavePaperDraft $saveDraft): void
     {
         $actor = Auth::user();
@@ -373,9 +478,22 @@ class PaperEditor extends Component
 
         Gate::authorize($paper === null ? 'create' : 'update', $paper ?? Paper::class);
 
+        // Accept a last typed keyword on Save Draft so unfinished input is not lost.
+        if (trim($this->keywordInput) !== '') {
+            $this->addKeyword();
+
+            if ($this->getErrorBag()->has('keywordInput')) {
+                return;
+            }
+        }
+
         $data = $this->validate([
             'title' => ['required', 'string', 'min:5', 'max:255'],
             'conferenceTrackId' => ['required', 'integer'],
+            'abstractText' => ['nullable', 'string', 'max:10000'],
+            'keywords' => ['array', 'max:15'],
+            'keywords.*' => ['required', 'string', 'min:2', 'max:80'],
+            'abstractPdfUpload' => ['nullable', 'file', File::types(['pdf'])->max(10240)],
             'authors' => ['required', 'array', 'min:1'],
             'authors.*.name' => ['required', 'string', 'min:2', 'max:150'],
             'authors.*.email' => ['required', 'email:rfc', 'max:254', 'distinct:ignore_case'],
@@ -405,6 +523,9 @@ class PaperEditor extends Component
             ['title' => $data['title'], 'conference_track_id' => (int) $data['conferenceTrackId']],
             $authors,
             (int) $data['correspondingIndex'],
+            ['abstract_text' => $data['abstractText'] ?? null, 'keywords' => array_values($data['keywords'])],
+            $this->abstractPdfUpload,
+            $this->removeAbstractPdf,
         );
 
         session()->flash('success', "Draft {$saved->reference} saved. It has not been submitted for review.");

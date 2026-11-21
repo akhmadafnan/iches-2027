@@ -10,17 +10,25 @@ use App\Models\User;
 use App\Services\RorOrganizationService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\File;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 final class SavePaperDraft
 {
     /**
      * @param  array{title: string, conference_track_id: int}  $input
      * @param  list<array{name: string, email: string, institution?: string|null, country?: string|null, ror_id?: string|null, affiliation_source?: string|null}>  $authors
+     * @param  array{abstract_text?: string|null, keywords?: list<string>}  $abstractData
      */
     public function handle(
         User $actor,
@@ -28,6 +36,9 @@ final class SavePaperDraft
         array $input,
         array $authors,
         int $correspondingIndex,
+        array $abstractData = [],
+        ?UploadedFile $abstractPdf = null,
+        bool $removeAbstractPdf = false,
     ): Paper {
         if ($existing === null) {
             Gate::forUser($actor)->authorize('create', Paper::class);
@@ -54,47 +65,179 @@ final class SavePaperDraft
             throw ValidationException::withMessages(['conferenceTrackId' => 'Select an available conference track.']);
         }
 
-        // Resolve the authoritative ROR record on the server. A browser-provided
-        // organization name is never accepted as a ROR-verified affiliation.
+        // Resolve ROR records on the server rather than trusting browser-provided labels.
         $normalizedAuthors = $this->normalizeAffiliations($authors);
+        $validatedAbstract = $abstractData !== [] ? $this->normalizeAbstract($abstractData) : null;
 
-        return DB::transaction(function () use ($actor, $existing, $input, $normalizedAuthors, $correspondingIndex, $track): Paper {
-            if ($existing !== null) {
-                $paper = Paper::query()->whereKey($existing->id)->lockForUpdate()->firstOrFail();
-                Gate::forUser($actor)->authorize('update', $paper);
-            } else {
-                $paper = new Paper;
-                $paper->owner_id = $actor->id;
-                $paper->public_id = (string) Str::ulid();
-                $paper->status = PaperStatus::Draft;
-            }
+        if ($abstractPdf !== null) {
+            $this->validatePdf($abstractPdf);
+        }
 
-            $paper->title = trim($input['title']);
-            $paper->conference_track_id = $track->id;
-            $paper->save();
+        $newFilePath = null;
+        $previousFilePath = null;
 
-            if ($paper->reference === null) {
-                $paper->reference = sprintf('ICH27-P%06d', $paper->id);
+        try {
+            $saved = DB::transaction(function () use (
+                $actor, $existing, $input, $normalizedAuthors, $correspondingIndex,
+                $track, $validatedAbstract, $abstractPdf, $removeAbstractPdf,
+                &$newFilePath, &$previousFilePath
+            ): Paper {
+                if ($existing !== null) {
+                    $paper = Paper::query()->whereKey($existing->id)->lockForUpdate()->firstOrFail();
+                    Gate::forUser($actor)->authorize('update', $paper);
+                } else {
+                    $paper = new Paper;
+                    $paper->owner_id = $actor->id;
+                    $paper->public_id = (string) Str::ulid();
+                    $paper->status = PaperStatus::Draft;
+                }
+
+                $paper->title = trim($input['title']);
+                $paper->conference_track_id = $track->id;
+
+                if ($validatedAbstract !== null) {
+                    $paper->abstract_text = $validatedAbstract['abstract_text'];
+                    $paper->keywords = $validatedAbstract['keywords'];
+                }
+
                 $paper->save();
+
+                if ($paper->reference === null) {
+                    $paper->reference = sprintf('ICH27-P%06d', $paper->id);
+                    $paper->save();
+                }
+
+                if ($abstractPdf !== null || $removeAbstractPdf) {
+                    $previousFilePath = $paper->abstract_pdf_path;
+
+                    if ($abstractPdf !== null) {
+                        $directory = "paper-abstracts/{$actor->id}/{$paper->public_id}";
+                        $newFilePath = $abstractPdf->storeAs($directory, Str::uuid().'.pdf', 'local');
+
+                        if (! is_string($newFilePath) || ! Storage::disk('local')->exists($newFilePath)) {
+                            throw new RuntimeException('The private abstract PDF could not be stored.');
+                        }
+
+                        $paper->abstract_pdf_path = $newFilePath;
+                        $paper->abstract_pdf_original_name = $this->safeOriginalName($abstractPdf);
+                        $paper->abstract_pdf_size = $abstractPdf->getSize();
+                        $paper->abstract_pdf_uploaded_at = Carbon::now();
+                    } else {
+                        $paper->abstract_pdf_path = null;
+                        $paper->abstract_pdf_original_name = null;
+                        $paper->abstract_pdf_size = null;
+                        $paper->abstract_pdf_uploaded_at = null;
+                    }
+
+                    $paper->save();
+                }
+
+                $paper->authors()->delete();
+
+                foreach ($normalizedAuthors as $position => $author) {
+                    $paper->authors()->create([
+                        'position' => $position + 1,
+                        'name' => trim($author['name']),
+                        'email' => mb_strtolower(trim($author['email'])),
+                        'institution' => $author['institution'],
+                        'ror_id' => $author['ror_id'],
+                        'affiliation_source' => $author['affiliation_source'],
+                        'country' => filled($author['country'] ?? null) ? trim($author['country']) : null,
+                        'is_corresponding' => $position === $correspondingIndex,
+                    ]);
+                }
+
+                return $paper->load('authors', 'conferenceTrack');
+            });
+        } catch (Throwable $exception) {
+            // Database rollback does not roll back filesystem writes.
+            if (is_string($newFilePath)) {
+                Storage::disk('local')->delete($newFilePath);
             }
 
-            $paper->authors()->delete();
+            throw $exception;
+        }
 
-            foreach ($normalizedAuthors as $position => $author) {
-                $paper->authors()->create([
-                    'position' => $position + 1,
-                    'name' => trim($author['name']),
-                    'email' => mb_strtolower(trim($author['email'])),
-                    'institution' => $author['institution'],
-                    'ror_id' => $author['ror_id'],
-                    'affiliation_source' => $author['affiliation_source'],
-                    'country' => filled($author['country'] ?? null) ? trim($author['country']) : null,
-                    'is_corresponding' => $position === $correspondingIndex,
+        // Delete the superseded private file only after the new database state commits.
+        if (is_string($previousFilePath) && $previousFilePath !== $newFilePath) {
+            Storage::disk('local')->delete($previousFilePath);
+        }
+
+        return $saved;
+    }
+
+    /**
+     * @param  array{abstract_text?: string|null, keywords?: list<string>}  $data
+     * @return array{abstract_text: string|null, keywords: list<string>}
+     */
+    private function normalizeAbstract(array $data): array
+    {
+        $validated = Validator::make($data, [
+            'abstract_text' => ['nullable', 'string', 'max:10000'],
+            'keywords' => ['sometimes', 'array', 'max:15'],
+            'keywords.*' => ['required', 'string', 'min:2', 'max:80'],
+        ])->validate();
+
+        $keywords = [];
+        $seen = [];
+
+        foreach ($validated['keywords'] ?? [] as $value) {
+            $keyword = preg_replace('/\s+/u', ' ', trim($value)) ?? trim($value);
+            $folded = mb_strtolower($keyword);
+
+            if (in_array($folded, $seen, true)) {
+                throw ValidationException::withMessages([
+                    'keywords' => 'Each keyword may only be added once.',
                 ]);
             }
 
-            return $paper->load('authors', 'conferenceTrack');
-        });
+            $keywords[] = $keyword;
+            $seen[] = $folded;
+        }
+
+        $text = trim($validated['abstract_text'] ?? '');
+
+        return ['abstract_text' => $text === '' ? null : $text, 'keywords' => $keywords];
+    }
+
+    private function validatePdf(UploadedFile $file): void
+    {
+        Validator::make(['abstractPdfUpload' => $file], [
+            'abstractPdfUpload' => ['required', 'file', File::types(['pdf'])->max(10240)],
+        ])->validate();
+
+        if (strtolower($file->getClientOriginalExtension()) !== 'pdf') {
+            throw ValidationException::withMessages([
+                'abstractPdfUpload' => 'The file must use the .pdf extension.',
+            ]);
+        }
+
+        // Detect a PDF header from file contents, not just its extension or browser MIME.
+        $stream = fopen($file->getRealPath(), 'rb');
+
+        if ($stream === false) {
+            throw ValidationException::withMessages(['abstractPdfUpload' => 'The PDF file could not be read.']);
+        }
+
+        try {
+            $signature = fread($stream, 5);
+        } finally {
+            fclose($stream);
+        }
+
+        if ($signature !== '%PDF-') {
+            throw ValidationException::withMessages([
+                'abstractPdfUpload' => 'Upload a genuine PDF file rather than a renamed document.',
+            ]);
+        }
+    }
+
+    private function safeOriginalName(UploadedFile $file): string
+    {
+        $filename = basename(str_replace('\\', '/', $file->getClientOriginalName()));
+        $filename = preg_replace('/[[:cntrl:]]/u', '', $filename) ?? 'Abstract.pdf';
+
+        return mb_strimwidth($filename, 0, 240, '');
     }
 
     /**

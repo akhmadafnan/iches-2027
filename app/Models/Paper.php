@@ -17,6 +17,12 @@ use Illuminate\Support\Carbon;
  * @property string|null $reference
  * @property string $title
  * @property PaperStatus $status
+ * @property string|null $abstract_text
+ * @property list<string>|null $keywords
+ * @property string|null $abstract_pdf_path
+ * @property string|null $abstract_pdf_original_name
+ * @property int|null $abstract_pdf_size
+ * @property Carbon|null $abstract_pdf_uploaded_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -29,7 +35,12 @@ class Paper extends Model
 
     protected function casts(): array
     {
-        return ['status' => PaperStatus::class];
+        return [
+            'status' => PaperStatus::class,
+            'keywords' => 'array',
+            'abstract_pdf_size' => 'integer',
+            'abstract_pdf_uploaded_at' => 'datetime',
+        ];
     }
 
     /** @return BelongsTo<User, $this> */

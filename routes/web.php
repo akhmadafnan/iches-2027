@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PaperAbstractDownloadController;
 use App\Livewire\Admin\ManageConferenceTracks;
 use App\Livewire\Admin\ManageEventSettings;
 use App\Livewire\Admin\ManagePrograms;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::livewire('my/submissions', MyPapers::class)->name('papers.index');
     Route::livewire('my/submissions/create', PaperEditor::class)->name('papers.create');
     Route::livewire('my/submissions/{paper:public_id}/edit', PaperEditor::class)->name('papers.edit');
+    Route::get('my/submissions/{paper:public_id}/abstract-pdf', PaperAbstractDownloadController::class)->name('papers.abstract.download');
 
     Route::livewire('admin/programs', ManagePrograms::class)
         ->middleware('can:manage-programs')

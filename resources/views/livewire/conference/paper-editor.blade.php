@@ -96,6 +96,99 @@
             </div>
         </section>
 
+        <section class="overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div class="flex items-center gap-3 border-b border-zinc-100 px-6 py-5 dark:border-zinc-800">
+                <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400"><flux:icon.document-text class="size-5" /></div>
+                <div>
+                    <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Abstract &amp; keywords</h2>
+                    <p class="mt-1 text-sm text-zinc-500">Add the academic abstract and register each keyword individually, as in OJS.</p>
+                </div>
+            </div>
+
+            <div class="space-y-6 p-5 sm:p-6">
+                <div class="space-y-2">
+                    <flux:textarea wire:model="abstractText" label="Abstract text" placeholder="Enter or paste the abstract of your research..." rows="8" maxlength="10000" />
+                    <p class="text-xs leading-5 text-zinc-500">You may leave this unfinished while saving a Draft. A 10,000-character technical safeguard applies; the official academic word limit will be configured before submission opens.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Keywords</p>
+                        <span class="text-xs font-medium tabular-nums text-zinc-500">{{ count($keywords) }} of 15 tags</span>
+                    </div>
+                    @if (count($keywords) > 0)
+                        <div class="flex flex-wrap gap-2 rounded-xl border border-emerald-200 bg-emerald-50/35 p-3 dark:border-emerald-900 dark:bg-emerald-950/20" aria-label="Saved keywords">
+                            @foreach ($keywords as $index => $keyword)
+                                <div wire:key="paper-keyword-{{ $index }}" class="inline-flex max-w-full items-center gap-2 rounded-lg border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-900 shadow-sm dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-100">
+                                    <span class="break-words">{{ $keyword }}</span>
+                                    <button type="button" wire:click="removeKeyword({{ $index }})" class="flex size-5 shrink-0 items-center justify-center rounded text-emerald-700 hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:text-emerald-300" aria-label="Remove keyword {{ $keyword }}"><flux:icon.x-mark class="size-3.5" /></button>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                    <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
+                        <div class="min-w-0 flex-1">
+                            <flux:input wire:model="keywordInput" wire:keydown.enter.prevent="addKeyword" label="Add one keyword" placeholder="e.g. Islamic Education — press Enter" autocomplete="off" maxlength="80" aria-label="Add one keyword" />
+                        </div>
+                        <flux:button type="button" variant="outline" icon="plus" wire:click="addKeyword" class="w-full sm:w-auto">Add keyword</flux:button>
+                    </div>
+                    <p class="text-xs leading-5 text-zinc-500">Press Enter or click Add keyword after each word or phrase. Duplicate keywords are blocked. No comma-separated text list is used.</p>
+                    @error('keywords') <p role="alert" class="text-sm text-red-600">{{ $message }}</p> @enderror
+                    @error('keywords.*') <p role="alert" class="text-sm text-red-600">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div class="flex items-center gap-3 border-b border-zinc-100 px-6 py-5 dark:border-zinc-800">
+                <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 dark:bg-violet-950 dark:text-violet-400"><flux:icon.document-text class="size-5" /></div>
+                <div>
+                    <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Abstract PDF</h2>
+                    <p class="mt-1 text-sm text-zinc-500">Private file, accessible only to the paper owner. No reviewer access in Draft status.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 p-5 sm:p-6">
+                @if ($currentAbstractPdfName !== null && ! $removeAbstractPdf)
+                    <div class="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50/65 p-4 dark:border-emerald-900 dark:bg-emerald-950/20 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex min-w-0 items-start gap-3">
+                            <flux:icon.check-circle class="mt-0.5 size-5 shrink-0 text-emerald-700" />
+                            <div class="min-w-0 space-y-1">
+                                <p class="break-all text-sm font-semibold text-emerald-950 dark:text-emerald-100">{{ $currentAbstractPdfName }}</p>
+                                <p class="text-xs text-emerald-800 dark:text-emerald-300">{{ $currentAbstractPdfSize !== null ? number_format($currentAbstractPdfSize / 1024, 1).' KB' : 'PDF' }} · Uploaded {{ $currentAbstractPdfUploadedAt ?? 'previously' }}</p>
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-wrap items-center gap-2">
+                            <flux:button type="button" variant="outline" size="sm" :href="route('papers.abstract.download', $editingPublicId)">Download</flux:button>
+                            <flux:button type="button" variant="ghost" size="sm" icon="trash" wire:click="markPdfForRemoval">Remove</flux:button>
+                        </div>
+                    </div>
+                @elseif ($removeAbstractPdf)
+                    <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/20">
+                        <p class="text-sm text-amber-900 dark:text-amber-100">The existing PDF will be removed when you save this Draft.</p>
+                        <flux:button type="button" variant="ghost" size="sm" wire:click="undoPdfRemoval">Undo removal</flux:button>
+                    </div>
+                @endif
+
+                <div class="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/60 p-4 dark:border-zinc-700 dark:bg-zinc-800/30">
+                    <flux:input type="file" wire:model="abstractPdfUpload" :label="$currentAbstractPdfName !== null ? 'Choose a replacement PDF' : 'Upload abstract PDF'" accept=".pdf,application/pdf" />
+                    <div wire:loading wire:target="abstractPdfUpload" class="mt-2 flex items-center gap-2 text-xs text-emerald-700">
+                        <flux:icon.arrow-path class="size-4 animate-spin" /> Uploading PDF to temporary private storage...
+                    </div>
+                    @if ($abstractPdfUpload)
+                        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
+                            <div class="min-w-0">
+                                <p class="break-all text-sm font-medium text-zinc-800 dark:text-white">{{ $abstractPdfUpload->getClientOriginalName() }}</p>
+                                <p class="text-xs text-zinc-500">{{ number_format(($abstractPdfUpload->getSize() ?: 0) / 1024, 1) }} KB · Selected, not yet saved</p>
+                            </div>
+                            <flux:button type="button" variant="ghost" size="sm" wire:click="discardSelectedPdf" icon="x-mark">Clear</flux:button>
+                        </div>
+                    @endif
+                    <p class="mt-3 text-xs leading-5 text-zinc-500">PDF only, up to 10 MB (technical limit). The file is stored privately when you click Save Draft. You may save a Draft without a PDF.</p>
+                </div>
+            </div>
+        </section>
+
         <div class="flex flex-col items-start justify-between gap-4 rounded-2xl border border-zinc-200 bg-white px-6 py-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:flex-row sm:items-center">
             <div class="flex items-start gap-3">
                 <flux:icon.shield-check class="mt-0.5 size-5 shrink-0 text-emerald-700" />
