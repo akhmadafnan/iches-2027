@@ -1,6 +1,6 @@
 # IMPLEMENTATION TASK BACKLOG — ICHES 2027
 
-**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001 / ACAD-002 / ACAD-003 owner UAT PASS; ACAD-004 TODO; later tasks TODO
+**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001 / ACAD-002 / ACAD-003 / ACAD-004 owner UAT PASS; REV-001 next (TODO); later tasks TODO
 **Source:** [PRD](PRD.md) + [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md).  
 **Priority:** P0 = critical flow, P1 = essential follow-up, P2 = polish/post-event.  
 **Never treat TODO as implemented.** Code changes begin only when the owner instructs us to start coding.
@@ -27,7 +27,7 @@
 | **ACAD-001 [DONE — OWNER UAT PASS]** Eight official conference tracks | AC-01 | FND-004, FND-006 | 8 exact TOR Section E.2 track titles seeded with immutable codes, originals preserved, Admin editing/search/filter/active selection scope implemented; active-track selection is now wired into ACAD-002 Draft editor. |
 | **ACAD-002 [DONE — OWNER UAT PASS]** Draft paper, authors, ROR affiliations, stable IDs | AC-03 | FND-002, ACAD-001 | Paper Draft/ROR and OJS-style compact Add/Edit author modal owner UAT PASS; Cancel discards, corresponding and ordering retained, ROR verified. No Submit. |
 | **ACAD-003 [DONE — OWNER UAT PASS]** Abstract form and private PDF upload | AC-04 | ACAD-002 | OJS-style individual keyword tags, abstract text, local-private PDF upload/download/remove/replacement, validated files; 18 focused and 155 full tests PASS; Edge desktop/mobile 390px PASS; owner UAT PASS (21 Nov 2026); implementation commit `ccf1ba9`; no Submit. See [ACAD-003 evidence](ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md). |
-| ACAD-004 Submit action and version/status timeline | AC-04, AC-05, AC-10 | ACAD-003 | Draft remains editable; Submitted valid immediately indexable |
+| **ACAD-004 [DONE — OWNER UAT PASS]** Submit action and version/status timeline | AC-04, AC-05, AC-10 | ACAD-003 | Icon-only Edit/Submit/View in My Submissions; Submit visible only after server-side persisted completeness; confirmation, atomic Draft→Submitted, owner-only read-only View, status/version history; no administrative screening; owner UAT PASS (21 Nov 2026), including final hero and abstract whitespace polish. [ACAD-004 evidence](ACAD-004-SUBMIT-STATUS-TIMELINE.md). |
 | REV-001 Reviewer available index and filters | AC-06 | ACAD-004, FND-004 | Submitted eligible paper visible; draft not |
 | REV-002 Atomic self-claim and conflict check | AC-06 | REV-001 | Own paper blocked; concurrent claim safe |
 | REV-003 Save/submit review and recommendation | AC-07 | REV-002 | Only claimant can edit, review history kept |

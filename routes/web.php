@@ -6,6 +6,7 @@ use App\Livewire\Admin\ManageEventSettings;
 use App\Livewire\Admin\ManagePrograms;
 use App\Livewire\Admin\ManageUsers;
 use App\Livewire\Conference\MyPapers;
+use App\Livewire\Conference\PaperDetails;
 use App\Livewire\Conference\PaperEditor;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
 
     Route::livewire('my/submissions', MyPapers::class)->name('papers.index');
     Route::livewire('my/submissions/create', PaperEditor::class)->name('papers.create');
+    Route::livewire('my/submissions/{paper:public_id}', PaperDetails::class)->name('papers.show');
     Route::livewire('my/submissions/{paper:public_id}/edit', PaperEditor::class)->name('papers.edit');
     Route::get('my/submissions/{paper:public_id}/abstract-pdf', PaperAbstractDownloadController::class)->name('papers.abstract.download');
 

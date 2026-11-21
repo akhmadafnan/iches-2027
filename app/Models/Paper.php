@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $abstract_pdf_original_name
  * @property int|null $abstract_pdf_size
  * @property Carbon|null $abstract_pdf_uploaded_at
+ * @property Carbon|null $submitted_at
+ * @property int $submission_version
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -40,6 +42,8 @@ class Paper extends Model
             'keywords' => 'array',
             'abstract_pdf_size' => 'integer',
             'abstract_pdf_uploaded_at' => 'datetime',
+            'submitted_at' => 'datetime',
+            'submission_version' => 'integer',
         ];
     }
 
@@ -53,6 +57,12 @@ class Paper extends Model
     public function conferenceTrack(): BelongsTo
     {
         return $this->belongsTo(ConferenceTrack::class);
+    }
+
+    /** @return HasMany<PaperStatusHistory, $this> */
+    public function statusHistories(): HasMany
+    {
+        return $this->hasMany(PaperStatusHistory::class)->orderBy('occurred_at')->orderBy('id');
     }
 
     /** @return HasMany<PaperAuthor, $this> */

@@ -23,6 +23,12 @@ class PaperPolicy
         return $paper->owner_id === $actor->id;
     }
 
+    public function submit(User $actor, Paper $paper): bool
+    {
+        return $paper->owner_id === $actor->id
+            && $paper->status === PaperStatus::Draft;
+    }
+
     public function update(User $actor, Paper $paper): bool
     {
         return $paper->owner_id === $actor->id
