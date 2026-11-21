@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICHES 2027 — Letter of Acceptance — Design Master V2.1</title>
+<style>
+  /* ICHES 2027 | LoA Master V2.1 — placement and spacing refinements only
+     Authoritative editable source: this HTML/CSS. Chrome produces the PDF from THIS file.
+     All sample details below are synthetic. QR and signature are not issued/valid.
+  */
+  @font-face {
+    font-family: "Sora";
+    src: url("./assets/Sora-Variable.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 100 900;
+  }
+  :root {
+    --green: #116947;
+    --green-deep: #104b37;
+    --ink: #25302a;
+    --muted: #59665f;
+    --light-rule: #e5ebe7;
+  }
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #e6e8e7;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    margin: 16px auto;
+    background: white;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(20,30,25,.18);
+  }
+  .letterhead {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 85mm minmax(0,1fr);
+    align-items: start;
+    column-gap: 5mm;
+    width: 100%;
+    padding: 16mm 20mm 0;
+    min-height: 42mm;
+  }
+  .logo-cluster {
+    display: grid;
+    grid-template-columns: 26mm 31mm 24mm;
+    gap: 2mm;
+    align-items: center;
+    padding-top: .9mm;
+  }
+  .logo-cluster img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  .iches-lockup {
+    display: flex;
+    align-items: center;
+    gap: 1.2mm;
+  }
+  .iches-lockup img { width: 11.6mm; height: auto; }
+  .iches-lockup span {
+    display: block;
+    font: 700 8pt/1.15 "Sora",Arial,sans-serif;
+    color: var(--green-deep);
+    letter-spacing: -.1pt;
+  }
+  .event-identification {
+    text-align: right;
+    font-family: "Sora",Arial,sans-serif;
+    margin-top: 0;
+  }
+  .event-identification .conference {
+    margin: 0;
+    font-size: 9.4pt;
+    line-height: 1.35;
+    font-weight: 700;
+    letter-spacing: -.1pt;
+    color: #194e3a;
+  }
+  .event-identification .host {
+    margin: 3mm 0 0;
+    font-size: 7.5pt;
+    line-height: 1.55;
+    font-weight: 450;
+    color: #69766e;
+  }
+
+  .watermark {
+    pointer-events: none;
+    position: absolute;
+    width: 91mm;
+    height: auto;
+    left: 59.5mm;
+    top: 129mm;
+    z-index: 0;
+    filter: brightness(0);
+    opacity: .034;
+    /* Genuine ICHES logo becomes ONE neutral monochrome tone without altering original file */
+  }
+
+  .letter-content {
+    position: relative;
+    z-index: 1;
+    margin: 0 20mm;
+    padding-top: 8mm;
+  }
+  h1 {
+    margin: 0;
+    font: 400 23pt/1.11 Georgia,"Times New Roman",serif;
+    letter-spacing: -.55pt;
+    color: #183f31;
+  }
+  .issue-details {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-top: 6.5mm;
+    font: 400 9.3pt/1.5 Georgia,"Times New Roman",serif;
+    color: #38433d;
+  }
+  .issue-details strong { font-weight: 700; color:#174d39; }
+  .issue-details .letter-number {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 11pt;
+    font-weight: 700;
+  }
+  .salutation {
+    margin: 9mm 0 4.1mm;
+    font: 400 10.4pt Georgia,"Times New Roman",serif;
+  }
+  .acceptance {
+    margin: 0;
+    font: 400 10pt/1.64 Georgia,"Times New Roman",serif;
+    text-align: justify;
+  }
+  .acceptance strong { color:#0b6041; }
+
+  .paper-details { margin-top: 9.5mm; }
+   .paper-details .section-label {
+    font: 700 7.5pt/1.5 "Sora",Arial,sans-serif;
+    color: #186b4a;
+    text-transform: uppercase;
+    letter-spacing: .75pt;
+    margin-bottom: 3.7mm;
+  }
+  .paper-detail {
+    display: grid;
+    grid-template-columns: 37mm minmax(0, 1fr);
+    column-gap: 5mm;
+    padding: 3mm 0;
+    border-bottom: .24mm solid var(--light-rule);
+  }
+  .paper-detail:last-child { border-bottom: 0; }
+  .paper-detail .label {
+    font: 600 8.2pt/1.38 "Sora",Arial,sans-serif;
+    color: #4a5e53;
+  }
+  .paper-detail .value {
+    font: 400 9.4pt/1.38 Georgia,"Times New Roman",serif;
+    overflow-wrap: anywhere;
+  }
+  .paper-detail .value.strong { font-weight: bold; }
+  .paper-detail .value.accepted {
+    color: #126b48;
+    font-weight: bold;
+  }
+
+  .closing {
+    margin: 8.5mm 0 0;
+    font: 400 9.8pt/1.56 Georgia,"Times New Roman",serif;
+    text-align: justify;
+  }
+  .closing em { font-style: normal; }
+
+  .signing-and-verification {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-top: 8mm;
+    min-height: 39mm;
+  }
+  .signature { width: 116mm; }
+  .signature .issued-on {
+    font: 500 8pt/1.4 "Sora", Arial, sans-serif;
+    margin-bottom: 3.4mm;
+  }
+  .signature .greeting {
+    font: 400 9.8pt Georgia,"Times New Roman",serif;
+  }
+  .signature .signature-space {
+    height: 13mm;
+    padding-top: 5mm;
+    font: italic 7.3pt Georgia,serif;
+    color: #b2bdb4;
+  }
+  .signature .signer {
+    margin-top: 1mm;
+    font: 700 9.4pt/1.32 "Sora",Arial,sans-serif;
+    color: #254936;
+  }
+  .signature .position {
+    margin-top: 1mm;
+    font: 400 8.8pt/1.4 Georgia,serif;
+    color: #56665b;
+  }
+  .verification {
+    text-align: center;
+    width: 31mm;
+    font: 600 6.7pt "Sora",Arial,sans-serif;
+    color: #6b806f;
+  }
+  .verification .qr-placeholder {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border: .25mm dashed #bacbc0;
+    width: 23mm;
+    height: 23mm;
+    margin: 0 auto 2mm;
+    padding: 2mm;
+    line-height:1.4;
+    font-size: 6.7pt;
+    color:#92a397;
+  }
+  .verification .qr-label { color:#217450; font-size:6.5pt; }
+  .verification .qr-subtitle { margin-top:1mm; font-weight:400; font-size:5.8pt; line-height:1.3; }
+
+  .footer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 15mm;
+    background: #116b49;
+    color: #f4fff8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20mm;
+    font: 500 7.2pt/1.4 "Sora",Arial,sans-serif;
+    z-index: 2;
+  }
+  .footer .footer-mark {font-weight:700;letter-spacing:.4pt;}
+  .footer .footer-status {font-size:7.2pt;font-weight:700;letter-spacing:.4pt;color:#cde7d8;}
+  @media screen and (max-width:850px) {
+    body {overflow-x:auto}
+    .sheet {margin:8px auto}
+  }
+  @media print {
+    html, body { width:210mm; height:297mm; background: white; }
+    .sheet { margin:0; box-shadow:none; break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+<article class="sheet" aria-label="ICHES 2027 Letter of Acceptance draft">
+  <header class="letterhead">
+    <div class="logo-cluster" aria-label="Original institutional logos, left-aligned">
+      <img src="./assets/logo-forpim.webp" alt="Forum Pimpinan PTKIS Tapal Kuda">
+      <img src="./assets/logo-unisya.webp" alt="Universitas Islam Syarifuddin">
+      <div class="iches-lockup">
+        <img src="./assets/logo-iches.webp" alt="ICHES original logo">
+        <span>ICHES<br>2027</span>
+      </div>
+    </div>
+    <div class="event-identification">
+      <p class="conference">THE 6TH INTERNATIONAL CONFERENCE ON HUMANITY, EDUCATION, AND SOCIETY</p>
+      <p class="host">Hosted by Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia</p>
+    </div>
+  </header>
+
+  <img class="watermark" src="./assets/logo-iches.webp" alt="" aria-hidden="true">
+
+  <main class="letter-content">
+    <h1>Letter of Acceptance</h1>
+
+    <div class="issue-details">
+      <span class="letter-number"><strong>No.</strong> 0001/ICHES/LOA/XII/2026</span>
+    </div>
+
+    <p class="salutation">Dear Author(s),</p>
+    <p class="acceptance">On behalf of the Steering Committee of the 6th International Conference on Humanity, Education, and Society (ICHES 2027), hosted by Universitas Islam Syarifuddin, we are pleased to confirm that the abstract identified below has been officially <strong>accepted for presentation</strong> following the academic review and approval process.</p>
+
+    <section class="paper-details" aria-label="Accepted abstract details">
+      <div class="section-label">Accepted Abstract Details</div>
+      <div class="paper-detail">
+        <div class="label">Paper ID</div>
+        <div class="value">ICH27-P0000XX</div>
+      </div>
+      <div class="paper-detail">
+        <div class="label">Paper Title</div>
+        <div class="value strong">Community-Based Educational Innovation and Social Resilience in Contemporary Indonesia</div>
+      </div>
+      <div class="paper-detail">
+        <div class="label">All Authors</div>
+        <div class="value">First Author; Second Author; Third Author</div>
+      </div>
+      <div class="paper-detail">
+        <div class="label">Conference Track</div>
+        <div class="value">Education, Pedagogy, and Human Development</div>
+      </div>
+      <div class="paper-detail">
+        <div class="label">Official Decision</div>
+        <div class="value accepted">Accepted for Abstract Presentation</div>
+      </div>
+    </section>
+
+    <p class="closing">This letter confirms acceptance of the abstract for presentation at ICHES 2027. It does not constitute acceptance of a full paper for publication. The author(s) should follow the official conference guidelines and consult the participant dashboard for presentation arrangements and subsequent submission requirements.</p>
+
+    <section class="signing-and-verification">
+      <div class="signature">
+        <div class="issued-on">15 December 2026</div>
+        <div class="greeting">Sincerely,</div>
+        <div class="signature-space">Authorized signature — pending</div>
+        <div class="signer">Dr. Ahmad Ihwanul Muttaqin, M.Pd.I.</div>
+        <div class="position">Steering Committee · ICHES 2027</div>
+      </div>
+      <div class="verification">
+        <div class="qr-placeholder">QR verification<br>on official issue</div>
+        <div class="qr-label">VERIFY DOCUMENT</div>
+        <div class="qr-subtitle">Activation after issuance</div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="footer-mark">ICHES 2027 <span style="opacity:.55">·</span> OFFICIAL CORRESPONDENCE</span>
+    <span class="footer-status">UNISYA · INDONESIA</span>
+  </footer>
+</article>
+</body>
+</html>

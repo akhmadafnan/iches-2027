@@ -2,7 +2,7 @@
 
 **Versi:** 2.0 | **Diperbarui:** 21 November 2026
 **Tujuan:** cepat selesai, sesuai harapan pemilik proyek, tetap bisa dirawat dan tidak salah sasaran.  
-**Acuan utama:** [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md) → [PRD](PRD.md) → [TASKS](TASKS.md) → [OOP Standards](OOP-LARAVEL-LIVEWIRE-STANDARDS.md).
+**Acuan utama:** [CURRENT STATE & DECISIONS](CURRENT-STATE-AND-DECISIONS.md) → [PRD](PRD.md) → [TASKS](TASKS.md) → [OOP Standards](OOP-LARAVEL-LIVEWIRE-STANDARDS.md). **CURRENT WORKSTATION:** Laptop 1 `D:\PROJEKKU\iches-2027`; treat older Laptop 2 paths as historical. See [DEVELOPMENT-WORKSTATIONS](DEVELOPMENT-WORKSTATIONS.md).
 
 ## 1. Prinsip utama
 

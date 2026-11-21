@@ -30,7 +30,7 @@ This repository contains the official **Laravel 13 + Livewire 4 + Flux UI Emeral
 
 ## Local development — Foundation and account registration verified
 
-**Working directory:** `D:\PINJAM-AFNAN\iches-2027` on Windows.
+**Primary working directory:** `D:\PROJEKKU\iches-2027` on Laptop 1. Previous Laptop 2 directory: `D:\PINJAM-AFNAN\iches-2027`. Follow [workstation mapping](docs/DEVELOPMENT-WORKSTATIONS.md) for machine-local commands.
 **Local Herd URL:** `https://iches-2027.test` (Herd Secure Site; only available on the configured development computer).
 **Installed foundation:** PHP 8.4.27, Laravel 13.43.0, Livewire 4.4.8, Flux UI 2.22.0, MySQL 9.7.
 
