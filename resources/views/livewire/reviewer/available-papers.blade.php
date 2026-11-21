@@ -36,7 +36,7 @@
             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div>
                     <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ $tab === 'mine' ? 'My Reviews' : 'Available Papers' }}</h2>
-                    <p class="mt-1 text-sm text-zinc-500">{{ $tab === 'mine' ? 'Abstracts assigned to you; the review form arrives in REV-003.' : 'Submitted abstracts not yet claimed by a reviewer. Only Paper ID and academic content are shown.' }}</p>
+                    <p class="mt-1 text-sm text-zinc-500">{{ $tab === 'mine' ? 'Manage your assigned abstracts and review progress here.' : 'Submitted abstracts not yet claimed by a reviewer. Only Paper ID and academic content are shown.' }}</p>
                 </div>
                 <flux:badge color="emerald" size="sm">{{ $tab === 'mine' ? 'My assigned papers' : '1 reviewer per abstract' }}</flux:badge>
             </div>
@@ -86,11 +86,21 @@
                                 <flux:table.cell class="!py-4">
                                     <p class="break-words text-sm font-semibold leading-6 text-zinc-900 dark:text-white">{{ $paper->title }}</p>
                                     <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $paper->conferenceTrack?->name }}</p>
+                                    @if ($tab === 'mine')
+                                        @php($currentReview = $paper->reviewClaims->first()?->review)
+                                        <flux:badge size="sm" class="mt-2" :color="$currentReview?->status?->value === 'submitted' ? 'emerald' : ($currentReview ? 'amber' : 'zinc')">
+                                            {{ $currentReview?->status?->value === 'submitted' ? 'Review Submitted' : ($currentReview ? 'Review Draft' : 'Claimed') }}
+                                        </flux:badge>
+                                    @endif
                                 </flux:table.cell>
                                 <flux:table.cell class="!py-4 text-xs tabular-nums text-zinc-600 dark:text-zinc-300">{{ $paper->submitted_at?->timezone('Asia/Jakarta')->format('d M Y') }}</flux:table.cell>
                                 <flux:table.cell class="!py-4" align="end">
                                     <div class="flex items-center justify-end gap-1.5">
-                                        <flux:button size="sm" variant="outline" icon="eye" :href="route('reviewer.papers.show', $paper->public_id)" wire:navigate tooltip="Preview paper" aria-label="Preview paper {{ $paper->reference }}" />
+                                        @if ($tab === 'mine')
+                                            <flux:button size="sm" variant="outline" :icon="$currentReview?->status?->value === 'submitted' ? 'eye' : 'pencil-square'" :href="route('reviewer.papers.show', $paper->public_id)" wire:navigate :tooltip="$currentReview?->status?->value === 'submitted' ? 'View submitted review' : 'Open review form'" :aria-label="($currentReview?->status?->value === 'submitted' ? 'View submitted review ' : 'Open review form ').$paper->reference" />
+                                        @else
+                                            <flux:button size="sm" variant="outline" icon="eye" :href="route('reviewer.papers.show', $paper->public_id)" wire:navigate tooltip="Preview paper" aria-label="Preview paper {{ $paper->reference }}" />
+                                        @endif
                                         @if ($tab === 'available')
                                             <flux:button size="sm" variant="outline" icon="hand-raised" class="!text-emerald-700 dark:!text-emerald-400" wire:click="askClaim(@js($paper->public_id))" tooltip="Claim paper" aria-label="Claim paper {{ $paper->reference }}" />
                                         @endif
@@ -117,7 +127,7 @@
     </section>
 
     <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-        <p><strong>Reviewer self-claim is active.</strong> Each abstract is assigned to at most one reviewer. Claiming a paper does not submit a review; comments and academic recommendations will follow in REV-003. The author identity and affiliations are not displayed in this workspace.</p>
+        <p><strong>Reviewer workflow:</strong> Claim an available abstract, open it from My Reviews, then write General Comments and choose Accept or Reject. Save Draft or confirm Submit Review. Recommendations remain internal until the academic decision is formally published. Author identities and affiliations are not displayed in this workspace.</p>
     </div>
 
     <flux:modal wire:model.self="claimModalOpen" class="md:w-[32rem]">

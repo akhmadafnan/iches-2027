@@ -135,6 +135,14 @@ class AvailablePapers extends Component
 
         $papers = $query
             ->with('conferenceTrack:id,name')
+            ->when($this->tab === 'mine', function (Builder $builder) use ($reviewer): void {
+                $builder->with([
+                    'reviewClaims' => fn ($claims) => $claims
+                        ->where('reviewer_id', $reviewer->id)
+                        ->whereNotNull('active_paper_id')
+                        ->with('review'),
+                ]);
+            })
             ->when($this->trackFilter !== '', fn (Builder $builder) => $builder
                 ->where('conference_track_id', $this->trackFilter))
             ->when(trim($this->search) !== '', function (Builder $builder): void {

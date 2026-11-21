@@ -286,7 +286,7 @@ class ClaimPaperTest extends TestCase
             ->assertOk()->assertDontSee('Secret Author Name')->assertDontSee('Secret University Affiliation');
     }
 
-    public function test_claimed_abstract_can_be_previewed_but_review_form_not_yet_available(): void
+    public function test_claimed_abstract_opens_review_form_without_submitting_any_review(): void
     {
         $reviewer = $this->reviewer();
         $paper = $this->paper(User::factory()->create());
@@ -296,7 +296,9 @@ class ClaimPaperTest extends TestCase
             ->assertOk()
             ->assertSee('Claimed by you')
             ->assertSee('Assigned to you')
-            ->assertSee('REV-003')
+            ->assertSee('Abstract review')
+            ->assertSee('General Comments')
+            ->assertSee('Save Draft')
             ->assertDontSee('Confirm claim');
         $this->assertSame(PaperStatus::Submitted, $paper->fresh()->status);
     }
@@ -346,7 +348,7 @@ class ClaimPaperTest extends TestCase
             ->assertSee($submissionDate)
             ->assertSee('Not claimed yet')
             ->assertDontSee('Claimed by you')
-            ->assertSee('Not yet available')
+            ->assertSee('Awaiting reviewer submission')
             ->assertDontSee($owner->name);
 
         $claim = app(ClaimPaper::class)->handle($reviewer, $paper->public_id);
@@ -360,8 +362,8 @@ class ClaimPaperTest extends TestCase
             ->assertSee('Claimed by you')
             ->assertSee($claimedDate)
             ->assertDontSee('Not claimed yet')
-            ->assertSee('Not yet available')
-            ->assertSee('REV-003');
+            ->assertSee('Awaiting reviewer submission')
+            ->assertSee('General Comments');
     }
 
     public function test_author_timeline_uses_recorded_release_date_and_does_not_fabricate_review_completion(): void

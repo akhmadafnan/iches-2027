@@ -78,9 +78,9 @@ Guest → Account → Profile → Personal Dashboard → (Submit Paper / Confere
 | AC-04 | Abstract text, keywords, PDF upload and Submit | Mandatory server validation; private files |
 | AC-05 | Direct eligibility after Submitted | No separate administrative screening |
 | AC-06 | Reviewer index filter + self-claim | **Owner decision 21 Nov 2026:** one active reviewer per abstract, exclusive self-claim; no own-paper/co-author claim; concurrent attempts cannot double-assign; release history retained. **Reviewer UI shows Paper ID and academic content, but not author names or affiliations**; existing PDF may still contain identity. Reviewer names are not exposed to authors in REV-002. |
-| AC-07 | Review draft, comments and recommendation | Reviewer can only submit own assigned review |
-| AC-08 | Internal academic decision separate from Publish Decision | Author cannot view internal status/notes |
-| AC-09 | Revision Required and resubmit | Version trail retained under same paper ID |
+| AC-07 | Abstract review: General Comments + Accept/Reject only | Exclusive claimant can Save Draft (incomplete allowed) or Submit Review (comments and Accept/Reject required); UUID v7, timestamped audit, immutable after Submit; no numeric score, no Revisions Required and no automatic decision |
+| AC-08 | Internal academic Accept/Reject separate from Publish Decision | Only authorized academic authority decides; author sees Review completed date but no recommendation/comments/internal decision until explicitly published |
+| AC-09 | Superseded for abstract stage by owner decision 21 Nov 2026 | No abstract Revisions Required/resubmit; suggested improvements are written in General Comments and may guide Full Paper after an Accepted decision is published; original paper history remains intact |
 | AC-10 | My Submissions status timeline | Author knows current state and next action |
 | AC-11 | Accepted Published opens LoA and Full Paper | Not opened on internal accept; payment not prerequisite |
 | AC-12 | Full Paper upload and private access | Authorized users only |
@@ -160,7 +160,7 @@ Use browser camera scanner first, HTTPS and tested device compatibility. If no n
 
 ## 6. Status and transitions
 
-- **Paper:** Draft → Submitted → Review ongoing → Academic Decision internally → Decision Published (Accepted / Revision Required / Rejected) → Full Paper for Published Accepted → Scheduled → Presented or No Show.
+- **Paper:** Draft → Submitted → Review ongoing → Academic Decision internally → Decision Published (Accepted / Rejected) → Full Paper for Published Accepted → Scheduled → Presented or No Show.
 - **Review:** Available → Claimed → Draft Review → Submitted; assigned coordinator may release stale claim without erasing history.
 - **Finance:** Unpaid → Proof Submitted/Pending Verification → Verified or Correction Required.
 - **Enrollment:** Registered → Eligible/Active if criteria met → attended, separately per program.

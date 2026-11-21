@@ -83,7 +83,7 @@ class AvailablePapersTest extends TestCase
             ->assertOk()
             ->assertSee('Available Papers')
             ->assertSee('My Reviews')
-            ->assertSee('Reviewer self-claim is active');
+            ->assertSee('Reviewer workflow:');
     }
 
     public function test_submitted_papers_appear_but_drafts_and_own_papers_do_not(): void
@@ -145,8 +145,8 @@ class AvailablePapersTest extends TestCase
             ->assertSee('Download PDF')
             ->assertSee('Claim paper')
             ->assertSee('Review submitted')
-            ->assertSee('Not yet available')
-            ->assertSee('REV-003')
+            ->assertSee('Awaiting reviewer submission')
+            ->assertDontSee('Abstract review')
             ->assertDontSee('Confirm submission');
 
         $this->get(route('reviewer.papers.pdf', $paper->public_id))
@@ -198,7 +198,7 @@ class AvailablePapersTest extends TestCase
         $this->actingAs($reviewer)->get(route('reviewer.workspace'))
             ->assertOk()
             ->assertSee('No papers available yet')
-            ->assertSee('Reviewer self-claim is active');
+            ->assertSee('Reviewer workflow:');
 
         $author = User::factory()->create();
         $paper = $this->paper($author);

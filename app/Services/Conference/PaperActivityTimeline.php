@@ -2,6 +2,7 @@
 
 namespace App\Services\Conference;
 
+use App\Enums\PaperReviewStatus;
 use App\Models\Paper;
 use Illuminate\Support\Carbon;
 
@@ -15,7 +16,7 @@ final class PaperActivityTimeline
      */
     public function forOwner(Paper $paper): array
     {
-        $paper->loadMissing(['statusHistories', 'reviewClaims']);
+        $paper->loadMissing(['statusHistories', 'reviewClaims.review']);
 
         $events = [];
 
@@ -51,6 +52,14 @@ final class PaperActivityTimeline
                 'detail' => 'Assigned for academic review',
                 'occurred_at' => $claim->claimed_at,
             ];
+
+            if ($claim->review?->status === PaperReviewStatus::Submitted && $claim->review->submitted_at !== null) {
+                $events[] = [
+                    'label' => 'Review completed',
+                    'detail' => 'Academic review finalized',
+                    'occurred_at' => $claim->review->submitted_at,
+                ];
+            }
 
             if ($claim->released_at !== null) {
                 $events[] = [

@@ -59,6 +59,12 @@ class Paper extends Model
         return $this->belongsTo(ConferenceTrack::class);
     }
 
+    /** @return HasMany<PaperReview, $this> */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(PaperReview::class);
+    }
+
     /** @return HasMany<PaperReviewClaim, $this> */
     public function reviewClaims(): HasMany
     {

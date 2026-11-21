@@ -1,6 +1,6 @@
 # IMPLEMENTATION TASK BACKLOG — ICHES 2027
 
-**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001..004 / REV-001 owner UAT PASS; REV-002 implemented with automated QA and owner UAT pending; ARCH-001 UUID v7 forward standard applied; MSG-001 email workflow planned; REV-003 TODO.
+**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001..004 / REV-001..002 owner UAT FINAL PASS; REV-003 owner UAT FINAL PASS, checkpoint approved; ARCH-001 UUID v7 forward standard applied; MSG-001 email workflow planned; DEC-001 TODO.
 **Source:** [PRD](PRD.md) + [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md).  
 **Priority:** P0 = critical flow, P1 = essential follow-up, P2 = polish/post-event.  
 **Never treat TODO as implemented.** Code changes begin only when the owner instructs us to start coding.
@@ -32,10 +32,10 @@
 | **ARCH-001 [FORWARD STANDARD APPLIED]** UUID v7 new business entities, legacy-key audit | Cross-cutting | REV-001 | [Architecture review](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md): REV-002 claims now use UUID v7 PK and BIGINT legacy foreign keys, preserving paper ULID and human reference. ARCH-002 legacy PK migration remains separate and not authorized. |
 | **MSG-001A [PLANNED BEFORE PUBLIC SUBMISSION]** Submitted email confirmation | COM-01, COM-02 | ACAD-004, recipient policy | Transactional after-commit, idempotent event/version, local Mail fake + queue failure tests; **NOT IMPLEMENTED**. See [email roadmap](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md). |
 | **REV-002 [DONE — OWNER UAT FINAL PASS]** Exclusive reviewer self-claim and conflict check | AC-06 | REV-001, ARCH-001 | One active reviewer per abstract enforced by DB unique active_paper_id and transactional row lock; owner/coauthor denied; UI only Paper ID + academic content (no author names/affiliations); Claim confirmation, Available Papers / My Reviews, UUID v7 claim PK; release fields prepared but no unauthorized Release UI. See [REV-002 evidence](REV-002-EXCLUSIVE-SELF-CLAIM.md). |
-| REV-003 Save/submit review and recommendation | AC-07 | REV-002 | Only claimant can edit; Save Review Draft vs Submit Review separated, history and recommendation kept; no auto decision |
+| **REV-003 [DONE — OWNER UAT FINAL PASS]** General Comments + Accept/Reject review | AC-07 | REV-002 | UUID v7 Review and audit events; assigned reviewer only; Save Draft incomplete permitted; Submit Review validates comments and Accept/Reject, confirms and locks; My Reviews progress and dated Review completed timeline; no decision/email leak. See [REV-003 evidence](REV-003-ABSTRACT-REVIEW.md). |
 | DEC-001 Internal academic decision | AC-08 | REV-003 | Authorized officer can decide; author sees nothing prematurely |
 | DEC-002 Explicit Publish Decision & tracking | AC-08, AC-10 | DEC-001 | Author notified by dashboard, status and history accurate |
-| **MSG-001B [PLANNED BEFORE DECISION RELEASE]** Published decision, revision, LoA email | COM-01, COM-02 | DEC-002 and document publication | No email on internal decision; publish-gated and after-commit with dedupe, privacy-safe links. **NOT IMPLEMENTED**. |
+| **MSG-001B [PLANNED BEFORE DECISION RELEASE]** Published Accept/Reject decision and LoA email | COM-01, COM-02 | DEC-002 and document publication | No email on internal decision; publish-gated and after-commit with dedupe, privacy-safe links. **NOT IMPLEMENTED**. |
 | QA-001 P0 feature tests + browser user journey | ACC/AC/REV | All relevant P0 | Register→Submit→Review→Decision PASS or exact blocker listed |
 
 **Demo checkpoint (22 Nov 2026):** demonstrate the longest *fully working* P0 journey possible using real functions and clearly labeled demo users/data. **Not guaranteed production-ready**. Do not consume time on landing-page aesthetics before academic core works. QR prototype optional if time allows.
@@ -68,7 +68,7 @@
 
 | Task | PRD | Dependency | Acceptance / tangible output |
 |---|---|---|---|
-| DEC-003 Revision Required flow | AC-09 | DEC-002 | Revision is a version on same paper ID, comments scoped |
+| **DEC-003 [NOT APPLICABLE FOR ABSTRACT STAGE]** Legacy abstract Revision Required flow | AC-09 superseded | — | Removed by owner policy: Abstract decision is Accept/Reject only. General Comments can guide Full Paper after Published Accept; no abstract revision/resubmit gate. |
 | DEC-004 Accepted Published unlocks Full Paper | AC-11, AC-12 | DEC-002 | Internal ACCEPT does not unlock; Verified not required |
 | DOC-001 Per-paper LoA document link in dashboard | DOC-01, DOC-02 | DEC-004 | Paper owner sees only own LoA URL/file |
 | FIN-001 Authorized bank settings | FI-02 | FND-004 | No fake bank information, authorized actor only |
@@ -130,7 +130,7 @@
 
 **Sprint 0:** FND-001..006, ACAD-001..004.  
 **Sprint 1:** REV-001..003, DEC-001..002, QA-001.  
-**Sprint 2:** DEC-003..004, finance and package, Co-Host, QA-002.  
+**Sprint 2:** DEC-004 (Full Paper after Published Accept), finance and package, Co-Host, QA-002.
 **Sprint 3:** ID cards, QR service builder/scanner, session, program forms, QA-003.  
 **Sprint 4:** Notifications/reports/documents; public design after WEB-001; operational readiness.
 

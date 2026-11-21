@@ -116,7 +116,7 @@ Fitur utama:
 - Tracking submission.
 - Reviewer Self-Claim.
 - Review dan rekomendasi akademik.
-- Keputusan resmi Accept, Revision Required, atau Reject.
+- Keputusan resmi seleksi abstrak hanya Accept atau Reject (keputusan akademik terpisah dari rekomendasi reviewer).
 - Letter of Acceptance.
 - Upload Full Paper.
 - Pengelolaan parallel session.
@@ -333,8 +333,9 @@ Petugas akademik yang berwenang membuka hasil review dan menetapkan keputusan.
 Status yang digunakan:
 
 - Accepted.
-- Revisions Required.
 - Rejected.
+
+Untuk seleksi abstrak **tidak ada status Revisions Required**. Reviewer hanya mengisi General Comments dan rekomendasi Accept/Reject. Saran perbaikan dari komentar digunakan pada penyusunan Full Paper jika keputusan Accepted resmi dipublikasikan.
 
 Keputusan internal belum otomatis terlihat oleh author.
 
@@ -342,13 +343,11 @@ Setelah pihak berwenang memilih **Publish Decision**, hasil muncul di dashboard 
 
 Keputusan akhir tidak dibuat otomatis oleh rekomendasi reviewer.
 
-## 5.4. Tahap 4 — Revisi
+## 5.4. Tahap 4 — Arahan Perbaikan Full Paper
 
-Jika keputusan Revisions Required, author melihat komentar yang boleh dibagikan serta mengunggah atau memperbaiki naskah melalui submission yang sama.
+Seleksi abstrak **tidak menggunakan status Revisions Required maupun pengiriman ulang abstrak**. Reviewer hanya menulis General Comments dan memilih Accept atau Reject. Setelah keputusan Accepted resmi dipublikasikan, komentar yang disetujui untuk dibagikan dapat menjadi panduan author saat menyusun Full Paper.
 
-Nomor paper dan histori sebelumnya tetap dipertahankan.
-
-Sistem menampilkan status revisi dan tindakan yang perlu dilakukan.
+Paper ID dan histori submission/review tetap dipertahankan. Tidak ada pembukaan kembali Draft abstrak atau tahapan revisi abstrak karena komentar reviewer. Rekomendasi reviewer tetap internal sampai keputusan dipublikasikan.
 
 ## 5.5. Tahap 5 — LoA dan Full Paper
 

@@ -36,8 +36,8 @@ Fortify handles verification and password-reset flows in the existing authentica
 | Abstract Submitted | Paper owner / corresponding contact policy TBD | Committed Draft → Submitted | High; never on Save Draft |
 | Paper Claim Confirmed | Claiming reviewer | Committed claim, REV-002 | Medium; not an automatic blast to all reviewers |
 | Review Submitted | Authorized academic coordinator | Committed review, REV-003 | Medium; internal only |
-| Decision Published | Author/paper owner | Explicit Publish Decision, not internal decision | High; no early leak |
-| Revision Required | Author/paper owner | Published revision decision | High |
+| Decision Published (Accept / Reject) | Author/paper owner | Explicit Publish Decision, not internal decision | High; no early leak |
+| Full Paper improvement guidance | Accepted author only | Approved General Comments shared after Published Accept | Not a separate abstract revision email or status |
 | LoA Available | Eligible paper owner | Explicit LoA release after Accepted Published | High |
 | Full Paper Received | Paper owner | Persisted Full Paper version | Medium |
 | Payment Proof Received | Payer | Receipt recorded, NOT verification | Medium |
@@ -54,13 +54,13 @@ Fortify handles verification and password-reset flows in the existing authentica
 - Confirm policy for corresponding author, coauthors, opt-outs, sender domain and SMTP credentials before production. Tests use Mail::fake / Notification::fake rather than sending external messages.
 - Event-based messages should not introduce invented due-date reminder schedules.
 
-Recommended staged delivery: MSG-000 = event inventory and recipient policy; MSG-001A = Submitted confirmation before submission publicly opens; MSG-001B = Published Decision, revision and LoA before publishing decisions; MSG-001C = finance, scheduling, documents before their respective launches. These are planning child IDs; the original MSG-001 remains the umbrella PRD requirement.
+Recommended staged delivery: MSG-000 = event inventory and recipient policy; MSG-001A = Submitted confirmation before submission publicly opens; MSG-001B = Published Accept/Reject Decision and LoA before publishing decisions; MSG-001C = finance, scheduling, documents before their respective launches. These are planning child IDs; the original MSG-001 remains the umbrella PRD requirement.
 
 ## C. Reviewer UX contract for REV-001 / 002 / 003
 
 - **REV-001 (current):** single green reviewer workspace, live Available Papers count, filters for title/Paper ID and eight conference tracks, responsive paginated table, icon-only preview, read-only paper details and private PDF download. Exclude Drafts and the reviewer's own papers. Preview makes NO assignment.
 - **REV-002 (implemented, owner UAT pending):** single-reviewer exclusive self-claim: one active reviewer slot per submitted abstract. Available Papers and My Reviews tabs, Confirm Claim from list/preview, DB unique active_paper_id plus locked transaction, own-paper/coauthor denial. UUID v7 claim PK. Release fields prepared, but no Release UI/automatic expiration without an owner-approved policy. No separate cap per reviewer invented.
-- **REV-003 (future):** private review draft with comments and recommendation, Save Draft vs Confirm Submit Review, exactly the claiming reviewer authorized, submitted review history/read-only view. Recommendations never auto-publish academic decisions.
+- **REV-003 (implemented, owner UAT pending):** one General Comments field and exactly Accept / Reject recommendation. Save Draft allows incomplete data; Submit Review requires both, confirms, timestamps, records versioned UUID v7 history, and locks review. Only active claim holder can operate. Author sees Review completed date only; the internal recommendation does not auto-publish the decision. See [REV-003](REV-003-ABSTRACT-REVIEW.md).
 
 **Owner UI clarification 21 Nov 2026:** REV-002 continues the REV-001 preview approach: reviewer-facing screens show **Paper ID and academic content but never author name, email or affiliation**; reviewer identity is not displayed to the author in this phase. This is a presentation rule, not proof that the uploaded PDF is anonymized (the PDF may contain identifying text). One active reviewer per abstract removes inter-reviewer disagreements but does not inherently eliminate individual bias; REV-003 still needs consistent written criteria and DEC-001 retains decision authority.
 

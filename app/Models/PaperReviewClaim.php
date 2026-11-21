@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -37,6 +38,12 @@ class PaperReviewClaim extends Model
             'paper_id' => 'integer',
             'reviewer_id' => 'integer',
         ];
+    }
+
+    /** @return HasOne<PaperReview, $this> */
+    public function review(): HasOne
+    {
+        return $this->hasOne(PaperReview::class, 'paper_review_claim_id');
     }
 
     /** @return BelongsTo<Paper, $this> */
