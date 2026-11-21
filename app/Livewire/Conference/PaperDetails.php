@@ -4,6 +4,7 @@ namespace App\Livewire\Conference;
 
 use App\Models\Paper;
 use App\Models\User;
+use App\Services\Conference\PaperActivityTimeline;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -21,7 +22,7 @@ class PaperDetails extends Component
         $this->paperPublicId = $paper->public_id;
     }
 
-    public function render(): View
+    public function render(PaperActivityTimeline $timeline): View
     {
         $user = Auth::user();
         abort_unless($user instanceof User, 403);
@@ -29,11 +30,14 @@ class PaperDetails extends Component
         $paper = Paper::query()
             ->ownedBy($user)
             ->where('public_id', $this->paperPublicId)
-            ->with(['authors', 'conferenceTrack', 'statusHistories'])
+            ->with(['authors', 'conferenceTrack', 'statusHistories', 'reviewClaims'])
             ->firstOrFail();
 
         Gate::authorize('view', $paper);
 
-        return view('livewire.conference.paper-details', compact('paper'));
+        return view('livewire.conference.paper-details', [
+            'paper' => $paper,
+            'activity' => $timeline->forOwner($paper),
+        ]);
     }
 }

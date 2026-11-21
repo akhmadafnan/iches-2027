@@ -4,7 +4,7 @@
         <div class="relative">
             <p class="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[.18em] text-emerald-200"><flux:icon.academic-cap class="size-4" /> ICHES 2027 / Reviewer Workspace</p>
             <h1 class="text-3xl font-semibold tracking-tight sm:text-[34px]">Reviewer Workspace</h1>
-            <p class="mt-2 max-w-2xl text-sm leading-7 text-emerald-50/85">Browse submitted conference abstracts and open their private PDFs. Claiming and reviewing papers will be enabled in the next academic phases.</p>
+            <p class="mt-2 max-w-2xl text-sm leading-7 text-emerald-50/85">Browse submitted abstracts, claim one for review, and manage your assigned papers. Each abstract can have only one active reviewer.</p>
         </div>
     </section>
 
@@ -19,18 +19,26 @@
         </div>
         <div class="flex items-center gap-4 rounded-2xl border border-zinc-200/80 bg-white px-5 py-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div class="flex size-12 items-center justify-center rounded-xl bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"><flux:icon.clipboard-document-check class="size-6" /></div>
-            <div><p class="text-xs font-medium text-zinc-500">My Reviews</p><p class="mt-1 text-sm font-semibold text-zinc-700 dark:text-zinc-200">Coming in REV-002/003</p></div>
+            <div><p class="text-xs font-medium text-zinc-500">My Reviews</p><p class="mt-1 text-[26px] font-semibold leading-none tabular-nums text-zinc-900 dark:text-white">{{ $totalAssigned }}</p></div>
         </div>
+    </div>
+
+    @if (session('success'))
+        <div role="status" class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200">{{ session('success') }}</div>
+    @endif
+    <div class="flex w-full items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1 sm:w-fit dark:border-zinc-800 dark:bg-zinc-900" role="group" aria-label="Reviewer paper lists">
+        <button type="button" wire:click="selectTab('available')" aria-pressed="{{ $tab === 'available' ? 'true' : 'false' }}" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none {{ $tab === 'available' ? 'bg-emerald-700 text-white' : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800' }}">Available Papers <span class="ml-1 text-xs opacity-80">{{ $totalAvailable }}</span></button>
+        <button type="button" wire:click="selectTab('mine')" aria-pressed="{{ $tab === 'mine' ? 'true' : 'false' }}" class="flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors sm:flex-none {{ $tab === 'mine' ? 'bg-emerald-700 text-white' : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800' }}">My Reviews <span class="ml-1 text-xs opacity-80">{{ $totalAssigned }}</span></button>
     </div>
 
     <section class="overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div class="flex flex-col gap-4 border-b border-zinc-100 px-6 py-5 dark:border-zinc-800">
             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div>
-                    <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Available Papers</h2>
-                    <p class="mt-1 text-sm text-zinc-500">Only submitted abstracts from other author accounts appear here.</p>
+                    <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">{{ $tab === 'mine' ? 'My Reviews' : 'Available Papers' }}</h2>
+                    <p class="mt-1 text-sm text-zinc-500">{{ $tab === 'mine' ? 'Abstracts assigned to you; the review form arrives in REV-003.' : 'Submitted abstracts not yet claimed by a reviewer. Only Paper ID and academic content are shown.' }}</p>
                 </div>
-                <flux:badge color="emerald" size="sm">Read-only access</flux:badge>
+                <flux:badge color="emerald" size="sm">{{ $tab === 'mine' ? 'My assigned papers' : '1 reviewer per abstract' }}</flux:badge>
             </div>
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div class="min-w-0 flex-1">
@@ -53,8 +61,8 @@
         @if ($papers->isEmpty())
             <div class="flex min-h-[300px] flex-col items-center justify-center gap-3 px-6 py-12 text-center">
                 <div class="flex size-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"><flux:icon.document-magnifying-glass class="size-7" /></div>
-                <h3 class="text-base font-semibold text-zinc-900 dark:text-white">{{ $search !== '' || $trackFilter !== '' ? 'No matching papers' : 'No papers available yet' }}</h3>
-                <p class="max-w-sm text-sm leading-6 text-zinc-500">{{ $search !== '' || $trackFilter !== '' ? 'Try a different search or conference track.' : 'Submitted abstracts from other authors will appear here automatically. Draft papers are not visible.' }}</p>
+                <h3 class="text-base font-semibold text-zinc-900 dark:text-white">{{ $search !== '' || $trackFilter !== '' ? 'No matching papers' : ($tab === 'mine' ? 'No claimed papers yet' : 'No papers available yet') }}</h3>
+                <p class="max-w-sm text-sm leading-6 text-zinc-500">{{ $search !== '' || $trackFilter !== '' ? 'Try a different search or conference track.' : ($tab === 'mine' ? 'Claim an available abstract to see it listed here.' : 'Unclaimed submitted abstracts will appear automatically. Drafts and abstracts already claimed by others are not listed.') }}</p>
                 @if ($search !== '' || $trackFilter !== '')
                     <flux:button type="button" variant="outline" size="sm" wire:click="clearFilters">Clear filters</flux:button>
                 @endif
@@ -81,7 +89,12 @@
                                 </flux:table.cell>
                                 <flux:table.cell class="!py-4 text-xs tabular-nums text-zinc-600 dark:text-zinc-300">{{ $paper->submitted_at?->timezone('Asia/Jakarta')->format('d M Y') }}</flux:table.cell>
                                 <flux:table.cell class="!py-4" align="end">
-                                    <flux:button size="sm" variant="outline" icon="eye" :href="route('reviewer.papers.show', $paper->public_id)" wire:navigate tooltip="Preview paper" aria-label="Preview paper {{ $paper->reference }}" />
+                                    <div class="flex items-center justify-end gap-1.5">
+                                        <flux:button size="sm" variant="outline" icon="eye" :href="route('reviewer.papers.show', $paper->public_id)" wire:navigate tooltip="Preview paper" aria-label="Preview paper {{ $paper->reference }}" />
+                                        @if ($tab === 'available')
+                                            <flux:button size="sm" variant="outline" icon="hand-raised" class="!text-emerald-700 dark:!text-emerald-400" wire:click="askClaim(@js($paper->public_id))" tooltip="Claim paper" aria-label="Claim paper {{ $paper->reference }}" />
+                                        @endif
+                                    </div>
                                 </flux:table.cell>
                             </flux:table.row>
                         @endforeach
@@ -104,6 +117,28 @@
     </section>
 
     <div class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">
-        <p><strong>Next: REV-002 and REV-003.</strong> Reviewer self-claim and the private review form will be added to this workspace after their authorization and conflict checks are tested. Previewing a paper does not assign it to you.</p>
+        <p><strong>Reviewer self-claim is active.</strong> Each abstract is assigned to at most one reviewer. Claiming a paper does not submit a review; comments and academic recommendations will follow in REV-003. The author identity and affiliations are not displayed in this workspace.</p>
     </div>
+
+    <flux:modal wire:model.self="claimModalOpen" class="md:w-[32rem]">
+        @if ($claimModalOpen)
+            <div class="space-y-5">
+                <div class="flex items-start gap-3">
+                    <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"><flux:icon.hand-raised class="size-5" /></div>
+                    <div class="space-y-1">
+                        <flux:heading size="xl">Claim this abstract?</flux:heading>
+                        <flux:text size="sm">Paper ID: {{ $confirmingReference }}</flux:text>
+                    </div>
+                </div>
+                <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-300">You will become the only active reviewer assigned to this abstract. It will move to My Reviews. Claiming does not submit a review.</p>
+                @error('claim')
+                    <p role="alert" class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+                <div class="flex items-center justify-end gap-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                    <flux:button type="button" variant="ghost" wire:click="cancelClaim">Cancel</flux:button>
+                    <flux:button type="button" variant="primary" icon="check" wire:click="confirmClaim" wire:loading.attr="disabled" wire:target="confirmClaim">Confirm claim</flux:button>
+                </div>
+            </div>
+        @endif
+    </flux:modal>
 </div>

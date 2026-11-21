@@ -77,7 +77,7 @@ Guest → Account → Profile → Personal Dashboard → (Submit Paper / Confere
 | AC-03 | New/edit Draft paper, metadata and co-authors | Owner-managed, stable unique paper ID |
 | AC-04 | Abstract text, keywords, PDF upload and Submit | Mandatory server validation; private files |
 | AC-05 | Direct eligibility after Submitted | No separate administrative screening |
-| AC-06 | Reviewer index filter + self-claim | No own-paper claim; concurrent last-slot claims safe |
+| AC-06 | Reviewer index filter + self-claim | **Owner decision 21 Nov 2026:** one active reviewer per abstract, exclusive self-claim; no own-paper/co-author claim; concurrent attempts cannot double-assign; release history retained. **Reviewer UI shows Paper ID and academic content, but not author names or affiliations**; existing PDF may still contain identity. Reviewer names are not exposed to authors in REV-002. |
 | AC-07 | Review draft, comments and recommendation | Reviewer can only submit own assigned review |
 | AC-08 | Internal academic decision separate from Publish Decision | Author cannot view internal status/notes |
 | AC-09 | Revision Required and resubmit | Version trail retained under same paper ID |

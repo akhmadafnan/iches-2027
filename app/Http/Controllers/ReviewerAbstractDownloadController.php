@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\PaperStatus;
 use App\Models\Paper;
 use App\Models\User;
+use App\Services\Reviewer\ReviewerPaperAccess;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
@@ -12,13 +12,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class ReviewerAbstractDownloadController
 {
-    public function __invoke(Paper $paper): StreamedResponse
+    public function __invoke(Paper $paper, ReviewerPaperAccess $access): StreamedResponse
     {
         Gate::authorize('review-papers');
 
         $reviewer = Auth::user();
         abort_unless($reviewer instanceof User, 403);
-        abort_unless($paper->status === PaperStatus::Submitted && $paper->owner_id !== $reviewer->id, 404);
+        abort_unless($access->canPreview($paper, $reviewer), 404);
 
         $path = $paper->abstract_pdf_path;
         $directory = "paper-abstracts/{$paper->owner_id}/{$paper->public_id}/";

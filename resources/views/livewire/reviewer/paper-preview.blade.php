@@ -4,7 +4,7 @@
         <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div class="min-w-0">
                 <h1 class="text-2xl font-semibold leading-tight sm:text-3xl">Paper preview</h1>
-                <p class="mt-2 text-sm leading-6 text-emerald-50/85">Read-only academic material. Opening this paper does not claim it.</p>
+                <p class="mt-2 text-sm leading-6 text-emerald-50/85">Read-only academic material with Paper ID instead of author identity. Opening this paper does not claim it.</p>
             </div>
             <div class="shrink-0 rounded-2xl border border-white/15 bg-white/10 px-4 py-3">
                 <p class="text-[11px] font-semibold uppercase tracking-widest text-emerald-100/80">Paper ID</p>
@@ -48,12 +48,58 @@
         <aside>
             <section class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 class="text-base font-semibold text-zinc-900 dark:text-white">Review workflow</h2>
-                <div class="mt-4 space-y-3">
-                    <div class="flex items-start gap-3"><div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950"><flux:icon.eye class="size-4" /></div><div><p class="text-sm font-semibold">Preview available</p><p class="mt-1 text-xs text-zinc-500">You can read the abstract and PDF.</p></div></div>
-                    <div class="flex items-start gap-3"><div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800"><flux:icon.hand-raised class="size-4" /></div><div><p class="text-sm font-semibold">Claim paper</p><p class="mt-1 text-xs text-zinc-500">Coming in REV-002; no assignment created yet.</p></div></div>
-                    <div class="flex items-start gap-3"><div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-500 dark:bg-zinc-800"><flux:icon.clipboard-document-check class="size-4" /></div><div><p class="text-sm font-semibold">Submit review</p><p class="mt-1 text-xs text-zinc-500">Coming in REV-003 after a valid claim.</p></div></div>
+                <ol class="mt-5 border-l-2 border-emerald-200 pl-4 dark:border-emerald-900" aria-label="Reviewer workflow timeline">
+                    <li class="relative pb-6">
+                        <span aria-hidden="true" class="absolute -left-[22px] top-1.5 size-3 rounded-full bg-emerald-500"></span>
+                        <p class="text-sm font-semibold">Paper submitted</p>
+                        <p class="mt-1 text-xs leading-5 text-zinc-500">{{ $paper->submitted_at ? $paper->submitted_at->timezone('Asia/Jakarta')->format('d M Y, H:i').' WIB' : 'Submission date unavailable' }}</p>
+                    </li>
+                    <li class="relative pb-6">
+                        <span aria-hidden="true" class="absolute -left-[22px] top-1.5 size-3 rounded-full {{ $claimedByMe ? 'bg-emerald-500' : 'bg-zinc-300 dark:bg-zinc-600' }}"></span>
+                        <p class="text-sm font-semibold">{{ $claimedByMe ? 'Claimed by you' : 'Claim paper' }}</p>
+                        <p class="mt-1 text-xs leading-5 text-zinc-500">
+                            {{ $claimedAt?->timezone('Asia/Jakarta')->format('d M Y, H:i') ?? 'Not claimed yet' }}{{ $claimedAt ? ' WIB' : '' }}
+                        </p>
+                    </li>
+                    <li class="relative pb-1">
+                        <span aria-hidden="true" class="absolute -left-[22px] top-1.5 size-3 rounded-full border-2 border-zinc-300 bg-white dark:border-zinc-600 dark:bg-zinc-900"></span>
+                        <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-300">Review submitted</p>
+                        <p class="mt-1 text-xs leading-5 text-zinc-500">Not yet available · REV-003</p>
+                    </li>
+                </ol>
+                <div class="mt-5 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                    @if ($canClaim)
+                        <flux:button type="button" variant="primary" icon="hand-raised" class="w-full" wire:click="askClaim">Claim this abstract</flux:button>
+                    @else
+                        <flux:badge color="emerald" size="sm">Assigned to you</flux:badge>
+                    @endif
+                    @error('claim')
+                        <p role="alert" class="mt-2 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                    @enderror
                 </div>
             </section>
         </aside>
     </div>
+
+    <flux:modal wire:model.self="claimModalOpen" class="md:w-[32rem]">
+        @if ($claimModalOpen)
+            <div class="space-y-5">
+                <div class="flex items-start gap-3">
+                    <div class="flex size-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"><flux:icon.hand-raised class="size-5" /></div>
+                    <div class="space-y-1">
+                        <flux:heading size="xl">Claim this abstract?</flux:heading>
+                        <flux:text size="sm">Paper ID: {{ $paper->reference }}</flux:text>
+                    </div>
+                </div>
+                <p class="text-sm leading-6 text-zinc-600 dark:text-zinc-300">You will become the only active reviewer assigned to this abstract. It will move to My Reviews. Claiming does not submit a review.</p>
+                @error('claim')
+                    <p role="alert" class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+                <div class="flex items-center justify-end gap-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+                    <flux:button type="button" variant="ghost" wire:click="cancelClaim">Cancel</flux:button>
+                    <flux:button type="button" variant="primary" icon="check" wire:click="confirmClaim" wire:loading.attr="disabled" wire:target="confirmClaim">Confirm claim</flux:button>
+                </div>
+            </div>
+        @endif
+    </flux:modal>
 </div>

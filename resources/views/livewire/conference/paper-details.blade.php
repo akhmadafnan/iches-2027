@@ -84,31 +84,26 @@
             <section
                 class="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 class="text-base font-semibold">Status timeline</h2>
-                <div class="mt-5 border-l-2 border-emerald-200 pl-4 dark:border-emerald-900">
-                    <div class="relative pb-6">
-                        <span class="absolute -left-[22px] top-1.5 size-3 rounded-full bg-emerald-500"></span>
-                        <p class="text-sm font-semibold">Draft created</p>
-                        <p class="mt-1 text-xs text-zinc-500">
-                            {{ $paper->created_at?->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</p>
-                    </div>
-                    @foreach ($paper->statusHistories as $event)
-                        <div class="relative pb-4">
-                            <span class="absolute -left-[22px] top-1.5 size-3 rounded-full bg-emerald-500"></span>
-                            <p class="text-sm font-semibold">
-                                {{ $event->event === 'submitted' ? 'Paper submitted' : ucfirst(str_replace('_', ' ', $event->event)) }}
+                <ol class="mt-5 border-l-2 border-emerald-200 pl-4 dark:border-emerald-900" aria-label="Paper activity history">
+                    @foreach ($activity as $event)
+                        <li class="relative pb-5 last:pb-1">
+                            <span aria-hidden="true" class="absolute -left-[22px] top-1.5 size-3 rounded-full bg-emerald-500"></span>
+                            <p class="text-sm font-semibold">{{ $event['label'] }}</p>
+                            <p class="mt-1 text-xs leading-5 text-zinc-500">
+                                @if ($event['detail'])
+                                    {{ $event['detail'] }} ·
+                                @endif
+                                {{ $event['occurred_at']->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB
                             </p>
-                            <p class="mt-1 text-xs text-zinc-500">Version {{ $event->submission_version }} ·
-                                {{ $event->occurred_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</p>
-                        </div>
+                        </li>
                     @endforeach
-                </div>
+                </ol>
                 @if ($paper->status->value === 'draft')
                     <flux:button size="sm" variant="outline" icon="pencil-square"
                         :href="route('papers.edit', $paper->public_id)" wire:navigate class="w-full">Edit draft
                     </flux:button>
                 @else
-                    <p class="mt-1 text-xs leading-5 text-zinc-500">Submission is locked for editing. The reviewer and
-                        decision workflow will follow in subsequent academic phases.</p>
+                    <p class="mt-3 text-xs leading-5 text-zinc-500">Editing is locked. Reviewer assignment and future published academic milestones will appear here when recorded; reviewer identities remain private.</p>
                 @endif
             </section>
         </aside>

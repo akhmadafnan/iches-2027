@@ -16,7 +16,7 @@ The existing papers entity contains THREE different identifiers:
 
 Laravel 13 supports native UUID v7 generation through HasUuids and Str::uuid7(). UUID v7 is time-ordered; IDs alone do not grant access.
 
-### Recommended forward policy (ARCH-001; pending owner final decision)
+### Forward policy (ARCH-001 applied to REV-002 on 21 November 2026)
 
 1. Preserve existing primary keys, links, owner relationships, real paper data and human Paper IDs. Do NOT convert their types in place under REV-001.
 2. For new independent academic business entities beginning REV-002 (e.g. paper review claims, review records), use UUID v7 primary keys via Laravel HasUuids. Relate them to existing users.id and papers.id using matching BIGINT foreignId columns; never point foreignUuid to a BIGINT column.
@@ -24,7 +24,7 @@ Laravel 13 supports native UUID v7 generation through HasUuids and Str::uuid7().
 4. If ALL existing critical primary keys must become UUID v7, create separate ARCH-002 migration work: full FK/external-reference inventory, backup, idempotent backfill with new UUID v7 columns, testing and dual read/writes, URL/file-path compatibility, rollback test, only then possible PK conversion. No destructive migration without explicit authorization.
 5. Do not change or regenerate the permanent human-readable Paper ID even after an ID architecture upgrade.
 
-REV-001 is read-only and adds no new database table; it can proceed safely while ARCH-001 is decided. **ARCH-001 choice required before REV-002 schema.**
+REV-001 remains read-only. REV-002 now applies this forward-key standard through an additive UUID v7 paper_review_claims table without converting any old paper/user primary key. ARCH-002 full legacy conversion remains an unapproved separate project.
 
 ## B. Emails required by PRD COM-01 / COM-02
 
@@ -59,14 +59,14 @@ Recommended staged delivery: MSG-000 = event inventory and recipient policy; MSG
 ## C. Reviewer UX contract for REV-001 / 002 / 003
 
 - **REV-001 (current):** single green reviewer workspace, live Available Papers count, filters for title/Paper ID and eight conference tracks, responsive paginated table, icon-only preview, read-only paper details and private PDF download. Exclude Drafts and the reviewer's own papers. Preview makes NO assignment.
-- **REV-002 (future):** add Confirm Claim to an eligible paper and My Reviews assigned list within the same workspace, DB-transactional claim with race protection, own-paper prohibition, duplicate protection and auditable release. Do NOT invent required reviewer count or number of slots; approve these rules before the claim migration.
+- **REV-002 (implemented, owner UAT pending):** single-reviewer exclusive self-claim: one active reviewer slot per submitted abstract. Available Papers and My Reviews tabs, Confirm Claim from list/preview, DB unique active_paper_id plus locked transaction, own-paper/coauthor denial. UUID v7 claim PK. Release fields prepared, but no Release UI/automatic expiration without an owner-approved policy. No separate cap per reviewer invented.
 - **REV-003 (future):** private review draft with comments and recommendation, Save Draft vs Confirm Submit Review, exactly the claiming reviewer authorized, submitted review history/read-only view. Recommendations never auto-publish academic decisions.
 
-Reviewer anonymity / double-blind rules are still NOT specified in this project's PRD. REV-001 minimizes personal account/author details on the page, but author-uploaded PDF may disclose identities. Do not claim double-blind until a formal anonymization policy and PDF process are decided.
+**Owner UI clarification 21 Nov 2026:** REV-002 continues the REV-001 preview approach: reviewer-facing screens show **Paper ID and academic content but never author name, email or affiliation**; reviewer identity is not displayed to the author in this phase. This is a presentation rule, not proof that the uploaded PDF is anonymized (the PDF may contain identifying text). One active reviewer per abstract removes inter-reviewer disagreements but does not inherently eliminate individual bias; REV-003 still needs consistent written criteria and DEC-001 retains decision authority.
 
 ## Decision gates
 
 - Owner REV-001 UAT PASS before code commit.
-- ARCH-001 UUID v7 strategy finalized before REV-002 adds new business tables.
+- ARCH-001 UUID v7 forward standard **applied** for REV-002 claim records; legacy PK conversion remains separate and unapproved.
 - Academic reviewer identity / reviewer count / claim-capacity policy finalized before production claim logic.
 - MSG recipient policy and SMTP + queue QA finalized before sending any non-auth email to participants.
