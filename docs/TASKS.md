@@ -1,6 +1,6 @@
 # IMPLEMENTATION TASK BACKLOG — ICHES 2027
 
-**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001 / ACAD-002 / ACAD-003 / ACAD-004 owner UAT PASS; REV-001 next (TODO); later tasks TODO
+**Version:** 1.0 | **Date:** 21 November 2026 | **Status:** FND-001..006 / ACAD-001..004 / REV-001 owner UAT PASS; ARCH-001 UUID v7 decision and MSG-001 email workflow planned; REV-002 next; later tasks TODO
 **Source:** [PRD](PRD.md) + [Master Blueprint](../MASTER-BLUEPRINT-ICHES-2027.md).  
 **Priority:** P0 = critical flow, P1 = essential follow-up, P2 = polish/post-event.  
 **Never treat TODO as implemented.** Code changes begin only when the owner instructs us to start coding.
@@ -28,11 +28,14 @@
 | **ACAD-002 [DONE — OWNER UAT PASS]** Draft paper, authors, ROR affiliations, stable IDs | AC-03 | FND-002, ACAD-001 | Paper Draft/ROR and OJS-style compact Add/Edit author modal owner UAT PASS; Cancel discards, corresponding and ordering retained, ROR verified. No Submit. |
 | **ACAD-003 [DONE — OWNER UAT PASS]** Abstract form and private PDF upload | AC-04 | ACAD-002 | OJS-style individual keyword tags, abstract text, local-private PDF upload/download/remove/replacement, validated files; 18 focused and 155 full tests PASS; Edge desktop/mobile 390px PASS; owner UAT PASS (21 Nov 2026); implementation commit `ccf1ba9`; no Submit. See [ACAD-003 evidence](ACAD-003-ABSTRACT-KEYWORDS-PRIVATE-PDF.md). |
 | **ACAD-004 [DONE — OWNER UAT PASS]** Submit action and version/status timeline | AC-04, AC-05, AC-10 | ACAD-003 | Icon-only Edit/Submit/View in My Submissions; Submit visible only after server-side persisted completeness; confirmation, atomic Draft→Submitted, owner-only read-only View, status/version history; no administrative screening; owner UAT PASS (21 Nov 2026), including final hero and abstract whitespace polish. [ACAD-004 evidence](ACAD-004-SUBMIT-STATUS-TIMELINE.md). |
-| REV-001 Reviewer available index and filters | AC-06 | ACAD-004, FND-004 | Submitted eligible paper visible; draft not |
-| REV-002 Atomic self-claim and conflict check | AC-06 | REV-001 | Own paper blocked; concurrent claim safe |
-| REV-003 Save/submit review and recommendation | AC-07 | REV-002 | Only claimant can edit, review history kept |
+| **REV-001 [DONE — OWNER UAT PASS]** Reviewer available index and filters | AC-06 | ACAD-004, FND-004 | Reviewer-only read-only Available Papers / preview / private PDF, title/ID search, eight track filters, pagination; Draft and own paper excluded; no claim yet. Owner UAT PASS (21 Nov 2026) with accepted directory and preview UI. See [REV-001 evidence](REV-001-REVIEWER-INDEX.md). |
+| **ARCH-001 [DECISION PENDING]** UUID v7 forward standard and legacy-key audit | Cross-cutting | REV-001 | [Architecture review](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md): preserve existing BIGINT/ULID/paper reference; use UUID v7 for new business tables if approved; ARCH-002 legacy migration separately scoped. Resolve before REV-002 schema. |
+| **MSG-001A [PLANNED BEFORE PUBLIC SUBMISSION]** Submitted email confirmation | COM-01, COM-02 | ACAD-004, recipient policy | Transactional after-commit, idempotent event/version, local Mail fake + queue failure tests; **NOT IMPLEMENTED**. See [email roadmap](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md). |
+| REV-002 Atomic self-claim and conflict check | AC-06 | REV-001, ARCH-001 | Own paper blocked; concurrent claim safe; apply approved UUID v7 schema decision; extend Reviewer Workspace rather than new unrelated UI |
+| REV-003 Save/submit review and recommendation | AC-07 | REV-002 | Only claimant can edit; Save Review Draft vs Submit Review separated, history and recommendation kept; no auto decision |
 | DEC-001 Internal academic decision | AC-08 | REV-003 | Authorized officer can decide; author sees nothing prematurely |
 | DEC-002 Explicit Publish Decision & tracking | AC-08, AC-10 | DEC-001 | Author notified by dashboard, status and history accurate |
+| **MSG-001B [PLANNED BEFORE DECISION RELEASE]** Published decision, revision, LoA email | COM-01, COM-02 | DEC-002 and document publication | No email on internal decision; publish-gated and after-commit with dedupe, privacy-safe links. **NOT IMPLEMENTED**. |
 | QA-001 P0 feature tests + browser user journey | ACC/AC/REV | All relevant P0 | Register→Submit→Review→Decision PASS or exact blocker listed |
 
 **Demo checkpoint (22 Nov 2026):** demonstrate the longest *fully working* P0 journey possible using real functions and clearly labeled demo users/data. **Not guaranteed production-ready**. Do not consume time on landing-page aesthetics before academic core works. QR prototype optional if time allows.
@@ -111,7 +114,7 @@
 | Task | PRD | Dependency | Acceptance / tangible output |
 |---|---|---|---|
 | DOC-002 Documents Center, certificates via PDF/link | DOC-01, DOC-03 | FND-003, SESS-003 | Only authorized/ready files visible, publish explicit |
-| MSG-001 Event-based email notifications and queue | COM-01, COM-02 | Core domains | Sends after transaction commit; failures reported |
+| **MSG-001 [PLANNED]** Event-based email notifications and queue | COM-01, COM-02 | Core domains | See [event, recipient and after-commit roadmap](ARCH-UUIDV7-EMAIL-REVIEWER-ROADMAP.md). Prioritize Submitted confirmation before public opening; Decision Published/LoA before decision release; verified finance/schedule/documents per feature launch. No academic emails sent yet. |
 | REP-001 Filterable exports: paper/users/programs/payment | FI-07, REP-01 | Domain data | Scoped report in CSV/Excel; no unfiltered PII leak |
 | REP-002 Attendance/service summary for organizer | REP-01 | QRS-006, PROG-003 | Per-program and per-service actual figures |
 | WEB-001 Decide public frontend with owner (HOLD) | WEB-01..05 | Separate discussion | Approved page map, content, imagery and visual direction |
