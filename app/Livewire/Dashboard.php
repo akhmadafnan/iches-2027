@@ -44,9 +44,9 @@ class Dashboard extends Component
 
         $nextStep = match ($intention) {
             RegistrationIntention::SubmitPaper => [
-                'title' => 'Prepare your abstract submission',
-                'description' => 'The abstract submission form and paper tracking will become available after the academic workflow is implemented.',
-                'module' => 'ACAD-002–004',
+                'title' => 'Start your paper draft',
+                'description' => 'You can now prepare a private paper draft, select one of eight academic tracks, and record the author list. Abstract text, PDF upload and final submission follow in the next phases.',
+                'module' => 'ACAD-002 / Draft available',
             ],
             RegistrationIntention::JoinConference => [
                 'title' => 'Prepare for conference participation',

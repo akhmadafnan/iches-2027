@@ -1,6 +1,6 @@
 # ACAD-001 — Conference Tracks Master Data
 
-**Status:** implemented and automated/browser-verified on 21 November 2026 (**105 full tests / 546 assertions PASS**, Pint 79 files, PHPStan no errors, frontend build PASS). **Owner UAT pending.**
+**Status:** implemented and automated/browser-verified on 21 November 2026 (**105 full tests / 546 assertions PASS**, Pint 79 files, PHPStan no errors, frontend build PASS). **Owner UAT PASS (21 November 2026).**
 **Official source:** `TOR ICHES 6 UNISYA 2027.docx`, **Section E.2, sub-themes (a–h)**.
 **Scope:** the International Conference program only; this task does not build papers, submissions, reviewers, or the public website.
 

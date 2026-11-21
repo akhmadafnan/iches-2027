@@ -44,6 +44,9 @@
             <flux:spacer />
 
             <flux:sidebar.nav>
+                <flux:sidebar.group :heading="__('My Academic Workspace')" class="grid">
+                    <flux:sidebar.item icon="document-text" :href="route('papers.index')" :current="request()->routeIs('papers.*')" wire:navigate>{{ __('My Submissions') }}</flux:sidebar.item>
+                </flux:sidebar.group>
                 <flux:sidebar.group :heading="__('My Account')" class="grid">
                     <flux:sidebar.item icon="user-circle" :href="route('profile.edit')" :current="request()->routeIs('profile.edit')" wire:navigate>
                         {{ __('My Profile') }}

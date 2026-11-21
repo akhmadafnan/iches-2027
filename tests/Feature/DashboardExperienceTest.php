@@ -28,9 +28,10 @@ class DashboardExperienceTest extends TestCase
             ->assertOk()
             ->assertSee('Participant Portal')
             ->assertSee('Submit a Paper')
-            ->assertSee('Prepare your abstract submission')
-            ->assertSee('Coming soon')
-            ->assertSee('Review my profile')
+            ->assertSee('Start your paper draft')
+            ->assertSee('Draft available')
+            ->assertSee('Start a paper draft')
+            ->assertSee(route('papers.create'), false)
             ->assertDontSee('Users & Access')
             ->assertDontSee('Reviewer Workspace')
             ->assertDontSee('Committee Workspace');

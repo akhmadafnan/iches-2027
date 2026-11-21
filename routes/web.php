@@ -4,6 +4,8 @@ use App\Livewire\Admin\ManageConferenceTracks;
 use App\Livewire\Admin\ManageEventSettings;
 use App\Livewire\Admin\ManagePrograms;
 use App\Livewire\Admin\ManageUsers;
+use App\Livewire\Conference\MyPapers;
+use App\Livewire\Conference\PaperEditor;
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +13,10 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified', 'profile.complete'])->group(function () {
     Route::livewire('dashboard', Dashboard::class)->name('dashboard');
+
+    Route::livewire('my/submissions', MyPapers::class)->name('papers.index');
+    Route::livewire('my/submissions/create', PaperEditor::class)->name('papers.create');
+    Route::livewire('my/submissions/{paper:public_id}/edit', PaperEditor::class)->name('papers.edit');
 
     Route::livewire('admin/programs', ManagePrograms::class)
         ->middleware('can:manage-programs')

@@ -65,6 +65,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(StaffAssignment::class);
     }
 
+    /** @return HasMany<Paper, $this> */
+    public function papers(): HasMany
+    {
+        return $this->hasMany(Paper::class, 'owner_id');
+    }
+
     public function hasGlobalDuty(StaffDuty $duty): bool
     {
         if ($duty->requiresScope()) {

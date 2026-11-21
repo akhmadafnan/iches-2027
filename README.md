@@ -3,9 +3,9 @@
 **The 6th International Conference on Humanity, Education, and Society (ICHES 2027)**  
 Universitas Islam Syarifuddin (UNISYA), Lumajang, Indonesia | **5–6 January 2027**
 
-This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Submission, enrollment, payments, QR and other operational workflows are not implemented yet; the five official program master records and event settings are now implemented.**
+This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit** foundation. Planned modules include the academic submission lifecycle, reviewer workflow, five ICHES programs, Co-Host and international package participation, manual payments, ID Cards, a personal QR, scanner services, hybrid parallel sessions and reporting. **Paper Drafts and Conference Track administration are now implemented; final abstract/PDF submission, reviewer workflows, enrollment, payments, QR and other operations remain future phases.**
 
-> **Current status (21 November 2026): FND-001 through FND-006 owner UAT PASS; ACAD-001 implemented and automated/browser-tested, awaiting owner UAT.** Laravel 13/Livewire 4, Herd HTTPS, Fortify account onboarding, role-based dashboards, five TOR program masters, Event Settings, seven Important Dates, and the eight official Conference Tracks are available. **Paper draft/submission (ACAD-002 onwards), reviews, participation enrollment, finance and QR are not yet implemented.** Public website design remains on HOLD.
+> **Current status (21 November 2026): FND-001 through FND-006 and ACAD-001 owner UAT PASS; ACAD-002 Draft Papers implemented and tested, owner UAT pending.** Laravel 13/Livewire 4, Herd HTTPS, Fortify onboarding, role dashboards, five programs, Event Settings, seven dates, eight TOR tracks, and owner-managed Draft paper metadata/coauthors with permanent references are available. **Abstract/PDF upload and submission (ACAD-003/004), review, enrollment, finance and QR are NOT yet available.** Public website design remains on HOLD.
 
 ## Start here
 
@@ -16,6 +16,7 @@ This repository now contains the **official Laravel 13 + Livewire 4 Starter Kit*
 | [Task Backlog](docs/TASKS.md) | Prioritized P0/P1/P2 tasks, dependencies and outcomes |
 | [FND-006 TOR Master Data Baseline](docs/FND-006-TOR-BASELINE.md) | Verbatim source verification, canonical program codes, dates and safeguards |
 | [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md) | Eight immutable-source TOR titles, track administration and UAT |
+| [ACAD-002 Paper Drafts](docs/ACAD-002-PAPER-DRAFTS.md) | Owner-managed Drafts, permanent IDs, metadata/coauthors, UAT and security |
 | [Working Rules](docs/WORKING-RULES.md) | Lightweight way of working, safety and Git |
 | [OOP Laravel/Livewire Standards](docs/OOP-LARAVEL-LIVEWIRE-STANDARDS.md) | Architecture, naming, actions, policies, testing |
 | [AI Agent Instructions](AGENTS.md) | Scope and quick guidance for AI coding assistants |
@@ -107,7 +108,7 @@ Four existing `@iches.id` demo accounts are **not** forced into onboarding. Thei
 6. Sign in as `user@iches.id`, `reviewer@iches.id`, or `committee@iches.id`: both Admin paths must yield 403, with Admin-only navigation hidden. New accounts still complete profile before entering dashboards.
 7. Review desktop and mobile layout. On narrow screens tables scroll **inside** their card; no horizontal overflow should appear across the entire document.
 
-**Automated verification:** **95 tests / 450 assertions PASS** (11 new FND-006 tests), Pint **74 files**, PHPStan no errors, Blade compilation and npm build PASS. MySQL migration `2026_11_20_000005` ran safely; re-running `EventMasterSeeder` retains **1 event, 5 programs, 7 milestones** and does not overwrite Admin modifications. **Manual owner UI/UAT remains to be confirmed**; no direct visual browser inspection is claimed for FND-006.
+**Automated verification:** **95 tests / 450 assertions PASS** (11 new FND-006 tests), Pint **74 files**, PHPStan no errors, Blade compilation and npm build PASS. MySQL migration `2026_11_20_000005` ran safely; re-running `EventMasterSeeder` retains **1 event, 5 programs, 7 milestones** and does not overwrite Admin modifications. **Owner UAT for FND-006 was reported PASS before ACAD-001.** Initial automated browser inspection of that earlier phase was not completed.
 
 ## UAT ACAD-001 — Conference Tracks (local only)
 
@@ -117,7 +118,19 @@ Four existing `@iches.id` demo accounts are **not** forced into onboarding. Thei
 4. Test invalid order or duplicated display name: changes must be rejected. The last remaining active track cannot be disabled.
 5. On mobile, horizontally scroll the table within its card. Sign in as `user@iches.id` and verify the Admin URL returns **403 Forbidden**.
 
-Source: [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md). The actual paper author track selector is a future **ACAD-003** feature; this phase supplies the safe active-track Eloquent query, not the paper submission form. **Verification:** 105 application tests / 546 assertions PASS; Laravel Pint 79 files PASS; PHPStan and npm build PASS; Edge desktop/mobile visual QA and role-based HTTP 403 checks PASS. **Owner UAT is pending.**
+Source: [ACAD-001 Conference Tracks](docs/ACAD-001-CONFERENCE-TRACKS.md). The active-track selector is now wired into **ACAD-002 Draft editor**, while abstract text/PDF uploading and final submission are still reserved for ACAD-003/004. **Verification:** 105 application tests / 546 assertions PASS; Laravel Pint 79 files PASS; PHPStan and npm build PASS; Edge desktop/mobile visual QA and role-based HTTP 403 checks PASS. **ACAD-001 owner UAT PASS.**
+
+## UAT ACAD-002 — Paper Drafts (local only)
+
+1. Log in at `https://iches-2027.test/login` as `user@iches.id` / `password` (local demo only), then open **My Submissions** or `https://iches-2027.test/my/submissions`.
+2. Click **New paper draft**. Enter a title, select one of the eight active TOR tracks and inspect your initial author data.
+3. Add/edit/remove and reorder coauthors, select a corresponding author, then **Save draft**. No Submit action or reviewer eligibility exists yet.
+4. Verify a permanent `ICH27-P...` ID in My Submissions. Reopen via **Edit draft**, change title/authors and save again; the paper ID must stay the same.
+5. Try a missing/invalid title, duplicate author emails or invalid author data; the form must reject them.
+6. Log in as another account; the other user's paper must not appear, and its private edit URL must return **404**.
+7. On a phone-sized window, verify the empty state and paper editor are readable without whole-page horizontal overflow.
+
+See [ACAD-002 implementation and full UAT checklist](docs/ACAD-002-PAPER-DRAFTS.md). **Verification:** full 119 tests / 652 assertions PASS, Pint 88 files, PHPStan no errors, Blade and npm build PASS. Edge desktop/mobile 390px PASS, add/remove coauthor functional, JS errors none. **Owner UAT pending.**
 
 ## Core application areas
 
